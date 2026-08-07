@@ -3,10 +3,13 @@ import { AuthState, UserProfile } from '@real-estate-erp/types';
 
 const initialState: AuthState = {
   user: null,
+  session: null,
   isAuthenticated: false,
   isLoading: true,
   token: null,
+  customClaims: null,
   error: null,
+  isRemembered: true,
 };
 
 export const authSlice = createSlice({

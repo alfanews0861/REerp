@@ -140,7 +140,8 @@ export abstract class BaseRepository<T extends BaseFirestoreModel> implements IB
     };
 
     const docRef = this.getDocRef(id);
-    await updateDoc(docRef, updateData);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await updateDoc(docRef, updateData as any);
 
     const updatedEntity = {
       ...existing,

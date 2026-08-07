@@ -16,9 +16,11 @@
     "@emotion/styled": "^11.11.5",
     "@mui/icons-material": "^5.16.7",
     "@mui/material": "^5.16.7",
+    "@real-estate-erp/firebase": "workspace:*",
     "@real-estate-erp/types": "workspace:*",
     "react": "^19.0.0-rc.0 || ^18.3.1",
-    "react-dom": "^19.0.0-rc.0 || ^18.3.1"
+    "react-dom": "^19.0.0-rc.0 || ^18.3.1",
+    "react-router-dom": "^6.26.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
@@ -27,6 +29,7 @@
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",
-    "react-dom": "^18.0.0 || ^19.0.0"
+    "react-dom": "^18.0.0 || ^19.0.0",
+    "react-router-dom": "^6.0.0 || ^7.0.0"
   }
 }

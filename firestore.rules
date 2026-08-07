@@ -15,8 +15,12 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.token.role == role;
     }
     
+    function isSuperAdmin() {
+      return hasRole('super_admin') || (isAuthenticated() && request.auth.token.admin == true);
+    }
+    
     function isAdmin() {
-      return hasRole('admin') || (isAuthenticated() && request.auth.token.admin == true);
+      return isSuperAdmin() || hasRole('director') || hasRole('branch_manager');
     }
     
     function isOwner(userId) {
@@ -27,16 +31,29 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.token.tenantId == tenantId;
     }
 
+    function hasPermission(category, action) {
+      return isAuthenticated() && (
+        (category + ':' + action) in request.auth.token.permissions ||
+        (category + ':*') in request.auth.token.permissions ||
+        '*:*' in request.auth.token.permissions
+      );
+    }
+
     // Baseline security fallback - deny all unhandled access
     match /{document=**} {
-      allow read, write: if isAdmin();
+      allow read, write: if isSuperAdmin();
     }
     
     // System Users collection baseline
     match /users/{userId} {
       allow read: if isAuthenticated();
-      allow create, update: if isAdmin() || isOwner(userId);
-      allow delete: if isAdmin();
+      allow create, update: if isSuperAdmin() || isOwner(userId);
+      allow delete: if isSuperAdmin();
+
+      // Multi-device sessions
+      match /sessions/{sessionId} {
+        allow read, write: if isOwner(userId) || isSuperAdmin();
+      }
     }
     
     // System Audit Logs - strictly immutable read-only for admins

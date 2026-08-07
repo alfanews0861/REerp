@@ -43,4 +43,6 @@ if (!admin.apps.length) {
 }
 __exportStar(require("./triggers/authTriggers"), exports);
 __exportStar(require("./triggers/scheduledTasks"), exports);
+__exportStar(require("./callables/setUserRole"), exports);
+__exportStar(require("./callables/syncCustomClaims"), exports);
 //# sourceMappingURL=index.js.map

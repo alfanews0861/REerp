@@ -1,6 +1,7 @@
 import { BaseEntity } from './common';
+import { UserRole } from './permissions';
 
-export type UserRole = 'super_admin' | 'admin' | 'marketing_manager' | 'sales_agent' | 'client';
+export type { UserRole };
 
 export type UserStatus = 'active' | 'inactive' | 'suspended' | 'pending';
 

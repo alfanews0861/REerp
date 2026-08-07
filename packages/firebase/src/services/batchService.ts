@@ -33,7 +33,8 @@ export class BatchService {
             batch.set(op.ref, op.data as T);
           }
         } else if (op.type === 'update' && op.data) {
-          batch.update(op.ref, op.data as Record<string, unknown>);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          batch.update(op.ref, op.data as any);
         } else if (op.type === 'delete') {
           batch.delete(op.ref);
         }

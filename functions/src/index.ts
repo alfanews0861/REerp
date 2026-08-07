@@ -7,3 +7,5 @@ if (!admin.apps.length) {
 
 export * from './triggers/authTriggers';
 export * from './triggers/scheduledTasks';
+export * from './callables/setUserRole';
+export * from './callables/syncCustomClaims';
