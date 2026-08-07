@@ -5,7 +5,6 @@ import {
 import { RuleEngine } from './RuleEngine';
 import { AssignmentEngine } from './AssignmentEngine';
 import { HistoryEngine } from './HistoryEngine';
-import { WorkflowAction, WorkflowTriggerType } from '@real-estate-crm/types';
 
 export class WorkflowExecutor {
   private definitionRepo: WorkflowDefinitionRepository;
@@ -22,7 +21,7 @@ export class WorkflowExecutor {
     this.historyEngine = new HistoryEngine();
   }
 
-  public async startWorkflow(definitionId: string, entityId: string, entityType: string, userId: string, context: Record<string, any>) {
+  public async startWorkflow(definitionId: string, entityId: string, entityType: string, userId: string, _context: Record<string, unknown>) {
     const definition = await this.definitionRepo.findById(definitionId);
     if (!definition) throw new Error('Workflow Definition not found');
 
@@ -54,7 +53,7 @@ export class WorkflowExecutor {
     return instance;
   }
 
-  public async triggerTransition(instanceId: string, targetStageId: string, userId: string, context: Record<string, any>) {
+  public async triggerTransition(instanceId: string, targetStageId: string, userId: string, context: Record<string, unknown>) {
     const instance = await this.instanceRepo.findById(instanceId);
     if (!instance) throw new Error('Instance not found');
 

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+// import { z } from 'zod';
 import { BaseEntity } from './common';
 
 export type WorkflowType = 
@@ -55,12 +55,12 @@ export type WorkflowConditionOperator =
 export interface WorkflowCondition {
   field: WorkflowConditionField;
   operator: WorkflowConditionOperator;
-  value: any;
+  value: unknown;
 }
 
 export interface WorkflowAction {
   type: WorkflowActionType;
-  payload: Record<string, any>;
+  payload: Record<string, unknown>;
 }
 
 export interface WorkflowRule {
@@ -132,7 +132,7 @@ export interface WorkflowHistory extends BaseEntity {
   triggerType: WorkflowTriggerType;
   actionTaken?: WorkflowActionType;
   comment?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   isActive: boolean;
   isDeleted: boolean;
   version: number;
@@ -160,6 +160,7 @@ export interface ApprovalStep {
 }
 
 // Zod Schemas
+/*
 export const workflowConditionSchema = z.object({
   field: z.enum([
     'ROLE', 'DEPARTMENT', 'BRANCH', 'PROJECT', 'LEAD_SCORE', 
@@ -202,3 +203,4 @@ export const workflowTransitionSchema = z.object({
   rules: z.array(workflowRuleSchema).optional(),
   requireComment: z.boolean().optional(),
 });
+*/

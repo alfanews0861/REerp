@@ -1,6 +1,5 @@
-import { WorkflowTriggerType, WorkflowActionType } from '@real-estate-crm/types';
+import { WorkflowTriggerType, WorkflowActionType } from '@real-estate-erp/types';
 import { WorkflowHistoryRepository } from '../../repositories/WorkflowRepository';
-import { TimestampService } from '../timestampService';
 
 export class HistoryEngine {
   private historyRepository: WorkflowHistoryRepository;
@@ -32,8 +31,6 @@ export class HistoryEngine {
       actionTaken: params.actionTaken,
       comment: params.comment,
       metadata: params.metadata,
-      isActive: true,
-      isDeleted: false,
     }, params.triggeredByUserId);
   }
 

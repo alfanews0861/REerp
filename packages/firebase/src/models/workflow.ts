@@ -6,7 +6,7 @@ import {
   WorkflowAssignment,
   WorkflowTriggerType,
   WorkflowActionType,
-} from '@real-estate-crm/types';
+} from '@real-estate-erp/types';
 
 export interface WorkflowDefinitionModel extends BaseFirestoreModel {
   name: string;
@@ -35,7 +35,7 @@ export interface WorkflowHistoryModel extends BaseFirestoreModel {
   triggerType: WorkflowTriggerType;
   actionTaken?: WorkflowActionType;
   comment?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface WorkflowCommentModel extends BaseFirestoreModel {

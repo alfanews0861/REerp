@@ -1,7 +1,7 @@
-import { WorkflowCondition, WorkflowConditionField, WorkflowConditionOperator } from '@real-estate-crm/types';
+import { WorkflowCondition, WorkflowConditionField } from '@real-estate-erp/types';
 
 export class RuleEngine {
-  public evaluateConditions(conditions: WorkflowCondition[], context: Record<string, any>): boolean {
+  public evaluateConditions(conditions: WorkflowCondition[], context: Record<string, unknown>): boolean {
     if (!conditions || conditions.length === 0) {
       return true; // No conditions means it evaluates to true
     }
@@ -9,7 +9,7 @@ export class RuleEngine {
     return conditions.every(condition => this.evaluateCondition(condition, context));
   }
 
-  private evaluateCondition(condition: WorkflowCondition, context: Record<string, any>): boolean {
+  private evaluateCondition(condition: WorkflowCondition, context: Record<string, unknown>): boolean {
     const { field, operator, value } = condition;
     const contextValue = this.extractValueFromContext(field, context);
 
@@ -23,16 +23,16 @@ export class RuleEngine {
       case 'NOT_EQUALS':
         return contextValue !== value;
       case 'GREATER_THAN':
-        return contextValue > value;
+        return contextValue != null && (contextValue as any) > (value as any);
       case 'LESS_THAN':
-        return contextValue < value;
+        return contextValue != null && (contextValue as any) < (value as any);
       case 'IN':
         return Array.isArray(value) && value.includes(contextValue);
       case 'NOT_IN':
         return Array.isArray(value) && !value.includes(contextValue);
       case 'CONTAINS':
         if (typeof contextValue === 'string') {
-          return contextValue.includes(value);
+          return contextValue.includes(value as string);
         } else if (Array.isArray(contextValue)) {
           return contextValue.includes(value);
         }
@@ -42,7 +42,7 @@ export class RuleEngine {
     }
   }
 
-  private extractValueFromContext(field: WorkflowConditionField, context: Record<string, any>): any {
+  private extractValueFromContext(field: WorkflowConditionField, context: Record<string, unknown>): unknown {
     // Map the WorkflowConditionField to the actual context key
     const fieldMapping: Record<WorkflowConditionField, string> = {
       'ROLE': 'user.roleId',
@@ -61,7 +61,7 @@ export class RuleEngine {
     return this.resolvePath(path, context);
   }
 
-  private resolvePath(path: string, obj: Record<string, any>): any {
-    return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+  private resolvePath(path: string, obj: Record<string, unknown>): unknown {
+    return path.split('.').reduce((acc: any, part: string) => acc && acc[part], obj);
   }
 }

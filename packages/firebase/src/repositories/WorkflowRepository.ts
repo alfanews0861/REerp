@@ -6,7 +6,7 @@ import {
   WorkflowCommentModel,
 } from '../models/workflow';
 import { FIRESTORE_COLLECTIONS } from '../constants/collections';
-import { TimestampService } from '../services/timestampService';
+
 
 export class WorkflowDefinitionRepository extends BaseRepository<WorkflowDefinitionModel> {
   constructor() {
@@ -26,15 +26,15 @@ export class WorkflowHistoryRepository extends BaseRepository<WorkflowHistoryMod
   }
 
   // Workflow history is immutable, override update and delete methods
-  public override async update(id: string, input: any, userId: string): Promise<WorkflowHistoryModel> {
+  public override async update(_id: string, _input: any, _userId: string): Promise<WorkflowHistoryModel> {
     throw new Error('Workflow history is immutable and cannot be updated.');
   }
 
-  public override async softDelete(id: string, userId: string): Promise<boolean> {
+  public override async softDelete(_id: string, _userId: string): Promise<boolean> {
     throw new Error('Workflow history is immutable and cannot be deleted.');
   }
 
-  public override async hardDelete(id: string, userId: string): Promise<boolean> {
+  public override async hardDelete(_id: string, _userId: string): Promise<boolean> {
     throw new Error('Workflow history is immutable and cannot be deleted.');
   }
 }

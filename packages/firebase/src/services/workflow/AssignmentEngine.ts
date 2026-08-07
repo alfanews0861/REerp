@@ -1,4 +1,4 @@
-import { WorkflowAction, WorkflowAssignment } from '@real-estate-crm/types';
+import { WorkflowAction, WorkflowAssignment } from '@real-estate-erp/types';
 import { TimestampService } from '../timestampService';
 
 export class AssignmentEngine {
@@ -8,13 +8,13 @@ export class AssignmentEngine {
     for (const action of actions) {
       if (action.type === 'ASSIGN_USER') {
         assignments.push({
-          userId: action.payload.userId,
+          userId: action.payload.userId as string,
           assignedAt: TimestampService.nowIso(),
           assignedBy: userId,
         });
       } else if (action.type === 'ASSIGN_TEAM') {
         assignments.push({
-          teamId: action.payload.teamId,
+          teamId: action.payload.teamId as string,
           assignedAt: TimestampService.nowIso(),
           assignedBy: userId,
         });

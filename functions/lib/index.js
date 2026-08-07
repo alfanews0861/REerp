@@ -49,4 +49,5 @@ __exportStar(require("./triggers/onCompanyCreated"), exports);
 __exportStar(require("./triggers/onBranchCreated"), exports);
 __exportStar(require("./triggers/onDepartmentCreated"), exports);
 __exportStar(require("./triggers/onTeamUpdated"), exports);
+__exportStar(require("./triggers/projectTriggers"), exports);
 //# sourceMappingURL=index.js.map
