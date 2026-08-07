@@ -14,3 +14,4 @@ export * from './vehicle';
 export * from './zod-schemas';
 export * from './person';
 export * from './attendance';
+export * from './interaction';

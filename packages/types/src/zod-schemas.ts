@@ -207,3 +207,64 @@ export const personSchema = z.object({
 });
 
 export type PersonSchemaType = z.infer<typeof personSchema>;
+
+export const interactionAttachmentSchema = z.object({
+  type: z.enum(['PHOTO', 'VIDEO', 'PDF', 'VOICE_NOTE', 'DOCUMENT']),
+  url: z.string().url(),
+  name: z.string(),
+  sizeBytes: z.number().optional(),
+});
+
+export const interactionMeetingDetailsSchema = z.object({
+  location: z.string().optional(),
+  gpsCoordinates: z.object({
+    latitude: z.number(),
+    longitude: z.number(),
+  }).optional(),
+  checkInTime: z.string().optional(),
+  checkOutTime: z.string().optional(),
+  participants: z.array(z.string()).default([]),
+  minutes: z.string().optional(),
+});
+
+export const interactionTaskDetailsSchema = z.object({
+  assignedTo: z.string().min(1),
+  dueDate: z.string(),
+  reminderTime: z.string().optional(),
+  completionPercentage: z.number().min(0).max(100).optional(),
+});
+
+export const interactionReminderDetailsSchema = z.object({
+  pushNotification: z.boolean().default(false),
+  sms: z.boolean().default(false),
+  whatsappReady: z.boolean().default(false),
+  emailReady: z.boolean().default(false),
+});
+
+export const interactionSchema = z.object({
+  personId: z.string().min(1, 'Person ID is required'),
+  type: z.enum([
+    'PHONE_CALL', 'INCOMING_CALL', 'OUTGOING_CALL', 'WHATSAPP', 'SMS', 'EMAIL', 
+    'MEETING', 'VIDEO_MEETING', 'OFFICE_VISIT', 'SITE_VISIT', 'NOTE', 'TASK', 
+    'REMINDER', 'FOLLOW_UP', 'DOCUMENT_SHARED', 'QUOTATION_SHARED', 'BROCHURE_SHARED'
+  ]),
+  projectId: z.string().optional(),
+  employeeId: z.string().optional(),
+  branchId: z.string().optional(),
+  date: z.string().min(1, 'Date is required'),
+  time: z.string().optional(),
+  durationSeconds: z.number().optional(),
+  status: z.enum(['SCHEDULED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'NO_SHOW', 'PENDING']),
+  priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']),
+  outcome: z.enum(['SUCCESS', 'NEUTRAL', 'FAILURE', 'ESCALATED', 'REQUIRES_FOLLOW_UP']).optional(),
+  callResult: z.enum(['CONNECTED', 'BUSY', 'NO_ANSWER', 'SWITCHED_OFF', 'WRONG_NUMBER', 'INTERESTED', 'NOT_INTERESTED', 'CALL_BACK']).optional(),
+  notes: z.string().optional(),
+  nextAction: z.string().optional(),
+  nextFollowUpDate: z.string().optional(),
+  attachments: z.array(interactionAttachmentSchema).optional(),
+  meetingDetails: interactionMeetingDetailsSchema.optional(),
+  taskDetails: interactionTaskDetailsSchema.optional(),
+  reminderDetails: interactionReminderDetailsSchema.optional(),
+});
+
+export type InteractionSchemaType = z.infer<typeof interactionSchema>;

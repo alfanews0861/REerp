@@ -88,4 +88,5 @@ export const collections = {
   auditLogs: () => getTypedCollectionRef(FIRESTORE_COLLECTIONS.AUDIT_LOGS),
   aiSuggestions: () => getTypedCollectionRef(FIRESTORE_COLLECTIONS.AI_SUGGESTIONS),
   persons: () => getTypedCollectionRef(FIRESTORE_COLLECTIONS.PERSONS),
+  interactions: () => getTypedCollectionRef(FIRESTORE_COLLECTIONS.INTERACTIONS),
 };

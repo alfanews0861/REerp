@@ -37,6 +37,7 @@ export const FIRESTORE_COLLECTIONS = {
   AUDIT_LOGS: 'audit_logs',
   AI_SUGGESTIONS: 'ai_suggestions',
   PERSONS: 'persons',
+  INTERACTIONS: 'interactions',
 } as const;
 
 export type CollectionName = (typeof FIRESTORE_COLLECTIONS)[keyof typeof FIRESTORE_COLLECTIONS];
