@@ -2,46 +2,7 @@ import { z } from 'zod';
 import { baseFirestoreModelSchema, baseCreateInputSchema } from './base';
 
 // Organization Schemas
-export const companySchema = baseFirestoreModelSchema.extend({
-  name: z.string().min(1),
-  code: z.string().min(1),
-  email: z.string().email(),
-  phone: z.string().min(1),
-  address: z.string().min(1),
-  taxId: z.string().optional(),
-  logoUrl: z.string().url().optional(),
-  website: z.string().url().optional(),
-  status: z.enum(['active', 'inactive', 'suspended']),
-  settings: z.record(z.unknown()).optional(),
-});
-export const createCompanySchema = baseCreateInputSchema.merge(companySchema.omit({
-  id: true, createdAt: true, updatedAt: true, version: true,
-}));
 
-export const branchSchema = baseFirestoreModelSchema.extend({
-  companyId: z.string().min(1),
-  name: z.string().min(1),
-  code: z.string().min(1),
-  address: z.string().min(1),
-  managerId: z.string().optional(),
-  phone: z.string().min(1),
-  email: z.string().email(),
-});
-export const createBranchSchema = baseCreateInputSchema.merge(branchSchema.omit({
-  id: true, createdAt: true, updatedAt: true, version: true,
-}));
-
-export const departmentSchema = baseFirestoreModelSchema.extend({
-  companyId: z.string().min(1),
-  branchId: z.string().optional(),
-  name: z.string().min(1),
-  code: z.string().min(1),
-  description: z.string().optional(),
-  managerId: z.string().optional(),
-});
-export const createDepartmentSchema = baseCreateInputSchema.merge(departmentSchema.omit({
-  id: true, createdAt: true, updatedAt: true, version: true,
-}));
 
 export const roleSchema = baseFirestoreModelSchema.extend({
   companyId: z.string().min(1),
@@ -100,86 +61,6 @@ export const employeeSchema = baseFirestoreModelSchema.extend({
   }).optional(),
 });
 export const createEmployeeSchema = baseCreateInputSchema.merge(employeeSchema.omit({
-  id: true, createdAt: true, updatedAt: true, version: true,
-}));
-
-// Real Estate Schemas
-export const projectSchema = baseFirestoreModelSchema.extend({
-  companyId: z.string().min(1),
-  branchId: z.string().min(1),
-  name: z.string().min(1),
-  code: z.string().min(1),
-  description: z.string().optional(),
-  location: z.object({
-    address: z.string().min(1),
-    city: z.string().min(1),
-    state: z.string().min(1),
-    pincode: z.string().min(1),
-    latitude: z.number().optional(),
-    longitude: z.number().optional(),
-  }),
-  type: z.enum(['residential', 'commercial', 'mixed_use', 'plotted']),
-  status: z.enum(['planning', 'active', 'completed', 'on_hold']),
-  totalArea: z.number().positive(),
-  totalBlocks: z.number().int().nonnegative(),
-  totalPlots: z.number().int().nonnegative(),
-  launchDate: z.string().optional(),
-  completionDate: z.string().optional(),
-  amenities: z.array(z.string()),
-});
-export const createProjectSchema = baseCreateInputSchema.merge(projectSchema.omit({
-  id: true, createdAt: true, updatedAt: true, version: true,
-}));
-
-export const layoutSchema = baseFirestoreModelSchema.extend({
-  projectId: z.string().min(1),
-  name: z.string().min(1),
-  layoutCode: z.string().min(1),
-  mapUrl: z.string().url().optional(),
-  layoutImage: z.string().optional(),
-  totalPlots: z.number().int().nonnegative(),
-  status: z.enum(['draft', 'approved', 'active', 'archived']),
-  specifications: z.record(z.unknown()).optional(),
-});
-export const createLayoutSchema = baseCreateInputSchema.merge(layoutSchema.omit({
-  id: true, createdAt: true, updatedAt: true, version: true,
-}));
-
-export const blockSchema = baseFirestoreModelSchema.extend({
-  projectId: z.string().min(1),
-  layoutId: z.string().min(1),
-  name: z.string().min(1),
-  code: z.string().min(1),
-  totalPlots: z.number().int().nonnegative(),
-  facingDirection: z.enum(['east', 'west', 'north', 'south', 'north_east', 'north_west', 'south_east', 'south_west']).optional(),
-  notes: z.string().optional(),
-});
-export const createBlockSchema = baseCreateInputSchema.merge(blockSchema.omit({
-  id: true, createdAt: true, updatedAt: true, version: true,
-}));
-
-export const plotSchema = baseFirestoreModelSchema.extend({
-  projectId: z.string().min(1),
-  layoutId: z.string().min(1),
-  blockId: z.string().min(1),
-  plotNumber: z.string().min(1),
-  facing: z.enum(['east', 'west', 'north', 'south', 'north_east', 'north_west', 'south_east', 'south_west']),
-  squareFeet: z.number().positive(),
-  sqYards: z.number().positive(),
-  pricePerSqFt: z.number().positive(),
-  totalPrice: z.number().positive(),
-  status: z.enum(['available', 'booked', 'reserved', 'sold', 'blocked']),
-  dimensions: z.object({
-    length: z.number().positive(),
-    width: z.number().positive(),
-  }).optional(),
-  cornerPlot: z.boolean(),
-  eastBoundary: z.string().optional(),
-  westBoundary: z.string().optional(),
-  northBoundary: z.string().optional(),
-  southBoundary: z.string().optional(),
-});
-export const createPlotSchema = baseCreateInputSchema.merge(plotSchema.omit({
   id: true, createdAt: true, updatedAt: true, version: true,
 }));
 

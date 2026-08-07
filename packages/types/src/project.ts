@@ -1,80 +1,122 @@
+export type ProjectType = 'RESIDENTIAL' | 'COMMERCIAL' | 'VILLA' | 'FARM_LAND' | 'APARTMENT' | 'MIXED_USE';
+export type ProjectStatus = 'PLANNING' | 'ACTIVE' | 'ON_HOLD' | 'COMPLETED' | 'SOLD_OUT';
 export type PlotStatus = 'AVAILABLE' | 'HOLD' | 'BOOKED' | 'REGISTERED' | 'BLOCKED';
 export type PlotFacing = 'EAST' | 'WEST' | 'NORTH' | 'SOUTH' | 'NORTH_EAST' | 'NORTH_WEST' | 'SOUTH_EAST' | 'SOUTH_WEST';
-export type PlotType = 'RESIDENTIAL' | 'COMMERCIAL' | 'VILLA' | 'FARM_HOUSE' | 'CORNER_PLOT';
+export type AreaUnit = 'SQ_FT' | 'SQ_YARDS' | 'ACRES' | 'HECTARES' | 'GUNTAS';
 
-export interface PlotCoordinates {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+export interface LocationDetails {
+  country: string;
+  state: string;
+  district: string;
+  mandal: string;
+  village: string;
+  surveyNumbers: string[];
+  googleMapsUrl?: string;
+  latitude?: number;
+  longitude?: number;
+  polygonBoundaries?: { lat: number; lng: number }[];
 }
 
-export interface PlotItem {
-  id: string;
-  projectId: string;
-  projectName: string;
-  plotNumber: string;
-  surveyNumber?: string;
-  sectorBlock?: string;
-  sizeSqFt: number;
-  sizeSqYards: number;
-  dimensionsFeet: string; // e.g. "30x40"
-  facing: PlotFacing;
-  plotType: PlotType;
-  basePricePerSqFt: number;
-  plcCharges: number; // Preferential Location Charges
-  cornerCharges: number;
-  totalPrice: number;
-  status: PlotStatus;
-  heldByUserId?: string;
-  heldUntil?: string; // ISO string
-  bookedByCustomerName?: string;
-  bookedByCustomerId?: string;
-  coordinates?: PlotCoordinates;
-  notes?: string;
-  createdAt: string;
-  updatedAt: string;
+export interface ProjectMembers {
+  companyId: string;
+  branchId: string;
+  projectManagerId?: string;
+  marketingTeamIds: string[];
+  salesTeamIds: string[];
+  legalTeamIds: string[];
+  financeTeamIds: string[];
 }
 
-export interface ProjectPhase {
-  id: string;
-  phaseName: string;
-  totalPlots: number;
-  availablePlots: number;
-  bookedPlots: number;
-  launchDate: string;
-  completionDate?: string;
+export interface ProjectPricing {
+  basePrice: number;
+  launchOffer?: number;
+  currentPrice: number;
+  offerPrice?: number;
+  registrationCharges?: number;
+  maintenanceCharges?: number;
+}
+
+export interface Amenities {
+  hasRoads: boolean;
+  hasElectricity: boolean;
+  hasWater: boolean;
+  hasDrainage: boolean;
+  hasParks: boolean;
+  hasCompoundWall: boolean;
+  hasStreetLights: boolean;
+  hasClubHouse: boolean;
+  hasTemple: boolean;
+}
+
+export interface ProjectMedia {
+  photos: string[];
+  videos: string[];
+  droneImages: string[];
+  images360: string[];
+  brochurePdf?: string;
+  masterPlanPdf?: string;
 }
 
 export interface Project {
   id: string;
   name: string;
-  code: string; // Short code e.g. "GPR-01"
-  location: string;
-  city: string;
-  state: string;
-  zipCode?: string;
-  geoBounds?: {
-    latitude: number;
-    longitude: number;
-    radiusMeters: number;
-  };
-  totalAreaAcres: number;
+  code: string;
+  projectType: ProjectType;
+  status: ProjectStatus;
+  location: LocationDetails;
+  members: ProjectMembers;
+  pricing: ProjectPricing;
+  amenities: Amenities;
+  media: ProjectMedia;
+  totalArea: number;
+  areaUnit: AreaUnit;
+  totalLayoutsCount: number;
+  totalBlocksCount: number;
   totalPlotsCount: number;
-  availablePlotsCount: number;
-  bookedPlotsCount: number;
-  registeredPlotsCount: number;
-  approvalDetails: {
-    dtcpNumber?: string;
-    reraId?: string;
-    hmdaNumber?: string;
-    isApproved: boolean;
-  };
-  amenities: string[];
-  phases: ProjectPhase[];
-  layoutMapUrl?: string;
-  brochureUrl?: string;
-  status: 'UPCOMING' | 'ACTIVE' | 'SOLD_OUT' | 'COMPLETED';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Layout {
+  id: string;
+  projectId: string;
+  name: string;
+  code: string;
+  totalBlocksCount: number;
+  totalPlotsCount: number;
+  mapUrl?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Block {
+  id: string;
+  projectId: string;
+  layoutId: string;
+  name: string;
+  code: string;
+  totalPlotsCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Plot {
+  id: string;
+  projectId: string;
+  layoutId: string;
+  blockId: string;
+  plotNumber: string;
+  facing: PlotFacing;
+  length: number;
+  width: number;
+  area: number;
+  areaUnit: AreaUnit;
+  isCornerPlot: boolean;
+  roadWidth: number;
+  price: number;
+  status: PlotStatus;
+  isAvailable: boolean;
+  gpsPoint?: { lat: number; lng: number };
   createdAt: string;
   updatedAt: string;
 }

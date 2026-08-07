@@ -45,4 +45,8 @@ __exportStar(require("./triggers/authTriggers"), exports);
 __exportStar(require("./triggers/scheduledTasks"), exports);
 __exportStar(require("./callables/setUserRole"), exports);
 __exportStar(require("./callables/syncCustomClaims"), exports);
+__exportStar(require("./triggers/onCompanyCreated"), exports);
+__exportStar(require("./triggers/onBranchCreated"), exports);
+__exportStar(require("./triggers/onDepartmentCreated"), exports);
+__exportStar(require("./triggers/onTeamUpdated"), exports);
 //# sourceMappingURL=index.js.map

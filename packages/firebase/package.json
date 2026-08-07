@@ -9,6 +9,7 @@
     "build": "tsc --build",
     "type-check": "tsc --noEmit",
     "lint": "eslint src",
+    "test": "vitest run",
     "clean": "rimraf dist"
   },
   "dependencies": {

@@ -14,6 +14,11 @@ export type UserRole =
 export type PermissionCategory =
   | 'company'
   | 'branch'
+  | 'department'
+  | 'designation'
+  | 'team'
+  | 'business_unit'
+  | 'organization_settings'
   | 'employee'
   | 'attendance'
   | 'campaign'

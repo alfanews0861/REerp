@@ -1,38 +1,41 @@
 import { BaseFirestoreModel } from './base';
+import {
+  ProjectType,
+  ProjectStatus,
+  LocationDetails,
+  ProjectMembers,
+  ProjectPricing,
+  Amenities,
+  ProjectMedia,
+  AreaUnit,
+  PlotFacing,
+  PlotStatus
+} from '@real-estate-erp/types';
 
 export interface ProjectModel extends BaseFirestoreModel {
-  companyId: string;
-  branchId: string;
   name: string;
   code: string;
-  description?: string;
-  location: {
-    address: string;
-    city: string;
-    state: string;
-    pincode: string;
-    latitude?: number;
-    longitude?: number;
-  };
-  type: 'residential' | 'commercial' | 'mixed_use' | 'plotted';
-  status: 'planning' | 'active' | 'completed' | 'on_hold';
-  totalArea: number; // in sq ft or acres
-  totalBlocks: number;
-  totalPlots: number;
-  launchDate?: string;
-  completionDate?: string;
-  amenities: string[];
+  projectType: ProjectType;
+  status: ProjectStatus;
+  location: LocationDetails;
+  members: ProjectMembers;
+  pricing: ProjectPricing;
+  amenities: Amenities;
+  media: ProjectMedia;
+  totalArea: number;
+  areaUnit: AreaUnit;
+  totalLayoutsCount: number;
+  totalBlocksCount: number;
+  totalPlotsCount: number;
 }
 
 export interface LayoutModel extends BaseFirestoreModel {
   projectId: string;
   name: string;
-  layoutCode: string;
+  code: string;
+  totalBlocksCount: number;
+  totalPlotsCount: number;
   mapUrl?: string;
-  layoutImage?: string;
-  totalPlots: number;
-  status: 'draft' | 'approved' | 'active' | 'archived';
-  specifications?: Record<string, unknown>;
 }
 
 export interface BlockModel extends BaseFirestoreModel {
@@ -40,9 +43,7 @@ export interface BlockModel extends BaseFirestoreModel {
   layoutId: string;
   name: string;
   code: string;
-  totalPlots: number;
-  facingDirection?: 'east' | 'west' | 'north' | 'south' | 'north_east' | 'north_west' | 'south_east' | 'south_west';
-  notes?: string;
+  totalPlotsCount: number;
 }
 
 export interface PlotModel extends BaseFirestoreModel {
@@ -50,19 +51,15 @@ export interface PlotModel extends BaseFirestoreModel {
   layoutId: string;
   blockId: string;
   plotNumber: string;
-  facing: 'east' | 'west' | 'north' | 'south' | 'north_east' | 'north_west' | 'south_east' | 'south_west';
-  squareFeet: number;
-  sqYards: number;
-  pricePerSqFt: number;
-  totalPrice: number;
-  status: 'available' | 'booked' | 'reserved' | 'sold' | 'blocked';
-  dimensions?: {
-    length: number;
-    width: number;
-  };
-  cornerPlot: boolean;
-  eastBoundary?: string;
-  westBoundary?: string;
-  northBoundary?: string;
-  southBoundary?: string;
+  facing: PlotFacing;
+  length: number;
+  width: number;
+  area: number;
+  areaUnit: AreaUnit;
+  isCornerPlot: boolean;
+  roadWidth: number;
+  price: number;
+  status: PlotStatus;
+  isAvailable: boolean;
+  gpsPoint?: { lat: number; lng: number };
 }

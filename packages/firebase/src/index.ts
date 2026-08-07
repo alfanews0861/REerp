@@ -16,3 +16,4 @@ export * from './converters';
 export * from './collections';
 export * from './services';
 export * from './repositories';
+export * from './organization';

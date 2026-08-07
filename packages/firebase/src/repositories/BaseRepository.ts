@@ -98,6 +98,7 @@ export abstract class BaseRepository<T extends BaseFirestoreModel> implements IB
     const docRef = input.id ? this.getDocRef(input.id) : doc(this.collectionRef);
     const id = docRef.id;
 
+    const inputAny = input as any;
     const fullData = {
       ...input,
       id,
@@ -105,7 +106,7 @@ export abstract class BaseRepository<T extends BaseFirestoreModel> implements IB
       updatedAt: input.updatedAt || now,
       createdBy: userId,
       updatedBy: userId,
-      isActive: input.isActive ?? true,
+      isActive: inputAny.isActive ?? true,
       isDeleted: false,
       version: 1,
     } as unknown as T;

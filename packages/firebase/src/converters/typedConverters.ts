@@ -3,6 +3,10 @@ import {
   CompanyModel,
   BranchModel,
   DepartmentModel,
+  DesignationModel,
+  TeamModel,
+  OrganizationSettingsModel,
+  BusinessUnitModel,
   RoleModel,
   PermissionModel,
   UserModel,
@@ -38,6 +42,10 @@ import {
 export const companyConverter = createBaseConverter<CompanyModel>();
 export const branchConverter = createBaseConverter<BranchModel>();
 export const departmentConverter = createBaseConverter<DepartmentModel>();
+export const designationConverter = createBaseConverter<DesignationModel>();
+export const teamConverter = createBaseConverter<TeamModel>();
+export const organizationSettingsConverter = createBaseConverter<OrganizationSettingsModel>();
+export const businessUnitConverter = createBaseConverter<BusinessUnitModel>();
 export const roleConverter = createBaseConverter<RoleModel>();
 export const permissionConverter = createBaseConverter<PermissionModel>();
 export const userConverter = createBaseConverter<UserModel>();

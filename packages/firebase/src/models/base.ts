@@ -11,7 +11,7 @@ export interface BaseFirestoreModel {
 
 export type CreateModelInput<T extends BaseFirestoreModel> = Omit<
   T,
-  'id' | 'createdAt' | 'updatedAt' | 'version'
+  'id' | 'createdAt' | 'updatedAt' | 'version' | 'createdBy' | 'updatedBy' | 'isActive' | 'isDeleted'
 > & {
   id?: string;
   createdAt?: string;

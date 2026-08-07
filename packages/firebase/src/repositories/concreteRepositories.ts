@@ -1,17 +1,11 @@
 import { BaseRepository } from './BaseRepository';
 import { FIRESTORE_COLLECTIONS } from '../constants/collections';
 import {
-  CompanyModel,
-  BranchModel,
-  DepartmentModel,
   RoleModel,
   PermissionModel,
   UserModel,
   EmployeeModel,
-  ProjectModel,
-  LayoutModel,
-  BlockModel,
-  PlotModel,
+
   LeadSourceModel,
   LeadModel,
   LeadActivityModel,
@@ -36,17 +30,11 @@ import {
   AISuggestionModel,
 } from '../models';
 import {
-  companyConverter,
-  branchConverter,
-  departmentConverter,
   roleConverter,
   permissionConverter,
   userConverter,
   employeeConverter,
-  projectConverter,
-  layoutConverter,
-  blockConverter,
-  plotConverter,
+
   leadSourceConverter,
   leadConverter,
   leadActivityConverter,
@@ -71,23 +59,7 @@ import {
   aiSuggestionConverter,
 } from '../converters/typedConverters';
 
-export class CompanyRepository extends BaseRepository<CompanyModel> {
-  constructor() {
-    super(FIRESTORE_COLLECTIONS.COMPANIES, 'Company', companyConverter);
-  }
-}
 
-export class BranchRepository extends BaseRepository<BranchModel> {
-  constructor() {
-    super(FIRESTORE_COLLECTIONS.BRANCHES, 'Branch', branchConverter);
-  }
-}
-
-export class DepartmentRepository extends BaseRepository<DepartmentModel> {
-  constructor() {
-    super(FIRESTORE_COLLECTIONS.DEPARTMENTS, 'Department', departmentConverter);
-  }
-}
 
 export class RoleRepository extends BaseRepository<RoleModel> {
   constructor() {
@@ -113,29 +85,12 @@ export class EmployeeRepository extends BaseRepository<EmployeeModel> {
   }
 }
 
-export class ProjectRepository extends BaseRepository<ProjectModel> {
-  constructor() {
-    super(FIRESTORE_COLLECTIONS.PROJECTS, 'Project', projectConverter);
-  }
-}
-
-export class LayoutRepository extends BaseRepository<LayoutModel> {
-  constructor() {
-    super(FIRESTORE_COLLECTIONS.LAYOUTS, 'Layout', layoutConverter);
-  }
-}
-
-export class BlockRepository extends BaseRepository<BlockModel> {
-  constructor() {
-    super(FIRESTORE_COLLECTIONS.BLOCKS, 'Block', blockConverter);
-  }
-}
-
-export class PlotRepository extends BaseRepository<PlotModel> {
-  constructor() {
-    super(FIRESTORE_COLLECTIONS.PLOTS, 'Plot', plotConverter);
-  }
-}
+export {
+  ProjectRepository,
+  LayoutRepository,
+  BlockRepository,
+  PlotRepository,
+} from '../realestate/repositories';
 
 export class LeadSourceRepository extends BaseRepository<LeadSourceModel> {
   constructor() {
@@ -268,3 +223,11 @@ export class AISuggestionRepository extends BaseRepository<AISuggestionModel> {
     super(FIRESTORE_COLLECTIONS.AI_SUGGESTIONS, 'AISuggestion', aiSuggestionConverter);
   }
 }
+
+export {
+  DesignationRepository,
+  TeamRepository,
+  OrganizationSettingsRepository,
+  BusinessUnitRepository,
+} from '../organization/repositories';
+

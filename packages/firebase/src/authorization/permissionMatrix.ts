@@ -5,6 +5,11 @@ export const PERMISSION_MATRIX: PermissionMatrix = {
   director: [
     'company:*',
     'branch:*',
+    'department:*',
+    'designation:*',
+    'team:*',
+    'business_unit:*',
+    'organization_settings:*',
     'employee:*',
     'attendance:*',
     'campaign:*',
@@ -27,6 +32,10 @@ export const PERMISSION_MATRIX: PermissionMatrix = {
   branch_manager: [
     'branch:read',
     'branch:update',
+    'department:read',
+    'designation:read',
+    'team:read',
+    'team:update',
     'employee:read',
     'employee:update',
     'attendance:*',
