@@ -11,6 +11,7 @@ import { AppShell } from '../layouts/AppShell';
 
 // Lazy loading placeholder for all modules
 const Placeholder = lazy(() => import('../pages/PlaceholderPage'));
+const ExecutiveDashboard = lazy(() => import('../pages/dashboard/ExecutiveDashboard'));
 
 const LoadingFallback = () => (
   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', minHeight: '50vh' }}>
@@ -56,7 +57,7 @@ export const AppRoutes: FC = () => {
         <Route element={<PrivateRoute redirectTo="/login" />}>
           <Route element={<AppShell />}>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<Placeholder />} />
+            <Route path="/dashboard" element={<ExecutiveDashboard />} />
             
             {/* CRM */}
             <Route path="/crm/leads" element={<Placeholder />} />
