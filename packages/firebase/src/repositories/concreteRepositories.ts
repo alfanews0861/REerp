@@ -7,7 +7,6 @@ import {
   EmployeeModel,
 
   LeadSourceModel,
-  LeadModel,
   LeadActivityModel,
   FollowUpModel,
   CampaignModel,
@@ -36,7 +35,6 @@ import {
   employeeConverter,
 
   leadSourceConverter,
-  leadConverter,
   leadActivityConverter,
   followUpConverter,
   campaignConverter,
@@ -100,11 +98,7 @@ export class LeadSourceRepository extends BaseRepository<LeadSourceModel> {
   }
 }
 
-export class LeadRepository extends BaseRepository<LeadModel> {
-  constructor() {
-    super(FIRESTORE_COLLECTIONS.LEADS, 'Lead', leadConverter);
-  }
-}
+export { LeadRepository } from './LeadRepository';
 
 export class LeadActivityRepository extends BaseRepository<LeadActivityModel> {
   constructor() {

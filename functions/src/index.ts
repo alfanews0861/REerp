@@ -14,3 +14,4 @@ export * from './triggers/onBranchCreated';
 export * from './triggers/onDepartmentCreated';
 export * from './triggers/onTeamUpdated';
 export * from './triggers/projectTriggers';
+export * from './triggers/leadTriggers';

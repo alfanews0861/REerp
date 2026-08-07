@@ -32,23 +32,30 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const admin = __importStar(require("firebase-admin"));
-// Initialize Firebase Admin SDK
-if (!admin.apps.length) {
-    admin.initializeApp();
-}
-__exportStar(require("./triggers/authTriggers"), exports);
-__exportStar(require("./triggers/scheduledTasks"), exports);
-__exportStar(require("./callables/setUserRole"), exports);
-__exportStar(require("./callables/syncCustomClaims"), exports);
-__exportStar(require("./triggers/onCompanyCreated"), exports);
-__exportStar(require("./triggers/onBranchCreated"), exports);
-__exportStar(require("./triggers/onDepartmentCreated"), exports);
-__exportStar(require("./triggers/onTeamUpdated"), exports);
-__exportStar(require("./triggers/projectTriggers"), exports);
-__exportStar(require("./triggers/leadTriggers"), exports);
-//# sourceMappingURL=index.js.map
+exports.onLeadUpdated = exports.onLeadCreated = void 0;
+const functions = __importStar(require("firebase-functions"));
+exports.onLeadCreated = functions.firestore
+    .document('leads/{leadId}')
+    .onCreate(async (snap, context) => {
+    const leadData = snap.data();
+    const leadId = context.params['leadId'];
+    console.log(`Lead Created: ${leadId}`, leadData);
+    // Additional logic like push notifications, webhook integrations, etc.
+});
+exports.onLeadUpdated = functions.firestore
+    .document('leads/{leadId}')
+    .onUpdate(async (change, context) => {
+    const before = change.before.data();
+    const after = change.after.data();
+    const leadId = context.params['leadId'];
+    if (before.assignedToUserId !== after.assignedToUserId) {
+        console.log(`Lead Assigned: ${leadId} assigned to ${after.assignedToUserId}`);
+        // Notify new assignee
+    }
+    if (before.status !== 'qualified' && after.status === 'qualified') {
+        console.log(`Lead Qualified: ${leadId}`);
+        // Start qualification workflows
+    }
+});
+//# sourceMappingURL=leadTriggers.js.map
