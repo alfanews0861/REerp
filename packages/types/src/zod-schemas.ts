@@ -116,3 +116,94 @@ export const attendancePunchSchema = z.object({
 });
 
 export type AttendancePunchSchemaType = z.infer<typeof attendancePunchSchema>;
+
+export const personAddressSchema = z.object({
+  type: z.enum(['PERMANENT', 'CURRENT', 'OFFICE', 'OTHER']).optional(),
+  street: z.string().min(2, 'Street is required'),
+  city: z.string().min(2, 'City is required'),
+  state: z.string().min(2, 'State is required'),
+  zipCode: z.string().min(2, 'ZIP Code is required'),
+  country: z.string().default('India'),
+  geoCoordinates: z.object({
+    latitude: z.number(),
+    longitude: z.number(),
+  }).optional(),
+  googleMapsLink: z.string().url().optional(),
+});
+
+export const personIdentitySchema = z.object({
+  type: z.enum(['AADHAAR', 'PAN', 'PASSPORT', 'DRIVING_LICENSE', 'VOTER_ID', 'RERA_LICENSE', 'OTHER']),
+  idNumber: z.string().min(2, 'ID Number is required'),
+  documentUrl: z.string().url().optional(),
+  verified: z.boolean().default(false),
+});
+
+export const personSocialProfileSchema = z.object({
+  platform: z.enum(['LINKEDIN', 'FACEBOOK', 'TWITTER', 'INSTAGRAM', 'OTHER']),
+  url: z.string().url('Must be a valid URL'),
+});
+
+export const personCommunicationPreferencesSchema = z.object({
+  phone: z.boolean().default(true),
+  whatsapp: z.boolean().default(true),
+  sms: z.boolean().default(true),
+  email: z.boolean().default(true),
+  bestTimeToCall: z.string().optional(),
+  doNotDisturb: z.boolean().default(false),
+});
+
+export const personRelationshipSchema = z.object({
+  relatedPersonId: z.string().optional(),
+  relation: z.enum(['FAMILY_MEMBER', 'NOMINEE', 'REFERENCE', 'REFERRAL', 'BUSINESS_CONTACT', 'OTHER']),
+  name: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+export const personSchema = z.object({
+  firstName: z.string().min(2, 'First Name is required'),
+  lastName: z.string().optional(),
+  gender: z.enum(['MALE', 'FEMALE', 'OTHER', 'PREFER_NOT_TO_SAY']).default('PREFER_NOT_TO_SAY'),
+  dateOfBirth: z.string().optional(),
+  occupation: z.string().optional(),
+  company: z.string().optional(),
+  designation: z.string().optional(),
+  photoUrl: z.string().url().optional(),
+  preferredLanguage: z.string().optional(),
+  nationality: z.string().optional(),
+  maritalStatus: z.enum(['SINGLE', 'MARRIED', 'DIVORCED', 'WIDOWED']).optional(),
+
+  classifications: z.array(
+    z.enum(['INDIVIDUAL', 'CUSTOMER', 'LEAD', 'BROKER', 'CHANNEL_PARTNER', 'INVESTOR', 'BUILDER', 'VENDOR', 'LEGAL_ADVISOR', 'EMPLOYEE'])
+  ).default(['INDIVIDUAL']),
+  
+  tags: z.array(
+    z.enum(['VIP', 'HOT', 'WARM', 'COLD', 'NRI', 'HNI', 'REPEAT_BUYER', 'REFERRAL', 'BLACKLISTED'])
+  ).default([]),
+
+  mobileNumbers: z.array(z.string().min(10, 'Valid mobile number required')).min(1, 'At least one mobile number is required'),
+  emailAddresses: z.array(z.string().email('Invalid email')).default([]),
+  primaryMobile: z.string().optional(),
+  primaryEmail: z.string().email().optional(),
+  whatsappNumber: z.string().optional(),
+  telegram: z.string().optional(),
+  socialProfiles: z.array(personSocialProfileSchema).default([]),
+  
+  emergencyContact: z.object({
+    name: z.string(),
+    relation: z.string(),
+    phone: z.string(),
+  }).optional(),
+
+  addresses: z.array(personAddressSchema).default([]),
+  identities: z.array(personIdentitySchema).default([]),
+  communicationPreferences: personCommunicationPreferencesSchema.default({
+    phone: true,
+    whatsapp: true,
+    sms: true,
+    email: true,
+    doNotDisturb: false,
+  }),
+  relationships: z.array(personRelationshipSchema).default([]),
+});
+
+export type PersonSchemaType = z.infer<typeof personSchema>;

@@ -7,3 +7,4 @@ export * from './sales';
 export * from './fleet';
 export * from './finance';
 export * from './system';
+export * from './person';
