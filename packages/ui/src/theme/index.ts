@@ -1,12 +1,15 @@
 import { createTheme, Theme, responsiveFontSizes } from '@mui/material/styles';
 import { lightPalette } from './lightPalette';
 import { darkPalette } from './darkPalette';
+import { corporatePalette } from './corporatePalette';
 import { typography } from './typography';
 import { breakpoints } from './breakpoints';
 import { spacingMultiplier } from './spacing';
 
-export function createAppTheme(mode: 'light' | 'dark'): Theme {
-  const palette = mode === 'dark' ? darkPalette : lightPalette;
+export function createAppTheme(mode: 'light' | 'dark' | 'corporate'): Theme {
+  let palette = lightPalette;
+  if (mode === 'dark') palette = darkPalette;
+  if (mode === 'corporate') palette = corporatePalette;
 
   const theme = createTheme({
     palette,
@@ -52,6 +55,8 @@ export function createAppTheme(mode: 'light' | 'dark'): Theme {
 
 export * from './lightPalette';
 export * from './darkPalette';
+export * from './corporatePalette';
 export * from './typography';
 export * from './breakpoints';
 export * from './spacing';
+export * from './ThemeProvider';

@@ -1,7 +1,7 @@
 import { FC, ReactNode, useState } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AppThemeProvider, ErrorBoundary } from '@real-estate-erp/ui';
+import { ThemeProvider, ErrorBoundary } from '@real-estate-erp/ui';
 import { AuthProvider, SessionProvider, PermissionProvider } from '@real-estate-erp/firebase';
 import { store } from '../store';
 
@@ -28,13 +28,13 @@ export const AppProviders: FC<AppProvidersProps> = ({ children }) => {
     <ErrorBoundary>
       <ReduxProvider store={store}>
         <QueryClientProvider client={queryClient}>
-          <AppThemeProvider defaultMode="system">
+          <ThemeProvider defaultMode="light">
             <AuthProvider>
               <SessionProvider>
                 <PermissionProvider>{children}</PermissionProvider>
               </SessionProvider>
             </AuthProvider>
-          </AppThemeProvider>
+          </ThemeProvider>
         </QueryClientProvider>
       </ReduxProvider>
     </ErrorBoundary>

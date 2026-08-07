@@ -1,89 +1,37 @@
-import { FC } from 'react';
+import { FC, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Box, Typography, Button, Paper, Chip } from '@mui/material';
+import { Box, Typography, Button, Paper, CircularProgress } from '@mui/material';
 import {
-  useAppTheme,
+  useThemeMode,
   PrivateRoute,
   GuestRoute,
   PublicRoute,
-  RoleRoute,
-  PermissionRoute,
-  PermissionGuard,
-  RoleGuard,
 } from '@real-estate-erp/ui';
-import { useCurrentUser, useRole, usePermissions, useAuth } from '@real-estate-erp/hooks';
+import { AppShell } from '../layouts/AppShell';
+
+// Lazy loading placeholder for all modules
+const Placeholder = lazy(() => import('../pages/PlaceholderPage'));
+
+const LoadingFallback = () => (
+  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', minHeight: '50vh' }}>
+    <CircularProgress />
+  </Box>
+);
 
 const PublicHome: FC = () => {
-  const { toggleTheme, actualMode } = useAppTheme();
-
+  const { mode, setMode } = useThemeMode();
+  const toggleTheme = () => setMode(mode === 'light' ? 'dark' : mode === 'dark' ? 'corporate' : 'light');
   return (
     <Box sx={{ p: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, minHeight: '100vh', bgcolor: 'background.default' }}>
       <Paper elevation={2} sx={{ p: 4, maxWidth: 600, width: '100%', textAlign: 'center' }}>
         <Typography variant="h4" color="primary.main" gutterBottom fontWeight={600}>
-          Real Estate ERP Enterprise Portal
+          Enterprise Login
         </Typography>
         <Typography variant="body1" color="text.secondary" paragraph>
-          Authentication & Role-Based Access Control Foundation Active.
+          Please sign in to access the Admin Shell.
         </Typography>
-        <Box display="flex" justifyContent="center" gap={2} mt={2}>
-          <Button variant="contained" color="primary" onClick={toggleTheme}>
-            Toggle Theme ({actualMode})
-          </Button>
-        </Box>
-      </Paper>
-    </Box>
-  );
-};
-
-const DashboardView: FC = () => {
-  const { user } = useCurrentUser();
-  const { role, roleLevel } = useRole();
-  const { permissions } = usePermissions();
-  const { signOut } = useAuth();
-
-  return (
-    <Box sx={{ p: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, minHeight: '100vh', bgcolor: 'background.default' }}>
-      <Paper elevation={3} sx={{ p: 4, maxWidth: 700, width: '100%' }}>
-        <Typography variant="h4" color="primary.main" gutterBottom fontWeight={600}>
-          Admin Dashboard
-        </Typography>
-        <Typography variant="subtitle1" color="text.secondary" paragraph>
-          Welcome back, {user?.displayName || user?.email}!
-        </Typography>
-
-        <Box display="flex" gap={1} mb={3} flexWrap="wrap">
-          <Chip label={`Role: ${role || 'N/A'}`} color="primary" />
-          <Chip label={`Level: ${roleLevel}`} color="secondary" />
-          <Chip label={`Tenant: ${user?.tenantId || 'Default'}`} variant="outlined" />
-        </Box>
-
-        <Typography variant="h6" gutterBottom>
-          Effective Permissions ({permissions.length})
-        </Typography>
-        <Box display="flex" gap={0.5} flexWrap="wrap" mb={3}>
-          {permissions.map((perm) => (
-            <Chip key={perm} label={perm} size="small" variant="outlined" />
-          ))}
-        </Box>
-
-        <RoleGuard minRole="sales_manager">
-          <Paper sx={{ p: 2, bgcolor: 'action.hover', mb: 2 }}>
-            <Typography variant="subtitle2" color="success.main">
-              Sales Manager+ Exclusive Controls Visible
-            </Typography>
-          </Paper>
-        </RoleGuard>
-
-        <PermissionGuard permission="company:create">
-          <Paper sx={{ p: 2, bgcolor: 'action.selected', mb: 2 }}>
-            <Typography variant="subtitle2" color="primary.main">
-              Company Creation Privilege Active
-            </Typography>
-          </Paper>
-        </PermissionGuard>
-
-        <Button variant="outlined" color="error" onClick={signOut}>
-          Sign Out
+        <Button variant="contained" color="primary" onClick={toggleTheme}>
+          Toggle Theme ({mode})
         </Button>
       </Paper>
     </Box>
@@ -92,34 +40,55 @@ const DashboardView: FC = () => {
 
 export const AppRoutes: FC = () => {
   return (
-    <Routes>
-      {/* Public Routes */}
-      <Route element={<PublicRoute />}>
-        <Route path="/public" element={<PublicHome />} />
-      </Route>
-
-      {/* Guest Only Routes (e.g. Login) */}
-      <Route element={<GuestRoute redirectTo="/dashboard" />}>
-        <Route path="/login" element={<PublicHome />} />
-      </Route>
-
-      {/* Private Authenticated Routes */}
-      <Route element={<PrivateRoute redirectTo="/login" />}>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard" element={<DashboardView />} />
-
-        {/* Role Protected Sub-Route Example */}
-        <Route element={<RoleRoute allowedRoles={['super_admin', 'director']} />}>
-          <Route path="/admin/settings" element={<DashboardView />} />
+    <Suspense fallback={<LoadingFallback />}>
+      <Routes>
+        {/* Public Routes */}
+        <Route element={<PublicRoute />}>
+          <Route path="/public" element={<PublicHome />} />
         </Route>
 
-        {/* Permission Protected Sub-Route Example */}
-        <Route element={<PermissionRoute permission="reports:export" />}>
-          <Route path="/reports/export" element={<DashboardView />} />
+        {/* Guest Only Routes (e.g. Login) */}
+        <Route element={<GuestRoute redirectTo="/dashboard" />}>
+          <Route path="/login" element={<PublicHome />} />
         </Route>
-      </Route>
 
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        {/* Private Authenticated Routes with AppShell */}
+        <Route element={<PrivateRoute redirectTo="/login" />}>
+          <Route element={<AppShell />}>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<Placeholder />} />
+            
+            {/* CRM */}
+            <Route path="/crm/leads" element={<Placeholder />} />
+            <Route path="/crm/customers" element={<Placeholder />} />
+            
+            {/* Projects & Plots */}
+            <Route path="/projects" element={<Placeholder />} />
+            <Route path="/plots" element={<Placeholder />} />
+            
+            {/* Marketing */}
+            <Route path="/marketing/campaigns" element={<Placeholder />} />
+            <Route path="/marketing/site-visits" element={<Placeholder />} />
+            
+            {/* Sales & Finance */}
+            <Route path="/bookings" element={<Placeholder />} />
+            <Route path="/payments" element={<Placeholder />} />
+            <Route path="/expenses" element={<Placeholder />} />
+            
+            {/* HR & Ops */}
+            <Route path="/employees/attendance" element={<Placeholder />} />
+            <Route path="/vehicles" element={<Placeholder />} />
+            
+            {/* Reports & Settings */}
+            <Route path="/reports" element={<Placeholder />} />
+            <Route path="/analytics" element={<Placeholder />} />
+            <Route path="/settings" element={<Placeholder />} />
+            <Route path="/administration" element={<Placeholder />} />
+          </Route>
+        </Route>
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Suspense>
   );
 };

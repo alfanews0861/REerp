@@ -41,13 +41,14 @@ service cloud.firestore {
 
     // Baseline security fallback - deny all unhandled access
     match /{document=**} {
-      allow read, write: if isSuperAdmin();
+      allow read, write: if false; // Remove global superAdmin fallback to ensure explicit rules
     }
     
     // System Users collection baseline
     match /users/{userId} {
       allow read: if isAuthenticated();
-      allow create, update: if isSuperAdmin() || isOwner(userId);
+      allow create: if isSuperAdmin() || isOwner(userId);
+      allow update: if isSuperAdmin() || (isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'admin']));
       allow delete: if isSuperAdmin();
 
       // Multi-device sessions
