@@ -6,3 +6,8 @@ export * from './queryHelperService';
 export * from '../realestate/services';
 export * from './PersonService';
 export * from './InteractionService';
+export * from './workflow/RuleEngine';
+export * from './workflow/AssignmentEngine';
+export * from './workflow/HistoryEngine';
+export * from './workflow/ApprovalEngine';
+export * from './workflow/WorkflowExecutor';

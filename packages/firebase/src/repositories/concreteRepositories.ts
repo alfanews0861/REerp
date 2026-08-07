@@ -233,3 +233,5 @@ export {
   BusinessUnitRepository,
 } from '../organization/repositories';
 
+export * from './WorkflowRepository';
+

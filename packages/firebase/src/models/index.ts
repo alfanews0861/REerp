@@ -9,3 +9,4 @@ export * from './fleet';
 export * from './marketing';
 export * from './person';
 export * from './interaction';
+export * from './workflow';

@@ -38,6 +38,10 @@ export const FIRESTORE_COLLECTIONS = {
   AI_SUGGESTIONS: 'ai_suggestions',
   PERSONS: 'persons',
   INTERACTIONS: 'interactions',
+  WORKFLOW_DEFINITIONS: 'workflow_definitions',
+  WORKFLOW_INSTANCES: 'workflow_instances',
+  WORKFLOW_HISTORIES: 'workflow_histories',
+  WORKFLOW_COMMENTS: 'workflow_comments',
 } as const;
 
 export type CollectionName = (typeof FIRESTORE_COLLECTIONS)[keyof typeof FIRESTORE_COLLECTIONS];

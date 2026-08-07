@@ -15,3 +15,4 @@ export * from './zod-schemas';
 export * from './person';
 export * from './attendance';
 export * from './interaction';
+export * from './workflow';
