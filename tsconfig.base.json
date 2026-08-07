@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": ".",
+    "rootDir": ".",
+    "paths": {
+      "@real-estate-erp/config": ["packages/config/src/index.ts"],
+      "@real-estate-erp/config/*": ["packages/config/src/*"],
+      "@real-estate-erp/types": ["packages/types/src/index.ts"],
+      "@real-estate-erp/types/*": ["packages/types/src/*"],
+      "@real-estate-erp/utils": ["packages/utils/src/index.ts"],
+      "@real-estate-erp/utils/*": ["packages/utils/src/*"],
+      "@real-estate-erp/firebase": ["packages/firebase/src/index.ts"],
+      "@real-estate-erp/firebase/*": ["packages/firebase/src/*"],
+      "@real-estate-erp/ui": ["packages/ui/src/index.ts"],
+      "@real-estate-erp/ui/*": ["packages/ui/src/*"],
+      "@real-estate-erp/hooks": ["packages/hooks/src/index.ts"],
+      "@real-estate-erp/hooks/*": ["packages/hooks/src/*"]
+    }
+  }
+}

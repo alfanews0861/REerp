@@ -1,0 +1,36 @@
+{
+  "name": "@real-estate-erp/public-website",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@mui/icons-material": "^5.16.7",
+    "@mui/material": "^5.16.7",
+    "@real-estate-erp/config": "workspace:*",
+    "@real-estate-erp/firebase": "workspace:*",
+    "@real-estate-erp/types": "workspace:*",
+    "@real-estate-erp/ui": "workspace:*",
+    "@real-estate-erp/utils": "workspace:*",
+    "@tanstack/react-query": "^5.51.23",
+    "react": "^19.0.0-rc.0 || ^18.3.1",
+    "react-dom": "^19.0.0-rc.0 || ^18.3.1",
+    "react-router-dom": "^6.26.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.15",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "typescript": "5.5.4",
+    "vite": "^5.4.0"
+  }
+}

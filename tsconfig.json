@@ -1,0 +1,26 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@realestate-erp/types": ["packages/types/src/index.ts"],
+      "@realestate-erp/config": ["packages/config/src/index.ts"],
+      "@realestate-erp/utils": ["packages/utils/src/index.ts"],
+      "@realestate-erp/firebase": ["packages/firebase/src/index.ts"],
+      "@realestate-erp/services": ["packages/services/src/index.ts"],
+      "@realestate-erp/ui": ["packages/ui/src/index.ts"],
+      "@realestate-erp/hooks": ["packages/hooks/src/index.ts"]
+    }
+  },
+  "references": [
+    { "path": "./packages/types" },
+    { "path": "./packages/config" },
+    { "path": "./packages/utils" },
+    { "path": "./packages/firebase" },
+    { "path": "./packages/services" },
+    { "path": "./packages/ui" },
+    { "path": "./packages/hooks" },
+    { "path": "./apps/admin-web" },
+    { "path": "./apps/public-website" }
+  ]
+}

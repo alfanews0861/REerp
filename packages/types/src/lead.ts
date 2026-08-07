@@ -1,0 +1,62 @@
+export type LeadStatus =
+  | 'NEW'
+  | 'CONTACTED'
+  | 'QUALIFIED'
+  | 'SITE_VISIT_SCHEDULED'
+  | 'SITE_VISIT_COMPLETED'
+  | 'NEGOTIATING'
+  | 'BOOKED'
+  | 'CLOSED_LOST'
+  | 'INVALID_UNREACHABLE';
+
+export type LeadSource =
+  | 'PUBLIC_WEBSITE'
+  | 'FACEBOOK_ADS'
+  | 'INSTAGRAM_ADS'
+  | 'GOOGLE_SEARCH'
+  | '99ACRES'
+  | 'MAGICBRICKS'
+  | 'HOUSING_COM'
+  | 'WALK_IN'
+  | 'REFERRAL'
+  | 'NEWSPAPER_AD'
+  | 'COLD_CALLING';
+
+export interface LeadFollowUp {
+  id: string;
+  type: 'CALL' | 'WHATSAPP' | 'EMAIL' | 'IN_PERSON' | 'STATUS_CHANGE';
+  notes: string;
+  disposition: 'INTERESTED' | 'NOT_REACHABLE' | 'BUSY_CALLBACK_LATER' | 'SITE_VISIT_PROMISED' | 'NOT_INTERESTED';
+  nextFollowUpDate?: string; // ISO string
+  createdByUserId: string;
+  createdByUserName: string;
+  createdAt: string;
+}
+
+export interface Lead {
+  id: string;
+  fullName: string;
+  phone: string;
+  alternatePhone?: string;
+  email?: string;
+  city?: string;
+  source: LeadSource;
+  status: LeadStatus;
+  budgetMin?: number;
+  budgetMax?: number;
+  preferredPlotSizeSqFt?: number;
+  preferredProjectId?: string;
+  preferredProjectName?: string;
+  assignedBranchId?: string;
+  assignedTelecallerId?: string;
+  assignedTelecallerName?: string;
+  assignedExecutiveId?: string;
+  assignedExecutiveName?: string;
+  aiIntentScore: number; // 0-100 score calculated by Gemini AI
+  aiRecommendation?: string;
+  nextFollowUpDate?: string;
+  notes?: string;
+  followUps: LeadFollowUp[];
+  createdAt: string;
+  updatedAt: string;
+}

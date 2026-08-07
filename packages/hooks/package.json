@@ -1,0 +1,27 @@
+{
+  "name": "@real-estate-erp/hooks",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "tsc --build",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint \"src/**/*.{ts,tsx}\"",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@real-estate-erp/firebase": "workspace:*",
+    "@real-estate-erp/types": "workspace:*",
+    "@real-estate-erp/ui": "workspace:*",
+    "react": "^19.0.0-rc.0 || ^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "typescript": "^5.5.4"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0"
+  }
+}
