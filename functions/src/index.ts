@@ -15,3 +15,5 @@ export * from './triggers/onDepartmentCreated';
 export * from './triggers/onTeamUpdated';
 export * from './triggers/projectTriggers';
 export * from './triggers/leadTriggers';
+export * from './events/publishEvent';
+export * from './events/subscribeEvents';

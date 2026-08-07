@@ -231,6 +231,15 @@ importers:
 
   functions:
     dependencies:
+      '@real-estate-erp/events':
+        specifier: workspace:*
+        version: link:../packages/events
+      '@real-estate-erp/types':
+        specifier: workspace:*
+        version: link:../packages/types
+      '@real-estate-erp/utils':
+        specifier: workspace:*
+        version: link:../packages/utils
       firebase-admin:
         specifier: ^12.2.0
         version: 12.7.0
@@ -260,6 +269,25 @@ importers:
       typescript:
         specifier: ^5.5.4
         version: 5.9.3
+
+  packages/events:
+    dependencies:
+      '@real-estate-erp/types':
+        specifier: workspace:*
+        version: link:../types
+      '@real-estate-erp/utils':
+        specifier: workspace:*
+        version: link:../utils
+      firebase-admin:
+        specifier: ^12.0.0
+        version: 12.7.0
+      zod:
+        specifier: ^3.23.8
+        version: 3.25.76
+    devDependencies:
+      typescript:
+        specifier: 5.5.4
+        version: 5.5.4
 
   packages/firebase:
     dependencies:

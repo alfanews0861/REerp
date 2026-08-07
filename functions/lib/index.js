@@ -51,4 +51,6 @@ __exportStar(require("./triggers/onDepartmentCreated"), exports);
 __exportStar(require("./triggers/onTeamUpdated"), exports);
 __exportStar(require("./triggers/projectTriggers"), exports);
 __exportStar(require("./triggers/leadTriggers"), exports);
+__exportStar(require("./events/publishEvent"), exports);
+__exportStar(require("./events/subscribeEvents"), exports);
 //# sourceMappingURL=index.js.map

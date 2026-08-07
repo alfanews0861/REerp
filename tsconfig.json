@@ -9,7 +9,8 @@
       "@realestate-erp/firebase": ["packages/firebase/src/index.ts"],
       "@realestate-erp/services": ["packages/services/src/index.ts"],
       "@realestate-erp/ui": ["packages/ui/src/index.ts"],
-      "@realestate-erp/hooks": ["packages/hooks/src/index.ts"]
+      "@realestate-erp/hooks": ["packages/hooks/src/index.ts"],
+      "@realestate-erp/events": ["packages/events/src/index.ts"]
     }
   },
   "references": [
@@ -20,6 +21,7 @@
     { "path": "./packages/services" },
     { "path": "./packages/ui" },
     { "path": "./packages/hooks" },
+    { "path": "./packages/events" },
     { "path": "./apps/admin-web" },
     { "path": "./apps/public-website" }
   ]

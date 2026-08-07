@@ -29,7 +29,9 @@
       "@real-estate-erp/ui": ["packages/ui/src/index.ts"],
       "@real-estate-erp/ui/*": ["packages/ui/src/*"],
       "@real-estate-erp/hooks": ["packages/hooks/src/index.ts"],
-      "@real-estate-erp/hooks/*": ["packages/hooks/src/*"]
+      "@real-estate-erp/hooks/*": ["packages/hooks/src/*"],
+      "@real-estate-erp/events": ["packages/events/src/index.ts"],
+      "@real-estate-erp/events/*": ["packages/events/src/*"]
     }
   }
 }
