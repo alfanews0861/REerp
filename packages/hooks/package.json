@@ -15,6 +15,7 @@
     "@real-estate-erp/firebase": "workspace:*",
     "@real-estate-erp/types": "workspace:*",
     "@real-estate-erp/ui": "workspace:*",
+    "@tanstack/react-query": "^5.51.23",
     "react": "^19.0.0-rc.0 || ^18.3.1"
   },
   "devDependencies": {

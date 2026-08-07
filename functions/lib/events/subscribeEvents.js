@@ -45,7 +45,7 @@ const dispatcher = new events_1.EventDispatcher();
 // dispatcher.subscribe('LeadCreated', new NotificationHandler());
 exports.onEventCreated = functions.firestore
     .document('events/{eventId}')
-    .onCreate(async (snapshot, context) => {
+    .onCreate(async (snapshot, _context) => {
     const eventData = snapshot.data();
     // Convert Firestore Timestamp back to ISO string if necessary,
     // though the Event object should already be well-formed from publisher.
