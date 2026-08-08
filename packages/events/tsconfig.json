@@ -8,6 +8,7 @@
     "sourceMap": true,
     "noEmit": false,
     "allowImportingTsExtensions": false,
+    "composite": true,
     "baseUrl": ".",
     "paths": {
       "~/*": ["src/*"]

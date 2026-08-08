@@ -91,8 +91,20 @@ export const blockSchema = baseFirestoreModelSchema.extend({
   totalPlotsCount: z.number().int().nonnegative()
 });
 
-export const plotSchema = baseFirestoreModelSchema.extend({
+export const pricingConfigSchema = z.object({
+  baseRate: z.number().nonnegative(),
+  effectiveRate: z.number().nonnegative(),
+  facingPremium: z.number().nonnegative().optional(),
+  cornerPremium: z.number().nonnegative().optional(),
+  roadPremium: z.number().nonnegative().optional(),
+  specialPremium: z.number().nonnegative().optional(),
+  discount: z.number().nonnegative().optional(),
+  minimumPermissibleRate: z.number().nonnegative().optional(),
+  effectiveFrom: z.string().optional(),
+  effectiveTo: z.string().optional()
+});
 
+export const plotSchema = baseFirestoreModelSchema.extend({
   projectId: z.string().min(1),
   layoutId: z.string().min(1),
   blockId: z.string().min(1),
@@ -105,8 +117,12 @@ export const plotSchema = baseFirestoreModelSchema.extend({
   isCornerPlot: z.boolean(),
   roadWidth: z.number().nonnegative(),
   price: z.number().nonnegative(),
-  status: z.enum(['AVAILABLE', 'HOLD', 'BOOKED', 'REGISTERED', 'BLOCKED']),
+  status: z.enum(['AVAILABLE', 'BOOKED', 'REGISTERED']),
   isAvailable: z.boolean(),
+  pricingConfig: pricingConfigSchema.optional(),
+  bookingExpiryDurationHours: z.number().int().nonnegative().optional(),
+  currentBookingId: z.string().optional(),
+  bookingExpiryAt: z.string().optional(),
   gpsPoint: z.object({
     lat: z.number(),
     lng: z.number()

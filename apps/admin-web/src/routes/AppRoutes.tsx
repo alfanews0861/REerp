@@ -13,6 +13,8 @@ import { AppShell } from '../layouts/AppShell';
 const Placeholder = lazy(() => import('../pages/PlaceholderPage'));
 const ExecutiveDashboard = lazy(() => import('../pages/dashboard/ExecutiveDashboard'));
 const LeadsWorkspace = lazy(() => import('../pages/crm/leads/LeadsWorkspace'));
+const PlotInventory = lazy(() => import('../pages/plots/PlotInventory'));
+const PlotDetails = lazy(() => import('../pages/plots/PlotDetails'));
 
 const LoadingFallback = () => (
   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', minHeight: '50vh' }}>
@@ -66,7 +68,8 @@ export const AppRoutes: FC = () => {
             
             {/* Projects & Plots */}
             <Route path="/projects" element={<Placeholder />} />
-            <Route path="/plots" element={<Placeholder />} />
+            <Route path="/plots" element={<PlotInventory />} />
+            <Route path="/plots/:id" element={<PlotDetails />} />
             
             {/* Marketing */}
             <Route path="/marketing/campaigns" element={<Placeholder />} />

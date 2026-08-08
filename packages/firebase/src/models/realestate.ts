@@ -9,7 +9,8 @@ import {
   ProjectMedia,
   AreaUnit,
   PlotFacing,
-  PlotStatus
+  PlotStatus,
+  PricingConfig
 } from '@real-estate-erp/types';
 
 export interface ProjectModel extends BaseFirestoreModel {
@@ -61,5 +62,9 @@ export interface PlotModel extends BaseFirestoreModel {
   price: number;
   status: PlotStatus;
   isAvailable: boolean;
+  pricingConfig?: PricingConfig;
+  bookingExpiryDurationHours?: number;
+  currentBookingId?: string;
+  bookingExpiryAt?: string;
   gpsPoint?: { lat: number; lng: number };
 }

@@ -1,6 +1,6 @@
 export type ProjectType = 'RESIDENTIAL' | 'COMMERCIAL' | 'VILLA' | 'FARM_LAND' | 'APARTMENT' | 'MIXED_USE';
 export type ProjectStatus = 'PLANNING' | 'ACTIVE' | 'ON_HOLD' | 'COMPLETED' | 'SOLD_OUT';
-export type PlotStatus = 'AVAILABLE' | 'HOLD' | 'BOOKED' | 'REGISTERED' | 'BLOCKED';
+export type PlotStatus = 'AVAILABLE' | 'BOOKED' | 'REGISTERED';
 export type PlotFacing = 'EAST' | 'WEST' | 'NORTH' | 'SOUTH' | 'NORTH_EAST' | 'NORTH_WEST' | 'SOUTH_EAST' | 'SOUTH_WEST';
 export type AreaUnit = 'SQ_FT' | 'SQ_YARDS' | 'ACRES' | 'HECTARES' | 'GUNTAS';
 
@@ -100,6 +100,19 @@ export interface Block {
   updatedAt: string;
 }
 
+export interface PricingConfig {
+  baseRate: number;
+  effectiveRate: number;
+  facingPremium?: number;
+  cornerPremium?: number;
+  roadPremium?: number;
+  specialPremium?: number;
+  discount?: number;
+  minimumPermissibleRate?: number;
+  effectiveFrom?: string;
+  effectiveTo?: string;
+}
+
 export interface Plot {
   id: string;
   projectId: string;
@@ -116,6 +129,10 @@ export interface Plot {
   price: number;
   status: PlotStatus;
   isAvailable: boolean;
+  pricingConfig?: PricingConfig;
+  bookingExpiryDurationHours?: number;
+  currentBookingId?: string;
+  bookingExpiryAt?: string;
   gpsPoint?: { lat: number; lng: number };
   createdAt: string;
   updatedAt: string;

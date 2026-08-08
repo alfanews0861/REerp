@@ -2,6 +2,7 @@ import { PlotModel } from '../../models';
 import { PlotRepository } from '../repositories/PlotRepository';
 import { CreateModelInput, UpdateModelInput } from '../../models/base';
 import { plotSchema } from '../../validators/realestateSchemas';
+import { AuditLogRepository } from '../../repositories/concreteRepositories';
 
 export class PlotService {
   private repository: PlotRepository;
@@ -43,6 +44,21 @@ export class PlotService {
 
   public async bulkUpdatePlotPrices(updates: { id: string; price: number }[], userId: string): Promise<void> {
     const updatePayloads = updates.map(u => ({ id: u.id, data: { price: u.price } }));
-    return this.repository.bulkUpdate(updatePayloads, userId);
+    await this.repository.bulkUpdate(updatePayloads, userId);
+    
+    // Create audit logs for the price updates
+    const auditRepo = new AuditLogRepository();
+    
+    for (const update of updates) {
+      await auditRepo.create({
+        action: 'update',
+        entityType: 'Plot',
+        entityId: update.id,
+        userId: userId,
+        newState: { price: update.price },
+        ipAddress: '',
+        userAgent: ''
+      }, userId);
+    }
   }
 }
