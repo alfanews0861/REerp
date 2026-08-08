@@ -73,13 +73,23 @@ export class PaymentService {
         version: 1,
       };
 
-      // Update Booking
-      transaction.update(bookingRef, {
+      const isNowFullyPaid = newTotalPaid >= booking.finalAmount;
+      const wasAlreadyFullyPaid = booking.totalPaidAmount >= booking.finalAmount;
+
+      const bookingUpdate: any = {
         totalPaidAmount: newTotalPaid,
         updatedAt: now,
         updatedBy: userId,
         version: booking.version + 1,
-      });
+      };
+
+      if (isNowFullyPaid && !wasAlreadyFullyPaid) {
+        bookingUpdate.isFullyPaid = true;
+        bookingUpdate.fullyPaidAt = now;
+      }
+
+      // Update Booking
+      transaction.update(bookingRef, bookingUpdate);
 
       // Create Event
       const paymentEvent: Event = {
@@ -107,6 +117,33 @@ export class PaymentService {
         ...paymentEvent,
         timestamp: new Date(paymentEvent.timestamp),
       });
+
+      // Emit BOOKING_FULLY_PAID only if this specific payment crossed the threshold
+      if (isNowFullyPaid && !wasAlreadyFullyPaid) {
+        const fullyPaidEventRef = doc(collection(db, 'events'));
+        const fullyPaidEvent: Event = {
+          eventId: fullyPaidEventRef.id,
+          aggregateId: booking.id,
+          aggregateType: AggregateType.Booking as any,
+          eventType: 'BOOKING_FULLY_PAID',
+          timestamp: now,
+          version: booking.version + 2,
+          actor: userId,
+          payload: {
+            bookingId: booking.id,
+            totalPaidAmount: newTotalPaid,
+            finalAmount: booking.finalAmount,
+          },
+          metadata: {
+            source: 'PaymentService',
+            triggerPaymentId: paymentData.id
+          }
+        };
+        transaction.set(fullyPaidEventRef, {
+          ...fullyPaidEvent,
+          timestamp: new Date(fullyPaidEvent.timestamp),
+        });
+      }
 
       // Audit Log
       transaction.set(auditRef, {
