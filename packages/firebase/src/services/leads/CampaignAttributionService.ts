@@ -33,17 +33,21 @@ export class CampaignAttributionService {
   ): CampaignAttribution {
     const touchpoints = existingAttribution ? [...existingAttribution.touchpoints, newTouchpoint] : [newTouchpoint];
     
-    // Sort touchpoints chronologically
-    touchpoints.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+    // Sort touchpoints chronologically safely without mutating original if it was somehow frozen
+    const sortedTouchpoints = [...touchpoints].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
     
-    const firstTouch = touchpoints[0];
-    const lastTouch = touchpoints[touchpoints.length - 1];
+    const firstTouch = sortedTouchpoints[0];
+    const lastTouch = sortedTouchpoints[sortedTouchpoints.length - 1];
+    
+    // NOTE: For POSITION_BASED and TIME_DECAY, the underlying structure tracks all touchpoints.
+    // The actual fractional value per touchpoint (e.g. 40-20-40) is calculated dynamically in reporting layers 
+    // to preserve immutable touchpoint history here.
     
     return {
       leadId,
       firstTouchId: firstTouch.id,
       lastTouchId: lastTouch.id,
-      touchpoints,
+      touchpoints: sortedTouchpoints,
       attributionModel: model
     };
   }

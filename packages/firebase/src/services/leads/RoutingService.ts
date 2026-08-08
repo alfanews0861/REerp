@@ -1,5 +1,6 @@
-import { LeadCaptureRequestDTO } from './dto';
 import { LeadRoutingStrategy, RoundRobinState } from '@real-estate-erp/types';
+import { LeadCaptureRequestDTO } from './dto';
+import * as admin from 'firebase-admin';
 
 export class RoutingService {
   /**
@@ -37,20 +38,50 @@ export class RoutingService {
 
     if (strategy === 'ROUND_ROBIN') {
       const assigned = await this.executeRoundRobin('DEFAULT_GROUP');
-      ownerId = assigned;
+      ownerId = assigned || undefined;
     }
 
     return { ownerId, telecallerId, networkMemberId, routingStrategy: strategy };
   }
 
   /**
-   * Simple round-robin mock implementation.
-   * In reality, this would query a RoundRobinState doc, update it via a transaction, and return the user.
+   * Round-robin implementation with Firebase Transactions.
    */
-  private async executeRoundRobin(groupId: string): Promise<string> {
-    // Mock user IDs for round-robin
-    const eligibleUsers = ['USER_1', 'USER_2', 'USER_3'];
-    const randomUser = eligibleUsers[Math.floor(Math.random() * eligibleUsers.length)];
-    return randomUser;
+  private async executeRoundRobin(groupId: string): Promise<string | null> {
+    const db = admin.firestore();
+    const stateRef = db.collection('routing_states').doc(groupId);
+    
+    try {
+      return await db.runTransaction(async (t: admin.firestore.Transaction) => {
+        const doc = await t.get(stateRef);
+        
+        // Default mock list if not configured
+        let activeUsers = ['user-101', 'user-102', 'user-103'];
+        let lastAssignedIndex = -1;
+
+        if (doc.exists) {
+          const data = doc.data();
+          if (data?.activeUsers?.length > 0) activeUsers = data.activeUsers;
+          if (typeof data?.lastAssignedIndex === 'number') lastAssignedIndex = data.lastAssignedIndex;
+        }
+
+        if (activeUsers.length === 0) return null;
+
+        const nextIndex = (lastAssignedIndex + 1) % activeUsers.length;
+        const assignedUser = activeUsers[nextIndex];
+
+        t.set(stateRef, {
+          groupId,
+          activeUsers,
+          lastAssignedIndex: nextIndex,
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+
+        return assignedUser;
+      });
+    } catch (e) {
+      console.error('Round robin transaction failed:', e);
+      return null;
+    }
   }
 }

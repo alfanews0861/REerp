@@ -1,3 +1,4 @@
+import * as admin from 'firebase-admin';
 import { LeadCaptureRequestDTO } from './dto';
 import { LeadValidator } from './validators';
 import { LeadMatchingService } from './LeadMatchingService';
@@ -7,9 +8,6 @@ import { LeadFactory } from './LeadFactory';
 import { LeadRepository } from '../../repositories/LeadRepository';
 import { LeadModel } from '../../models/leads';
 import { InteractionService } from '../InteractionService';
-
-// Fallback to simpler Workflow executor or just skip importing if we don't have it directly.
-// As per requirement, every Lead starts a Workflow.
 import { WorkflowExecutor } from '../workflow/WorkflowExecutor';
 
 export class LeadAcquisitionService {
@@ -32,6 +30,27 @@ export class LeadAcquisitionService {
   public async acquireLead(dto: LeadCaptureRequestDTO, userId: string = 'SYSTEM'): Promise<LeadModel> {
     // 1. Validation
     LeadValidator.validateCaptureRequest(dto);
+
+    // 1.5 Strict Idempotency Check
+    if (dto.eventId) {
+      const db = admin.firestore();
+      const eventRef = db.collection('processed_webhooks').doc(dto.eventId);
+      
+      try {
+        await db.runTransaction(async (t: admin.firestore.Transaction) => {
+          const doc = await t.get(eventRef);
+          if (doc.exists) {
+            throw new Error('ALREADY_PROCESSED');
+          }
+          t.set(eventRef, { processedAt: new Date().toISOString(), sourceCode: dto.sourceCode });
+        });
+      } catch (e: any) {
+        if (e.message === 'ALREADY_PROCESSED') {
+          throw e; // Handled by webhook layer
+        }
+        throw e;
+      }
+    }
 
     // 2. Duplicate Detection & Person Matching
     const matchResult = await this.leadMatchingService.matchOrCreatePerson(dto, userId);

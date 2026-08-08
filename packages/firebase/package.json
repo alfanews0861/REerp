@@ -17,6 +17,7 @@
     "@real-estate-erp/types": "workspace:*",
     "@types/react": "^18.3.3",
     "firebase": "^10.12.5",
+    "firebase-admin": "^14.2.0",
     "react": "^18.3.1",
     "zod": "^3.23.8"
   },

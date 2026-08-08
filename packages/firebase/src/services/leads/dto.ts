@@ -1,4 +1,5 @@
 export interface LeadCaptureRequestDTO {
+  eventId?: string; // For strict webhook idempotency
   companyId: string;
   branchId: string;
   sourceCode: string; // From LeadSource

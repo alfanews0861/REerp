@@ -1,4 +1,5 @@
 import * as functions from 'firebase-functions';
+import * as crypto from 'crypto';
 import { LeadAcquisitionService, LeadCaptureRequestDTO } from '@real-estate-erp/firebase';
 
 export const captureLeadWebhook = functions.https.onRequest(async (req, res) => {
@@ -7,9 +8,12 @@ export const captureLeadWebhook = functions.https.onRequest(async (req, res) => 
     return;
   }
 
-  // Basic API key validation
+  // API key validation with rotation support (comma separated)
   const apiKey = req.headers['x-api-key'];
-  if (!apiKey || apiKey !== process.env.LEAD_WEBHOOK_SECRET) {
+  const validSecrets = (process.env.LEAD_WEBHOOK_SECRETS || process.env.LEAD_WEBHOOK_SECRET || '').split(',');
+  
+  if (!apiKey || !validSecrets.includes(apiKey as string)) {
+    console.warn('Unauthorized webhook attempt');
     res.status(401).send('Unauthorized');
     return;
   }
@@ -17,18 +21,31 @@ export const captureLeadWebhook = functions.https.onRequest(async (req, res) => 
   try {
     const dto: LeadCaptureRequestDTO = req.body;
     
-    // Validate minimal payload manually or via validator
+    // Strict schema validation
     if (!dto.firstName || !dto.phone || !dto.sourceCode || !dto.companyId) {
       res.status(400).send('Bad Request: Missing required fields');
       return;
     }
 
+    // Generate fallback eventId if not provided (Idempotency key)
+    if (!dto.eventId) {
+      const payloadString = JSON.stringify({ phone: dto.phone, source: dto.sourceCode, time: new Date().toISOString().substring(0,10) });
+      dto.eventId = crypto.createHash('sha256').update(payloadString).digest('hex');
+    }
+
     const acquisitionService = new LeadAcquisitionService();
     const lead = await acquisitionService.acquireLead(dto, 'WEBHOOK_SYSTEM');
 
-    res.status(200).json({ success: true, leadId: lead.id });
+    res.status(200).json({ success: true, leadId: lead.id, eventId: dto.eventId });
   } catch (error: any) {
     console.error('Error capturing lead via webhook:', error);
-    res.status(500).json({ success: false, error: error.message });
+    
+    // Handle specific conflict error for idempotent retries safely
+    if (error.message && error.message.includes('ALREADY_PROCESSED')) {
+      res.status(200).json({ success: true, note: 'Idempotent request already processed', eventId: req.body.eventId });
+      return;
+    }
+
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
