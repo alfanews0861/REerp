@@ -20,7 +20,14 @@ export type LeadSource =
   | 'WALK_IN'
   | 'REFERRAL'
   | 'NEWSPAPER_AD'
-  | 'COLD_CALLING';
+  | 'COLD_CALLING'
+  | 'AGENT'
+  | 'SUB_AGENT'
+  | 'COMPANY_MARKETING'
+  | 'DOOR_TO_DOOR'
+  | 'TELECALL'
+  | 'NETWORK_SALE'
+  | 'OTHER';
 
 export interface LeadFollowUp {
   id: string;
@@ -31,6 +38,15 @@ export interface LeadFollowUp {
   createdByUserId: string;
   createdByUserName: string;
   createdAt: string;
+}
+
+export interface LeadOwnershipTransfer {
+  id: string;
+  previousOwnerId?: string;
+  newOwnerId: string;
+  reason: string;
+  transferredByUserId: string;
+  transferredAt: string; // ISO string
 }
 
 export interface Lead {
@@ -52,11 +68,15 @@ export interface Lead {
   assignedTelecallerName?: string;
   assignedExecutiveId?: string;
   assignedExecutiveName?: string;
+  ownerId?: string;
+  networkMemberId?: string;
+  telecallerId?: string;
   aiIntentScore: number; // 0-100 score calculated by Gemini AI
   aiRecommendation?: string;
   nextFollowUpDate?: string;
   notes?: string;
   followUps: LeadFollowUp[];
+  ownershipTransfers?: LeadOwnershipTransfer[];
   createdAt: string;
   updatedAt: string;
 }

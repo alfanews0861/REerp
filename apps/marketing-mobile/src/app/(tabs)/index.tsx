@@ -25,6 +25,12 @@ export default function HomeScreen() {
         <Text style={styles.text}>2 Site Visits Scheduled</Text>
         <Button title="View Visits" onPress={() => router.push('/visits')} variant="outline" />
       </Card>
+
+      <Card title="My Network & Commission" style={styles.card}>
+        <Text style={styles.text}>Network Level: SM</Text>
+        <Text style={styles.text}>Pending Commission: 1,50,000</Text>
+        <Button title="View My Network" onPress={() => router.push('/network')} variant="outline" />
+      </Card>
     </ScrollView>
   );
 }

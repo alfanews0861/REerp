@@ -35,6 +35,8 @@ export interface VehicleTripModel extends BaseFirestoreModel {
   startTime: string;
   endTime?: string;
   status: 'ongoing' | 'completed' | 'cancelled';
+  linkedVisitIds?: string[]; // IDs of SiteVisitModel
+  expenseId?: string; // Linked fuel/expense ID
 }
 
 export interface FuelEntryModel extends BaseFirestoreModel {

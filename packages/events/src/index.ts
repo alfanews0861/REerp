@@ -11,3 +11,8 @@ export * from './repositories/EventRepository';
 export * from './repositories/DLQRepository';
 export * from './services/EventReplayService';
 export * from './services/EventRetryService';
+export * from './siteVisit';
+export * from './marketing';
+export * from './networkEvents';
+export * from './commissionEvents';
+export * from './paymentEvents';

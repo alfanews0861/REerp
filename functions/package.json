@@ -22,7 +22,8 @@
     "firebase-functions": "^5.0.1",
     "@real-estate-erp/events": "workspace:*",
     "@real-estate-erp/types": "workspace:*",
-    "@real-estate-erp/utils": "workspace:*"
+    "@real-estate-erp/utils": "workspace:*",
+    "@real-estate-erp/firebase": "workspace:*"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^7.18.0",

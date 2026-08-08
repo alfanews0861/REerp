@@ -39,10 +39,10 @@ const events_1 = require("@real-estate-erp/events");
 // Example Handlers - In a real app, you would import these from feature modules
 // import { LeadCreatedHandler } from '../modules/leads/handlers';
 // import { NotificationHandler } from '../modules/notifications/handlers';
+const CommissionHandler_1 = require("./handlers/CommissionHandler");
 const dispatcher = new events_1.EventDispatcher();
 // Register handlers
-// dispatcher.subscribe('LeadCreated', new LeadCreatedHandler());
-// dispatcher.subscribe('LeadCreated', new NotificationHandler());
+dispatcher.subscribe('BOOKING_FULLY_PAID', new CommissionHandler_1.CommissionHandler());
 exports.onEventCreated = functions.firestore
     .document('events/{eventId}')
     .onCreate(async (snapshot, _context) => {

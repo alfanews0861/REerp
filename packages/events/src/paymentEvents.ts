@@ -1,0 +1,4 @@
+export enum PaymentEventType {
+  PAYMENT_RECEIVED = 'PAYMENT_RECEIVED',
+  BOOKING_FULLY_PAID = 'BOOKING_FULLY_PAID',
+}

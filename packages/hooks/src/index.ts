@@ -7,3 +7,4 @@ export * from './usePermissions';
 export * from './useRole';
 export * from './useSession';
 export * from './useLeads';
+export * from './useSiteVisits';

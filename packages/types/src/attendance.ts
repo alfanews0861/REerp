@@ -30,6 +30,9 @@ export interface AttendanceRecord {
   updatedAt: string;
 }
 
+/**
+ * @deprecated Use SiteVisit from './visit' instead. This legacy type will be removed.
+ */
 export interface SiteVisitRecord {
   id: string;
   leadId: string;

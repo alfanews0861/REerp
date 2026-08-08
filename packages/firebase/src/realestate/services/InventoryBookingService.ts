@@ -9,6 +9,7 @@ export interface BookPlotInput {
   customerId: string;
   customerName: string;
   customerPhone: string;
+  leadId?: string; // Newly added
   salesExecutiveId: string;
   salesExecutiveName: string;
   branchId: string;
@@ -20,6 +21,9 @@ export interface BookPlotInput {
   totalPlotAmount: number;
   discountAmount: number;
   finalSaleAmount: number;
+  paymentAmount: number; // Initial booking payment amount
+  paymentMethod?: 'CASH' | 'CHEQUE' | 'BANK_TRANSFER' | 'UPI' | 'CARD' | 'OTHER';
+  paymentReference?: string;
 }
 
 export class InventoryBookingService {
@@ -32,6 +36,7 @@ export class InventoryBookingService {
     
     const plotRef = doc(db, FIRESTORE_COLLECTIONS.PLOTS, input.plotId);
     const bookingRef = doc(collection(db, FIRESTORE_COLLECTIONS.BOOKINGS));
+    const paymentRef = doc(collection(db, FIRESTORE_COLLECTIONS.PAYMENTS || 'payments'));
     const eventRef = doc(collection(db, 'events')); // Internal events collection
     const auditRef = doc(collection(db, FIRESTORE_COLLECTIONS.AUDIT_LOGS));
 
@@ -47,6 +52,10 @@ export class InventoryBookingService {
         throw new Error('PLOT_NOT_AVAILABLE');
       }
 
+      if (input.paymentAmount > input.finalSaleAmount) {
+        throw new Error('PAYMENT_EXCEEDS_AMOUNT');
+      }
+
       const now = new Date().toISOString();
       const expiryHours = plot.bookingExpiryDurationHours || 48; // Default 48h
       const expiryDate = new Date();
@@ -57,20 +66,23 @@ export class InventoryBookingService {
         id: bookingRef.id,
         bookingNumber: `BKG-${Date.now()}`,
         projectId: input.projectId,
-        layoutId: '',
-        blockId: '',
+        layoutId: plot.layoutId || '',
+        blockId: plot.blockId || '',
         plotId: input.plotId,
         customerId: input.customerId,
+        leadId: input.leadId,
         agentId: input.salesExecutiveId,
         branchId: input.branchId,
         companyId: 'default',
         bookingDate: now,
+        expiryDate: expiryDate.toISOString(),
         totalAmount: input.totalPlotAmount,
         discountAmount: input.discountAmount,
         finalAmount: input.finalSaleAmount,
-        tokenAmount: 0,
+        tokenAmount: input.paymentAmount,
+        totalPaidAmount: input.paymentAmount,
         paymentPlanType: 'outright',
-        status: 'draft',
+        status: 'active', // Active booking
         createdAt: now,
         updatedAt: now,
         createdBy: userId,
@@ -79,6 +91,29 @@ export class InventoryBookingService {
         isDeleted: false,
         version: 1,
       };
+
+      // Create Payment object if payment > 0
+      if (input.paymentAmount > 0) {
+        transaction.set(paymentRef, {
+          id: paymentRef.id,
+          bookingId: bookingRef.id,
+          customerId: input.customerId,
+          companyId: 'default',
+          paymentNumber: `PAY-${Date.now()}`,
+          amount: input.paymentAmount,
+          paymentDate: now,
+          paymentMethod: input.paymentMethod || 'CASH',
+          transactionRef: input.paymentReference,
+          status: 'verified', // Initial booking payments are considered verified for MVP
+          createdAt: now,
+          updatedAt: now,
+          createdBy: userId,
+          updatedBy: userId,
+          isActive: true,
+          isDeleted: false,
+          version: 1,
+        });
+      }
 
       // Update plot
       const updatedPlot: Partial<PlotModel> = {
@@ -104,6 +139,9 @@ export class InventoryBookingService {
           plotId: input.plotId,
           bookingId: bookingRef.id,
           customerId: input.customerId,
+          leadId: input.leadId,
+          agreedPrice: input.finalSaleAmount,
+          paidAmount: input.paymentAmount,
         },
         metadata: {
           source: 'InventoryBookingService',
@@ -186,7 +224,7 @@ export class InventoryBookingService {
       if (plot.currentBookingId) {
         const bookingRef = doc(db, FIRESTORE_COLLECTIONS.BOOKINGS, plot.currentBookingId);
         transaction.update(bookingRef, {
-          status: 'cancelled',
+          status: 'expired',
           notes: 'Automatically expired',
           updatedAt: now,
           updatedBy: systemUserId,

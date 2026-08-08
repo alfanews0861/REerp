@@ -26,6 +26,7 @@
     "@real-estate-erp/utils": "workspace:*",
     "@reduxjs/toolkit": "^2.2.7",
     "@tanstack/react-query": "^5.51.23",
+    "firebase": "^10.12.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.52.2",

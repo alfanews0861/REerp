@@ -62,5 +62,37 @@ service cloud.firestore {
       allow read: if isAdmin();
       allow write: if false; // Only written via Cloud Functions admin SDK
     }
+    // Marketing Network & Commission Engine
+    match /network_positions/{positionId} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin() || hasPermission('network', 'manage_positions');
+    }
+    
+    match /network_members/{memberId} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin() || hasPermission('network', 'manage_members');
+    }
+
+    match /network_teams/{teamId} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin() || hasPermission('network', 'manage_teams');
+    }
+
+    match /commission_rules/{ruleId} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin() || hasPermission('commission', 'manage_rules');
+    }
+
+    match /commission_pools/{poolId} {
+      // Only admins and authorized finance can view all pools
+      allow read: if isAdmin() || hasPermission('commission', 'view_ledger');
+      allow write: if false; // Written only by Cloud Functions
+    }
+
+    match /commission_records/{recordId} {
+      // Members can read their own commission records. Admins can read all.
+      allow read: if isAdmin() || hasPermission('commission', 'view_ledger') || (isAuthenticated() && resource.data.networkMemberId == request.auth.uid);
+      allow write: if false; // Written only by Cloud Functions
+    }
   }
 }

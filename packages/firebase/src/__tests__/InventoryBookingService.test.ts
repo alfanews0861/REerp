@@ -1,15 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { InventoryBookingService } from '../realestate/services/InventoryBookingService';
 
-vi.mock('../../config', () => ({
+vi.mock('../config', () => ({
   getFirebaseInstance: () => ({
     db: {},
   }),
 }));
 
 vi.mock('firebase/firestore', () => ({
-  doc: vi.fn(),
-  collection: vi.fn(),
+  doc: vi.fn(() => ({ id: 'mock-doc-id' })),
+  collection: vi.fn(() => 'mock-collection'),
   runTransaction: vi.fn(async (_, cb) => {
     const transaction = {
       get: vi.fn().mockResolvedValue({
@@ -52,10 +52,11 @@ describe('InventoryBookingService', () => {
       totalPlotAmount: 1200000,
       discountAmount: 0,
       finalSaleAmount: 1200000,
+      paymentAmount: 10000,
     }, 'user1');
 
     expect(result).toBeDefined();
-    expect(result.status).toBe('DRAFT');
+    expect(result.status).toBe('active');
     expect(result.plotId).toBe('plot1');
     expect(result.customerId).toBe('cust1');
   });

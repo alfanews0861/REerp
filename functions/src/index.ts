@@ -17,3 +17,4 @@ export * from './triggers/projectTriggers';
 export * from './triggers/leadTriggers';
 export * from './events/publishEvent';
 export * from './events/subscribeEvents';
+export * from './triggers/paymentTriggers';

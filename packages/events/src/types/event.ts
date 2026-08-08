@@ -13,6 +13,8 @@ export enum AggregateType {
   SiteVisit = 'SiteVisit',
   Notification = 'Notification',
   Plot = 'Plot',
+  Network = 'Network',
+  Commission = 'Commission',
 }
 
 export interface EventMetadata {

@@ -33,9 +33,10 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.dailySystemCleanup = void 0;
+exports.hourlyBookingExpiry = exports.dailySystemCleanup = void 0;
 const scheduler_1 = require("firebase-functions/v2/scheduler");
 const admin = __importStar(require("firebase-admin"));
+const firebase_1 = require("@real-estate-erp/firebase");
 // Daily maintenance & system audit log cleanup cron job
 exports.dailySystemCleanup = (0, scheduler_1.onSchedule)('every 24 hours', async () => {
     const db = admin.firestore();
@@ -51,5 +52,27 @@ exports.dailySystemCleanup = (0, scheduler_1.onSchedule)('every 24 hours', async
     const batch = db.batch();
     snapshot.docs.forEach((doc) => batch.delete(doc.ref));
     await batch.commit();
+});
+// Hourly booking expiry job
+exports.hourlyBookingExpiry = (0, scheduler_1.onSchedule)('every 1 hours', async () => {
+    const db = admin.firestore();
+    const now = new Date().toISOString();
+    // Find all BOOKED plots whose expiry has passed
+    const snapshot = await db
+        .collection('plots')
+        .where('status', '==', 'BOOKED')
+        .where('bookingExpiryAt', '<', now)
+        .get();
+    if (snapshot.empty)
+        return;
+    for (const doc of snapshot.docs) {
+        try {
+            // Invoke existing service idempotently
+            await firebase_1.inventoryBookingService.processBookingExpiry(doc.id, 'system-cron');
+        }
+        catch (error) {
+            console.error(`Error processing expiry for plot ${doc.id}`, error);
+        }
+    }
 });
 //# sourceMappingURL=scheduledTasks.js.map

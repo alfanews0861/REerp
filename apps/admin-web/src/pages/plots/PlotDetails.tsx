@@ -4,13 +4,22 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getFirebaseInstance } from '@real-estate-erp/firebase';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { StatusChip, PageHeader } from '@real-estate-erp/ui';
+import { InitiateBookingDialog } from './components/InitiateBookingDialog';
+import { AddPaymentDialog } from './components/AddPaymentDialog';
+import { CompleteRegistrationDialog } from './components/CompleteRegistrationDialog';
 
 export const PlotDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [plot, setPlot] = useState<any>(null);
   const [booking, setBooking] = useState<any>(null);
+  const [payments, setPayments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0); // Used to trigger re-fetch
+
+  const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+  const [registrationDialogOpen, setRegistrationDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -30,7 +39,14 @@ export const PlotDetails = () => {
             const bookingRef = doc(db, 'bookings', plotData.currentBookingId);
             const bookingSnap = await getDoc(bookingRef);
             if (bookingSnap.exists()) {
-              setBooking({ id: bookingSnap.id, ...bookingSnap.data() });
+              const bData = { id: bookingSnap.id, ...bookingSnap.data() };
+              setBooking(bData);
+
+              // Fetch Payments for this booking
+              const paymentsQuery = query(collection(db, 'payments'), where('bookingId', '==', bData.id));
+              const paymentsSnap = await getDocs(paymentsQuery);
+              const paymentsData = paymentsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+              setPayments(paymentsData);
             }
           }
         }
@@ -42,7 +58,7 @@ export const PlotDetails = () => {
     };
     
     fetchDetails();
-  }, [id]);
+  }, [id, refreshKey]);
 
   if (loading) return <Typography p={3}>Loading...</Typography>;
   if (!plot) return <Typography p={3}>Plot not found.</Typography>;
@@ -84,7 +100,7 @@ export const PlotDetails = () => {
               </Grid>
               {plot.bookingExpiryAt && (
                 <Grid item xs={6}>
-                  <Typography color="textSecondary" color="error">Booking Expiry</Typography>
+                  <Typography color={new Date(plot.bookingExpiryAt) < new Date() ? "error" : "textSecondary"}>Booking Expiry</Typography>
                   <Typography variant="body1">{new Date(plot.bookingExpiryAt).toLocaleString()}</Typography>
                 </Grid>
               )}
@@ -92,27 +108,68 @@ export const PlotDetails = () => {
           </Paper>
 
           {booking && (
-            <Paper sx={{ p: 3 }}>
-              <Typography variant="h6" gutterBottom>Active Booking Details</Typography>
+            <Paper sx={{ p: 3, mb: 3 }}>
+              <Typography variant="h6" gutterBottom>Booking Information</Typography>
               <Divider sx={{ mb: 2 }} />
               <Grid container spacing={2}>
                 <Grid item xs={6}>
-                  <Typography color="textSecondary">Customer Name</Typography>
-                  <Typography variant="body1">{booking.customerName}</Typography>
+                  <Typography color="textSecondary">Customer ID</Typography>
+                  <Typography variant="body1">{booking.customerId}</Typography>
+                </Grid>
+                {booking.leadId && (
+                  <Grid item xs={6}>
+                    <Typography color="textSecondary">Lead ID</Typography>
+                    <Typography variant="body1">{booking.leadId}</Typography>
+                  </Grid>
+                )}
+                <Grid item xs={6}>
+                  <Typography color="textSecondary">Booking Date</Typography>
+                  <Typography variant="body1">{new Date(booking.bookingDate).toLocaleDateString()}</Typography>
                 </Grid>
                 <Grid item xs={6}>
-                  <Typography color="textSecondary">Customer Phone</Typography>
-                  <Typography variant="body1">{booking.customerPhone}</Typography>
-                </Grid>
-                <Grid item xs={6}>
-                  <Typography color="textSecondary">Sales Executive</Typography>
-                  <Typography variant="body1">{booking.salesExecutiveName}</Typography>
-                </Grid>
-                <Grid item xs={6}>
-                  <Typography color="textSecondary">Agreed Amount</Typography>
-                  <Typography variant="body1">₹{booking.finalSaleAmount}</Typography>
+                  <Typography color="textSecondary">Booking Status</Typography>
+                  <Typography variant="body1">{booking.status}</Typography>
                 </Grid>
               </Grid>
+            </Paper>
+          )}
+
+          {booking && (
+            <Paper sx={{ p: 3, mb: 3 }}>
+              <Typography variant="h6" gutterBottom>Payments & Ledger</Typography>
+              <Divider sx={{ mb: 2 }} />
+              <Grid container spacing={2}>
+                <Grid item xs={4}>
+                  <Typography color="textSecondary">Total Price</Typography>
+                  <Typography variant="body1">₹{booking.finalAmount}</Typography>
+                </Grid>
+                <Grid item xs={4}>
+                  <Typography color="textSecondary">Total Paid</Typography>
+                  <Typography variant="body1">₹{booking.totalPaidAmount || 0}</Typography>
+                </Grid>
+                <Grid item xs={4}>
+                  <Typography color="textSecondary">Outstanding Balance</Typography>
+                  <Typography variant="body1" color={booking.finalAmount - (booking.totalPaidAmount || 0) > 0 ? "error" : "success.main"}>
+                    ₹{booking.finalAmount - (booking.totalPaidAmount || 0)}
+                  </Typography>
+                </Grid>
+              </Grid>
+              <Box mt={2}>
+                <Typography variant="subtitle2" gutterBottom>Payment History</Typography>
+                {payments.length === 0 ? (
+                  <Typography variant="body2" color="textSecondary">No payments recorded.</Typography>
+                ) : (
+                  <ul>
+                    {payments.map(p => (
+                      <li key={p.id}>
+                        <Typography variant="body2">
+                          {new Date(p.paymentDate).toLocaleDateString()} - {p.paymentMethod}: ₹{p.amount} ({p.status})
+                        </Typography>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </Box>
             </Paper>
           )}
         </Grid>
@@ -123,11 +180,12 @@ export const PlotDetails = () => {
             <Divider sx={{ mb: 2 }} />
             <Box display="flex" flexDirection="column" gap={2}>
               {plot.status === 'AVAILABLE' && (
-                <Button variant="contained" color="primary">Initiate Booking</Button>
+                <Button variant="contained" color="primary" onClick={() => setBookingDialogOpen(true)}>Initiate Booking</Button>
               )}
-              {plot.status === 'BOOKED' && (
+              {plot.status === 'BOOKED' && booking?.status === 'active' && (
                 <>
-                  <Button variant="contained" color="success">Proceed to Registration</Button>
+                  <Button variant="contained" color="secondary" onClick={() => setPaymentDialogOpen(true)}>Add Payment</Button>
+                  <Button variant="contained" color="success" onClick={() => setRegistrationDialogOpen(true)}>Complete Registration</Button>
                   <Button variant="outlined" color="error">Cancel / Expire Booking</Button>
                 </>
               )}
@@ -137,7 +195,37 @@ export const PlotDetails = () => {
           </Paper>
         </Grid>
       </Grid>
+
+      {/* Dialogs */}
+      {plot.status === 'AVAILABLE' && (
+        <InitiateBookingDialog 
+          open={bookingDialogOpen} 
+          onClose={() => setBookingDialogOpen(false)} 
+          plot={plot} 
+          onBookingComplete={() => setRefreshKey(prev => prev + 1)} 
+        />
+      )}
+      
+      {booking && (
+        <AddPaymentDialog 
+          open={paymentDialogOpen} 
+          onClose={() => setPaymentDialogOpen(false)} 
+          booking={booking} 
+          onPaymentComplete={() => setRefreshKey(prev => prev + 1)} 
+        />
+      )}
+
+      {booking && (
+        <CompleteRegistrationDialog 
+          open={registrationDialogOpen} 
+          onClose={() => setRegistrationDialogOpen(false)} 
+          booking={booking} 
+          onRegistrationComplete={() => setRefreshKey(prev => prev + 1)} 
+        />
+      )}
+
     </Box>
   );
 };
 export default PlotDetails;
+

@@ -10,3 +10,6 @@ export * from './marketing';
 export * from './person';
 export * from './interaction';
 export * from './workflow';
+export * from './siteVisit';
+export * from './network';
+export * from './commission';

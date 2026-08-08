@@ -13,8 +13,10 @@ import { AppShell } from '../layouts/AppShell';
 const Placeholder = lazy(() => import('../pages/PlaceholderPage'));
 const ExecutiveDashboard = lazy(() => import('../pages/dashboard/ExecutiveDashboard'));
 const LeadsWorkspace = lazy(() => import('../pages/crm/leads/LeadsWorkspace'));
+const SiteVisitsWorkspace = lazy(() => import('../pages/crm/site-visits/SiteVisitsWorkspace'));
 const PlotInventory = lazy(() => import('../pages/plots/PlotInventory'));
 const PlotDetails = lazy(() => import('../pages/plots/PlotDetails'));
+const NetworkWorkspace = lazy(() => import('../pages/marketing/network/NetworkWorkspace'));
 
 const LoadingFallback = () => (
   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', minHeight: '50vh' }}>
@@ -64,6 +66,7 @@ export const AppRoutes: FC = () => {
             
             {/* CRM */}
             <Route path="/crm/leads" element={<LeadsWorkspace />} />
+            <Route path="/crm/site-visits" element={<SiteVisitsWorkspace />} />
             <Route path="/crm/customers" element={<Placeholder />} />
             
             {/* Projects & Plots */}
@@ -74,6 +77,7 @@ export const AppRoutes: FC = () => {
             {/* Marketing */}
             <Route path="/marketing/campaigns" element={<Placeholder />} />
             <Route path="/marketing/site-visits" element={<Placeholder />} />
+            <Route path="/marketing/network" element={<NetworkWorkspace />} />
             
             {/* Sales & Finance */}
             <Route path="/bookings" element={<Placeholder />} />

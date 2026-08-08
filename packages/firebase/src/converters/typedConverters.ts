@@ -37,6 +37,13 @@ import {
   SettingModel,
   AuditLogModel,
   AISuggestionModel,
+  SiteVisitModel,
+  NetworkMemberModel,
+  NetworkPositionModel,
+  NetworkTeamModel,
+  CommissionRuleModel,
+  CommissionPoolModel,
+  CommissionRecordModel,
 } from '../models';
 
 export const companyConverter = createBaseConverter<CompanyModel>();
@@ -76,3 +83,11 @@ export const mediaConverter = createBaseConverter<MediaModel>();
 export const settingConverter = createBaseConverter<SettingModel>();
 export const auditLogConverter = createBaseConverter<AuditLogModel>();
 export const aiSuggestionConverter = createBaseConverter<AISuggestionModel>();
+export const siteVisitConverter = createBaseConverter<SiteVisitModel>();
+
+export const networkMemberConverter = createBaseConverter<NetworkMemberModel>();
+export const networkPositionConverter = createBaseConverter<NetworkPositionModel>();
+export const networkTeamConverter = createBaseConverter<NetworkTeamModel>();
+export const commissionRuleConverter = createBaseConverter<CommissionRuleModel>();
+export const commissionPoolConverter = createBaseConverter<CommissionPoolModel>();
+export const commissionRecordConverter = createBaseConverter<CommissionRecordModel>();

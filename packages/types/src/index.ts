@@ -16,3 +16,6 @@ export * from './person';
 export * from './attendance';
 export * from './interaction';
 export * from './workflow';
+export * from './visit';
+export * from './network';
+export * from './commission';

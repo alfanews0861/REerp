@@ -27,6 +27,7 @@ import {
   SettingModel,
   AuditLogModel,
   AISuggestionModel,
+  SiteVisitModel,
 } from '../models';
 import {
   roleConverter,
@@ -55,6 +56,7 @@ import {
   settingConverter,
   auditLogConverter,
   aiSuggestionConverter,
+  siteVisitConverter,
 } from '../converters/typedConverters';
 
 
@@ -220,6 +222,12 @@ export class AISuggestionRepository extends BaseRepository<AISuggestionModel> {
   }
 }
 
+export class SiteVisitRepository extends BaseRepository<SiteVisitModel> {
+  constructor() {
+    super(FIRESTORE_COLLECTIONS.SITE_VISITS, 'SiteVisit', siteVisitConverter);
+  }
+}
+
 export {
   DesignationRepository,
   TeamRepository,
@@ -228,4 +236,6 @@ export {
 } from '../organization/repositories';
 
 export * from './WorkflowRepository';
+export * from './networkRepositories';
+export * from './commissionRepositories';
 

@@ -9,6 +9,14 @@ describe('Project Validators', () => {
 
   it('should validate a correct project', () => {
     const validProject = {
+      id: 'proj-1',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      createdBy: 'user-1',
+      updatedBy: 'user-1',
+      isActive: true,
+      isDeleted: false,
+      version: 1,
       name: 'Test Project',
       code: 'TP-01',
       projectType: 'RESIDENTIAL',
@@ -63,6 +71,14 @@ describe('Project Validators', () => {
 
   it('should validate a correct plot', () => {
     const validPlot = {
+      id: 'plot-1',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      createdBy: 'user-1',
+      updatedBy: 'user-1',
+      isActive: true,
+      isDeleted: false,
+      version: 1,
       projectId: 'proj-1',
       layoutId: 'lay-1',
       blockId: 'blk-1',

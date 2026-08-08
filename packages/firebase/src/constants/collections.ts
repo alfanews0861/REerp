@@ -23,6 +23,7 @@ export const FIRESTORE_COLLECTIONS = {
   CUSTOMERS: 'customers',
   BOOKINGS: 'bookings',
   PAYMENTS: 'payments',
+  REGISTRATIONS: 'registrations',
   RECEIPTS: 'receipts',
   VEHICLES: 'vehicles',
   DRIVERS: 'drivers',
@@ -42,6 +43,13 @@ export const FIRESTORE_COLLECTIONS = {
   WORKFLOW_INSTANCES: 'workflow_instances',
   WORKFLOW_HISTORIES: 'workflow_histories',
   WORKFLOW_COMMENTS: 'workflow_comments',
+  SITE_VISITS: 'site_visits',
+  NETWORK_POSITIONS: 'network_positions',
+  NETWORK_MEMBERS: 'network_members',
+  NETWORK_TEAMS: 'network_teams',
+  COMMISSION_RULES: 'commission_rules',
+  COMMISSION_POOLS: 'commission_pools',
+  COMMISSION_RECORDS: 'commission_records',
 } as const;
 
 export type CollectionName = (typeof FIRESTORE_COLLECTIONS)[keyof typeof FIRESTORE_COLLECTIONS];

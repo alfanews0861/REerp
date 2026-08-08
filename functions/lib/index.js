@@ -53,4 +53,5 @@ __exportStar(require("./triggers/projectTriggers"), exports);
 __exportStar(require("./triggers/leadTriggers"), exports);
 __exportStar(require("./events/publishEvent"), exports);
 __exportStar(require("./events/subscribeEvents"), exports);
+__exportStar(require("./triggers/paymentTriggers"), exports);
 //# sourceMappingURL=index.js.map
