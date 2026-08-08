@@ -120,3 +120,34 @@ export interface Person extends BaseEntity {
   isActive: boolean;
   version: number;
 }
+
+export interface CustomerTimelineItem {
+  id: string;
+  timestamp: string;
+  type: 'INTERACTION' | 'BOOKING' | 'PAYMENT' | 'SITE_VISIT' | 'AFTER_SALES' | 'REGISTRATION';
+  title: string;
+  description?: string;
+  actor?: string; // Who performed the action
+  metadata?: Record<string, any>; // Reference IDs etc.
+}
+
+export interface Customer360Profile extends Person {
+  /** Aggregated financial summary */
+  financials: {
+    totalBookedValue: number;
+    totalAmountPaid: number;
+    balanceDue: number;
+  };
+  
+  /** Aggregated counts for UI display */
+  summary: {
+    totalLeads: number;
+    totalSiteVisits: number;
+    totalBookings: number;
+    totalDocuments: number;
+    totalAfterSalesCases: number;
+  };
+  
+  /** Active relationships (e.g. Assigned Executive) */
+  assignedExecutiveId?: string;
+}

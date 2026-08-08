@@ -15,6 +15,9 @@ export enum AggregateType {
   Plot = 'Plot',
   Network = 'Network',
   Commission = 'Commission',
+  Document = 'Document',
+  AfterSales = 'AfterSales',
+  CustomerNotification = 'CustomerNotification',
 }
 
 export interface EventMetadata {

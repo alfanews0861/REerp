@@ -94,5 +94,37 @@ service cloud.firestore {
       allow read: if isAdmin() || hasPermission('commission', 'view_ledger') || (isAuthenticated() && resource.data.networkMemberId == request.auth.uid);
       allow write: if false; // Written only by Cloud Functions
     }
+    // Persons (Customers/Leads)
+    match /persons/{personId} {
+      allow read: if isAuthenticated() && (isAdmin() || hasPermission('customer', 'view') || isOwner(personId));
+      allow write: if isAdmin() || hasPermission('customer', 'manage');
+    }
+
+    // Documents Vault
+    match /documents/{documentId} {
+      allow read: if isAuthenticated() && (
+        isAdmin() || 
+        hasPermission('document', 'view') || 
+        (resource.data.visibility == 'CUSTOMER_VISIBLE' && isOwner(resource.data.entityId))
+      );
+      allow write: if isAdmin() || hasPermission('document', 'manage');
+    }
+
+    // After-Sales Cases
+    match /after_sales/{caseId} {
+      allow read: if isAuthenticated() && (
+        isAdmin() || 
+        hasPermission('after_sales', 'view') || 
+        (resource.data.assignedTo == request.auth.uid) ||
+        isOwner(resource.data.customerId)
+      );
+      allow write: if isAdmin() || hasPermission('after_sales', 'manage') || (isAuthenticated() && resource.data.assignedTo == request.auth.uid);
+    }
+
+    // Customer Notifications
+    match /customer_notifications/{notificationId} {
+      allow read: if isAuthenticated() && isOwner(resource.data.userId);
+      allow write: if false; // Written only by Cloud Functions
+    }
   }
 }

@@ -16,3 +16,5 @@ export * from './marketing';
 export * from './networkEvents';
 export * from './commissionEvents';
 export * from './paymentEvents';
+export * from './documentEvents';
+export * from './afterSalesEvents';

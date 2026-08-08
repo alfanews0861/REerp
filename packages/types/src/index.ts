@@ -20,3 +20,7 @@ export * from './visit';
 export * from './network';
 export * from './commission';
 export * from './routing';
+export * from './document';
+export * from './after-sales';
+export * from './notification';
+export * from './dashboard';
