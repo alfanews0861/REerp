@@ -1,11 +1,12 @@
 import { LeadCaptureRequestDTO } from './dto';
-import { CampaignAttributionResult } from './CampaignAttributionService';
+import { CampaignTouchpoint } from '@real-estate-erp/types';
 
 export class LeadMapper {
   public static toInternalModel(
     dto: LeadCaptureRequestDTO,
     personId: string,
-    attribution: CampaignAttributionResult
+    touchpoint: CampaignTouchpoint,
+    routingDetails: { ownerId?: string; telecallerId?: string; networkMemberId?: string; routingStrategy: string }
   ): any {
     return {
       companyId: dto.companyId,
@@ -16,20 +17,28 @@ export class LeadMapper {
       email: dto.email,
       phone: dto.phone,
       altPhone: dto.altPhone,
-      status: 'new',
-      stage: 'lead_captured',
+      status: 'NEW', // Matches LeadStatus 'NEW'
       requirementDetails: dto.requirementDetails,
       budgetMin: dto.budgetMin,
       budgetMax: dto.budgetMax,
       preferredLocation: dto.preferredLocation,
       notes: dto.notes,
-      // We will map person reference in LeadFactory or keep it in LeadModel if it had one
-      // Wait, LeadModel in leads.ts doesn't have personId by default, but we matched the person.
-      // Let's add it dynamically as it's required for CRM relations.
       personId: personId, 
-      initialScore: attribution.initialScore,
-      utmSource: attribution.utmSource,
-      utmCampaign: attribution.utmCampaign,
+      
+      // Ownership and Routing
+      ownerId: routingDetails.ownerId,
+      telecallerId: routingDetails.telecallerId,
+      networkMemberId: routingDetails.networkMemberId,
+      routingStrategy: routingDetails.routingStrategy,
+      
+      // Campaign
+      campaignId: touchpoint.campaignId,
+      source: dto.sourceCode,
+      
+      aiIntentScore: 0,
+      
+      // Timestamps
+      firstContactAt: new Date().toISOString()
     };
   }
 }

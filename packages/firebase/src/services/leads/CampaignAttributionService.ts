@@ -1,56 +1,50 @@
 import { LeadCaptureRequestDTO } from './dto';
-
-export interface CampaignAttributionResult {
-  initialScore: number;
-  utmSource?: string;
-  utmMedium?: string;
-  utmCampaign?: string;
-  referralCode?: string;
-}
+import { CampaignAttribution, CampaignTouchpoint, CampaignChannel, AttributionModel } from '@real-estate-erp/types';
 
 export class CampaignAttributionService {
-  public calculateAttribution(dto: LeadCaptureRequestDTO): CampaignAttributionResult {
-    let initialScore = 0;
-
-    // Base score by source
-    switch (dto.sourceCode.toUpperCase()) {
-      case 'WALK_IN':
-        initialScore += 50;
-        break;
-      case 'REFERRAL':
-        initialScore += 60;
-        break;
-      case 'GOOGLE_SEARCH':
-        initialScore += 40;
-        break;
-      case 'FACEBOOK_ADS':
-      case 'INSTAGRAM_ADS':
-        initialScore += 30;
-        break;
-      case '99ACRES':
-      case 'MAGICBRICKS':
-      case 'HOUSING_COM':
-        initialScore += 45;
-        break;
-      default:
-        initialScore += 20;
-    }
-
-    // Weight by campaign attribution
-    if (dto.utmCampaign) {
-      initialScore += 10;
-    }
-
-    if (dto.referralCode) {
-      initialScore += 20;
-    }
-
+  /**
+   * Generates a new touchpoint from a lead capture request.
+   */
+  public createTouchpoint(dto: LeadCaptureRequestDTO, leadId: string): CampaignTouchpoint {
     return {
-      initialScore: Math.min(initialScore, 100),
-      utmSource: dto.utmSource,
-      utmMedium: dto.utmMedium,
-      utmCampaign: dto.utmCampaign,
-      referralCode: dto.referralCode,
+      id: `touch_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+      campaignId: dto.campaignId || 'ORGANIC',
+      sourceCode: dto.sourceCode,
+      medium: dto.utmMedium || 'none',
+      channel: (dto.campaignChannel as CampaignChannel) || 'OTHER',
+      touchpoint: dto.utmSource || dto.sourceCode,
+      timestamp: new Date().toISOString(),
+      actor: dto.capturedByUserId || 'SYSTEM',
+      metadata: {
+        utmCampaign: dto.utmCampaign,
+        referralCode: dto.referralCode,
+      }
+    };
+  }
+
+  /**
+   * Computes the attribution model for a lead given its touchpoints.
+   */
+  public computeAttribution(
+    leadId: string, 
+    existingAttribution: CampaignAttribution | null, 
+    newTouchpoint: CampaignTouchpoint,
+    model: AttributionModel = 'FIRST_TOUCH'
+  ): CampaignAttribution {
+    const touchpoints = existingAttribution ? [...existingAttribution.touchpoints, newTouchpoint] : [newTouchpoint];
+    
+    // Sort touchpoints chronologically
+    touchpoints.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+    
+    const firstTouch = touchpoints[0];
+    const lastTouch = touchpoints[touchpoints.length - 1];
+    
+    return {
+      leadId,
+      firstTouchId: firstTouch.id,
+      lastTouchId: lastTouch.id,
+      touchpoints,
+      attributionModel: model
     };
   }
 }

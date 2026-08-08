@@ -6,3 +6,4 @@ export * from './LeadMatchingService';
 export * from './mapper';
 export * from './LeadFactory';
 export * from './LeadAcquisitionService';
+export * from './RoutingService';

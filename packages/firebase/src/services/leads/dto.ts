@@ -29,6 +29,12 @@ export interface LeadCaptureRequestDTO {
   utmMedium?: string;
   utmCampaign?: string;
   referralCode?: string;
+  campaignChannel?: string;
+  
+  // Ownership preservation
+  ownerId?: string;
+  telecallerId?: string;
+  networkMemberId?: string;
   
   // Audit
   capturedByUserId?: string;

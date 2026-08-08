@@ -19,3 +19,4 @@ export * from './workflow';
 export * from './visit';
 export * from './network';
 export * from './commission';
+export * from './routing';

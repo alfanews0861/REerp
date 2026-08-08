@@ -68,9 +68,29 @@ export interface Lead {
   assignedTelecallerName?: string;
   assignedExecutiveId?: string;
   assignedExecutiveName?: string;
+  assistingExecutiveIds?: string[];
   ownerId?: string;
+  leadIntroducerId?: string;
   networkMemberId?: string;
   telecallerId?: string;
+  campaignId?: string;
+  
+  // Qualification fields
+  interestLevel?: 'HIGH' | 'MEDIUM' | 'LOW';
+  purchasePurpose?: 'INVESTMENT' | 'SELF_USE' | 'UNDECIDED';
+  familyDecisionStatus?: 'PENDING' | 'DISCUSSED' | 'APPROVED';
+  
+  // Routing tracking
+  routingStrategy?: string;
+  assignmentCount?: number;
+  
+  // Funnel timestamps
+  firstContactAt?: string;
+  firstResponseAt?: string;
+  firstSiteVisitAt?: string;
+  bookingAt?: string;
+  registrationAt?: string;
+
   aiIntentScore: number; // 0-100 score calculated by Gemini AI
   aiRecommendation?: string;
   nextFollowUpDate?: string;
