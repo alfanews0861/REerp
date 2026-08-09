@@ -6,11 +6,23 @@ import { EventDispatcher, Event } from '@real-estate-erp/events';
 // import { NotificationHandler } from '../modules/notifications/handlers';
 
 import { CommissionHandler } from './handlers/CommissionHandler';
+import { KPIAggregatorHandler } from './handlers/KPIAggregatorHandler';
 
 const dispatcher = new EventDispatcher();
+const kpiHandler = new KPIAggregatorHandler();
 
-// Register handlers
+// Register existing handlers
 dispatcher.subscribe('BOOKING_FULLY_PAID', new CommissionHandler());
+
+// Register KPI aggregations
+const kpiEvents = [
+  'LEAD_CAPTURED', 'LEAD_QUALIFIED', 'SITE_VISIT_COMPLETED',
+  'PLOT_BOOKED', 'BOOKING_CREATED', 'BOOKING_FULLY_PAID', 'PLOT_REGISTERED',
+  'PAYMENT_RECEIVED', 'COMMISSION_APPROVED',
+  'AFTER_SALES_CREATED', 'AFTER_SALES_RESOLVED'
+];
+
+kpiEvents.forEach(evt => dispatcher.subscribe(evt, kpiHandler as any));
 
 export const onEventCreated = functions.firestore
   .document('events/{eventId}')

@@ -6,9 +6,20 @@ import { RuleBasedInsightProvider, AIMetricsPayload } from '@real-estate-erp/typ
 export class DashboardService {
   
   static async getCommandCenterData(filter?: DashboardFilter): Promise<ExecutiveDashboardData> {
-    // In production, we read the materialized view 'dashboard_kpis' document (e.g., scoped to companyId)
-    // For this implementation, we assume a global 'company_overview' document.
-    const kpiDocRef = doc(db, 'dashboard_kpis', filter?.companyId || 'company_overview');
+    const companyId = filter?.companyId || 'company_overview';
+    
+    let docId = `${companyId}_global`;
+    if (filter?.projectId && filter?.startDate) {
+      const dateStr = new Date(filter.startDate).toISOString().split('T')[0];
+      docId = `${companyId}_project_${filter.projectId}_daily_${dateStr}`;
+    } else if (filter?.projectId) {
+      docId = `${companyId}_project_${filter.projectId}`;
+    } else if (filter?.startDate) {
+      const dateStr = new Date(filter.startDate).toISOString().split('T')[0];
+      docId = `${companyId}_daily_${dateStr}`;
+    }
+    
+    const kpiDocRef = doc(db, 'dashboard_kpis', docId);
     const kpiSnap = await getDoc(kpiDocRef);
     
     // Fallback zero state if aggregation hasn't run

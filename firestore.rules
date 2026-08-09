@@ -126,5 +126,15 @@ service cloud.firestore {
       allow read: if isAuthenticated() && isOwner(resource.data.userId);
       allow write: if false; // Written only by Cloud Functions
     }
+
+    // Materialized KPI Views
+    match /dashboard_kpis/{kpiId} {
+      allow read: if isAdmin() || hasPermission('dashboard', 'view');
+      allow write: if false; // Only written by KPIAggregator Cloud Function
+      
+      match /processed_events/{eventId} {
+        allow read, write: if false; // Internal idempotency tracker, backend only
+      }
+    }
   }
 }

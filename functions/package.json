@@ -18,17 +18,20 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
-    "firebase-admin": "^12.2.0",
-    "firebase-functions": "^5.0.1",
     "@real-estate-erp/events": "workspace:*",
+    "@real-estate-erp/firebase": "workspace:*",
     "@real-estate-erp/types": "workspace:*",
     "@real-estate-erp/utils": "workspace:*",
-    "@real-estate-erp/firebase": "workspace:*"
+    "firebase-admin": "^12.2.0",
+    "firebase-functions": "^5.0.1"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "eslint": "^8.57.0",
+    "jest": "^30.4.2",
+    "ts-jest": "^29.4.12",
     "typescript": "^5.5.4"
   }
 }
