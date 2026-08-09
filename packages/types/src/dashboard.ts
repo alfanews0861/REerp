@@ -42,6 +42,12 @@ export interface AIInsight {
   
   /** Confidence score in this insight */
   confidence: AIConfidence;
+
+  /** Timestamp when the insight was generated */
+  generatedAt?: string;
+
+  /** Which provider generated this insight (e.g., RuleBased, LLM) */
+  provider?: string;
 }
 
 export interface DashboardFilter {

@@ -1,0 +1,82 @@
+import { assertFails, assertSucceeds, initializeTestEnvironment, RulesTestEnvironment } from '@firebase/rules-unit-testing';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
+
+let testEnv: RulesTestEnvironment;
+
+beforeAll(async () => {
+  testEnv = await initializeTestEnvironment({
+    projectId: 'real-estate-erp-test',
+    firestore: {
+      rules: readFileSync(resolve(__dirname, '../../../firestore.rules'), 'utf8'),
+    },
+  });
+});
+
+afterAll(async () => {
+  await testEnv.cleanup();
+});
+
+beforeEach(async () => {
+  await testEnv.clearFirestore();
+});
+
+describe('Firestore Security Rules: Documents, Notifications, After-Sales', () => {
+  it('Customer A cannot read Customer B documents', async () => {
+    const dbAdmin = testEnv.withSecurityRulesDisabled().firestore();
+    await dbAdmin.collection('documents').doc('docB').set({
+      visibility: 'CUSTOMER_VISIBLE',
+      entityId: 'customerB_id'
+    });
+
+    const alice = testEnv.authenticatedContext('customerA_id');
+    const docRef = alice.firestore().collection('documents').doc('docB');
+    await assertFails(docRef.get());
+  });
+
+  it('Customer A can read their own CUSTOMER_VISIBLE documents', async () => {
+    const dbAdmin = testEnv.withSecurityRulesDisabled().firestore();
+    await dbAdmin.collection('documents').doc('docA').set({
+      visibility: 'CUSTOMER_VISIBLE',
+      entityId: 'customerA_id'
+    });
+
+    const alice = testEnv.authenticatedContext('customerA_id');
+    const docRef = alice.firestore().collection('documents').doc('docA');
+    await assertSucceeds(docRef.get());
+  });
+
+  it('Customer A cannot read their own MANAGEMENT_ONLY documents', async () => {
+    const dbAdmin = testEnv.withSecurityRulesDisabled().firestore();
+    await dbAdmin.collection('documents').doc('docA_internal').set({
+      visibility: 'MANAGEMENT_ONLY',
+      entityId: 'customerA_id'
+    });
+
+    const alice = testEnv.authenticatedContext('customerA_id');
+    const docRef = alice.firestore().collection('documents').doc('docA_internal');
+    await assertFails(docRef.get());
+  });
+
+  it('Customer A cannot read Customer B notifications', async () => {
+    const dbAdmin = testEnv.withSecurityRulesDisabled().firestore();
+    await dbAdmin.collection('customer_notifications').doc('notifB').set({
+      userId: 'customerB_id'
+    });
+
+    const alice = testEnv.authenticatedContext('customerA_id');
+    const docRef = alice.firestore().collection('customer_notifications').doc('notifB');
+    await assertFails(docRef.get());
+  });
+
+  it('Customer A cannot read Customer B After-Sales cases', async () => {
+    const dbAdmin = testEnv.withSecurityRulesDisabled().firestore();
+    await dbAdmin.collection('after_sales').doc('caseB').set({
+      customerId: 'customerB_id'
+    });
+
+    const alice = testEnv.authenticatedContext('customerA_id');
+    const docRef = alice.firestore().collection('after_sales').doc('caseB');
+    await assertFails(docRef.get());
+  });
+});

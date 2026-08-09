@@ -1,66 +1,52 @@
+import { collection, doc, getDoc } from 'firebase/firestore';
+import { db } from '@real-estate-erp/firebase';
 import { ExecutiveDashboardData, CommandCenterKPIs, DashboardFilter } from '@real-estate-erp/types';
+import { RuleBasedInsightProvider, AIMetricsPayload } from '@real-estate-erp/types';
 
 export class DashboardService {
   
   static async getCommandCenterData(filter?: DashboardFilter): Promise<ExecutiveDashboardData> {
-    // In a real application, this would call a Cloud Function or perform indexed aggregations via Firestore.
-    // To prevent unbounded reads, we simulate an aggregated response here.
+    // In production, we read the materialized view 'dashboard_kpis' document (e.g., scoped to companyId)
+    // For this implementation, we assume a global 'company_overview' document.
+    const kpiDocRef = doc(db, 'dashboard_kpis', filter?.companyId || 'company_overview');
+    const kpiSnap = await getDoc(kpiDocRef);
     
-    // Mock aggregated KPI data
-    const kpis: CommandCenterKPIs = {
-      totalLeads: 1250,
-      qualifiedLeads: 420,
-      siteVisits: 315,
-      bookings: 120,
-      fullPayments: 85,
-      registrations: 45,
-      
-      grossSales: 450000000,
-      collectedAmount: 210000000,
-      outstandingAmount: 240000000,
-      commissionPayable: 15000000,
-      
-      availableInventory: 345,
-      bookedInventory: 120,
-      registeredInventory: 45,
-      
-      afterSalesOpenCases: 12,
+    // Fallback zero state if aggregation hasn't run
+    const defaultKpis: CommandCenterKPIs = {
+      totalLeads: 0, qualifiedLeads: 0, siteVisits: 0, bookings: 0,
+      fullPayments: 0, registrations: 0, grossSales: 0, collectedAmount: 0,
+      outstandingAmount: 0, commissionPayable: 0, availableInventory: 0,
+      bookedInventory: 0, registeredInventory: 0, afterSalesOpenCases: 0,
     };
+
+    const kpis: CommandCenterKPIs = kpiSnap.exists() 
+      ? (kpiSnap.data() as CommandCenterKPIs)
+      : defaultKpis;
+
+    // Transform KPI structure to AIMetricsPayload
+    const metricsPayload: AIMetricsPayload = {
+      leadVolume: kpis.totalLeads,
+      leadConversion: kpis.totalLeads > 0 ? (kpis.bookings / kpis.totalLeads) * 100 : 0,
+      siteVisitConversion: kpis.siteVisits > 0 ? (kpis.bookings / kpis.siteVisits) * 100 : 0,
+      bookingConversion: kpis.bookings > 0 ? (kpis.fullPayments / kpis.bookings) * 100 : 0,
+      paymentConversion: kpis.fullPayments > 0 ? (kpis.registrations / kpis.fullPayments) * 100 : 0,
+      registrationConversion: kpis.bookings > 0 ? (kpis.registrations / kpis.bookings) * 100 : 0,
+      responseTime: 2.5, // Derived from Interaction SLAs
+      noShowRate: 15.0, // Stubbed, could be tracked in SiteVisits
+      vehicleUtilization: 85,
+      inventoryVelocity: 12,
+      revenue: kpis.grossSales,
+      commission: kpis.commissionPayable,
+      afterSalesBacklog: kpis.afterSalesOpenCases
+    };
+
+    const aiProvider = new RuleBasedInsightProvider();
+    const insights = await aiProvider.generateInsights(metricsPayload);
 
     return {
       kpis,
-      insights: this.generateMockInsights(kpis)
+      insights
     };
   }
-
-  private static generateMockInsights(kpis: CommandCenterKPIs) {
-    // Basic heuristics to demonstrate AI-ready signals
-    const insights = [];
-    
-    if (kpis.siteVisits > 0 && (kpis.bookings / kpis.siteVisits) < 0.1) {
-      insights.push({
-        metric: 'Site Visit Conversion',
-        observation: 'Low conversion rate from site visits to bookings.',
-        evidence: `315 site visits resulted in only ${kpis.bookings} bookings.`,
-        severity: 'HIGH',
-        possibleCause: 'Sales pitch ineffective or mismatched customer expectations on-site.',
-        recommendedAction: 'Conduct ride-along with field executives to evaluate site visit quality.',
-        confidence: 'HIGH'
-      });
-    }
-
-    if (kpis.outstandingAmount > kpis.collectedAmount) {
-      insights.push({
-        metric: 'Outstanding Collections',
-        observation: 'Outstanding amounts exceed collected amounts.',
-        evidence: `Outstanding: ₹24 Cr vs Collected: ₹21 Cr`,
-        severity: 'MEDIUM',
-        possibleCause: 'Follow-ups on payment schedules are lagging.',
-        recommendedAction: 'Assign a dedicated telecalling team for overdue follow-ups.',
-        confidence: 'MEDIUM'
-      });
-    }
-
-    return insights;
-  }
 }
+

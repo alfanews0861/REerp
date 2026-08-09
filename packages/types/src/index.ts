@@ -24,3 +24,4 @@ export * from './document';
 export * from './after-sales';
 export * from './notification';
 export * from './dashboard';
+export * from './ai';

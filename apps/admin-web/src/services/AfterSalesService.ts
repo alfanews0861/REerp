@@ -1,4 +1,4 @@
-import { collection, query, where, getDocs, doc, setDoc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, setDoc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '@real-estate-erp/firebase';
 import { AfterSalesCase, AfterSalesStatus } from '@real-estate-erp/types';
 import { v4 as uuidv4 } from 'uuid';
@@ -48,5 +48,26 @@ export class AfterSalesService {
     }
     
     await updateDoc(docRef, updateData);
+  }
+
+  static async assignCase(id: string, assignToId: string, assignedById: string): Promise<void> {
+    const docRef = doc(db, this.collectionName, id);
+    const snap = await getDoc(docRef);
+    if (!snap.exists()) throw new Error('Case not found');
+    
+    const caseData = snap.data() as AfterSalesCase;
+    const assignments = caseData.assignments || [];
+    
+    assignments.push({
+      assignedTo: assignToId,
+      assignedBy: assignedById,
+      assignedAt: new Date().toISOString()
+    });
+
+    await updateDoc(docRef, {
+      assignedTo: assignToId,
+      assignments,
+      updatedAt: new Date().toISOString()
+    });
   }
 }

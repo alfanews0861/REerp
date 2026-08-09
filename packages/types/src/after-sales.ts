@@ -70,4 +70,11 @@ export interface AfterSalesCase extends BaseEntity {
     url: string;
     type: string;
   }[];
+
+  /** History of assignments to preserve audit trail */
+  assignments?: {
+    assignedTo: string;
+    assignedBy: string;
+    assignedAt: string;
+  }[];
 }
