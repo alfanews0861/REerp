@@ -5,7 +5,7 @@ export class CampaignAttributionService {
   /**
    * Generates a new touchpoint from a lead capture request.
    */
-  public createTouchpoint(dto: LeadCaptureRequestDTO, leadId: string): CampaignTouchpoint {
+  public createTouchpoint(dto: LeadCaptureRequestDTO): CampaignTouchpoint {
     return {
       id: `touch_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
       campaignId: dto.campaignId || 'ORGANIC',

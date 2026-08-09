@@ -1,15 +1,15 @@
-import { BaseRepository } from '../BaseRepository';
-import { FIRESTORE_COLLECTIONS } from '../../constants/collections';
+import { BaseRepository } from './BaseRepository';
+import { FIRESTORE_COLLECTIONS } from '../constants/collections';
 import {
   CommissionRuleModel,
   CommissionPoolModel,
   CommissionRecordModel,
-} from '../../models/commission';
+} from '../models/commission';
 import {
   commissionRuleConverter,
   commissionPoolConverter,
   commissionRecordConverter,
-} from '../../converters/typedConverters';
+} from '../converters/typedConverters';
 
 export class CommissionRuleRepository extends BaseRepository<CommissionRuleModel> {
   constructor() {

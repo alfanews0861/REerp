@@ -1,7 +1,8 @@
-import { CommissionRule, CommissionRecord, CommissionPool, Lead, PlotBooking, NetworkMember, CommissionStatus, CommissionAdjustment } from '@real-estate-erp/types';
+import { PlotBooking, Lead, CommissionStatus, CommissionAdjustment } from '@real-estate-erp/types';
 import { CommissionRuleRepository, CommissionPoolRepository, CommissionRecordRepository } from '../repositories/commissionRepositories';
 import { NetworkService } from './NetworkService';
 import { NetworkMemberRepository } from '../repositories/networkRepositories';
+import { where } from 'firebase/firestore';
 
 export class CommissionService {
   private ruleRepo: CommissionRuleRepository;
@@ -22,14 +23,14 @@ export class CommissionService {
    * Evaluates the rules and calculates upward commission based on the lead owner's hierarchy.
    * Triggered when BOOKING_FULLY_PAID event is received.
    */
-  async calculateCommission(booking: PlotBooking, lead: Lead, saleValue: number): Promise<void> {
+  async calculateCommission(booking: PlotBooking, lead: Lead, saleValue: number, userId: string): Promise<void> {
     if (!lead.ownerId && !lead.networkMemberId) {
       console.warn('Lead has no owner/network member to attribute commission.');
       return; 
     }
     
     // Idempotency Check: Prevent duplicate calculation
-    const existingPools = await this.poolRepo.query(q => q.where('bookingId', '==', booking.id));
+    const existingPools = await this.poolRepo.findAll([where('bookingId', '==', booking.id)]);
     const activePool = existingPools.find(p => p.status !== 'REVERSED');
     if (activePool) {
       console.log(`Commission already calculated for booking ${booking.id}. Pool ID: ${activePool.id}`);
@@ -48,32 +49,27 @@ export class CommissionService {
     const hierarchy = [ownerMember, ...ancestors.reverse()]; // From owner UP to top
 
     // 2. Fetch all active commission rules for this project/company
-    const allRules = await this.ruleRepo.query((q) => {
-        return q.where('active', '==', true)
-                .where('companyId', '==', ownerMember.companyId);
-    });
+    const allRules = await this.ruleRepo.findAll([
+      where('active', '==', true),
+      where('companyId', '==', ownerMember.companyId)
+    ]);
 
-    const pool: Omit<CommissionPool, 'id'> = {
+    const pool = {
       bookingId: booking.id,
       projectId: booking.projectId,
       plotId: booking.plotId,
       saleValue,
       totalCommissionCalculated: 0,
-      status: 'CALCULATED',
+      status: 'CALCULATED' as CommissionStatus,
       calculatedAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
     };
-    const createdPoolId = await this.poolRepo.create(pool);
+    const createdPool = await this.poolRepo.create(pool as any, userId);
+    const createdPoolId = createdPool.id;
 
     let totalCalculated = 0;
 
     // 3. Process each person in the hierarchy (bottom-up)
     for (const member of hierarchy) {
-      // Deterministic rule precedence:
-      // 1. member specific
-      // 2. project specific
-      // 3. position specific
-      // 4. priority value (higher is better)
       const validRules = allRules.filter(r => 
         (!r.projectId || r.projectId === booking.projectId) &&
         (!r.positionId || r.positionId === member.positionId) &&
@@ -92,7 +88,6 @@ export class CommissionService {
         const matchedRule = validRules[0];
         let amount = 0;
         
-        // Prevent negative values
         const percentage = Math.max(0, matchedRule.percentage || 0);
         const fixedAmount = Math.max(0, matchedRule.fixedAmount || 0);
 
@@ -103,7 +98,7 @@ export class CommissionService {
         }
 
         if (amount > 0) {
-          const record: Omit<CommissionRecord, 'id'> = {
+          const record = {
             poolId: createdPoolId,
             bookingId: booking.id,
             projectId: booking.projectId,
@@ -115,46 +110,37 @@ export class CommissionService {
             percentageApplied: matchedRule.percentage,
             fixedAmountApplied: matchedRule.fixedAmount,
             amount,
-            status: 'PENDING',
+            status: 'PENDING' as CommissionStatus,
             calculatedAt: new Date().toISOString(),
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
           };
-          await this.recordRepo.create(record);
+          await this.recordRepo.create(record as any, userId);
           totalCalculated += amount;
         }
       }
     }
 
-    // TODO: Optionally validate totalCalculated against a global project commission pool cap.
-
-    // Update pool with final total
-    await this.poolRepo.update(createdPoolId, {
-      totalCommissionCalculated: totalCalculated
-    });
+    await this.poolRepo.update(createdPoolId, { totalCommissionCalculated: totalCalculated }, userId);
   }
 
   /**
    * Reverses an entire commission pool (e.g. due to booking cancellation).
    */
   async reverseCommission(bookingId: string, reason: string, userId: string): Promise<void> {
-    const pools = await this.poolRepo.query(q => q.where('bookingId', '==', bookingId));
+    const pools = await this.poolRepo.findAll([where('bookingId', '==', bookingId)]);
     for (const pool of pools) {
       if (pool.status === 'REVERSED') continue;
       
       await this.poolRepo.update(pool.id, {
         status: 'REVERSED',
-        updatedAt: new Date().toISOString()
-      });
+      }, userId);
 
-      const records = await this.recordRepo.query(q => q.where('poolId', '==', pool.id));
+      const records = await this.recordRepo.findAll([where('poolId', '==', pool.id)]);
       for (const record of records) {
         await this.recordRepo.update(record.id, {
           status: 'REVERSED',
           reversalReason: reason,
           reversalDate: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        });
+        }, userId);
       }
     }
   }
@@ -177,10 +163,9 @@ export class CommissionService {
     const adjustments = record.adjustments || [];
     adjustments.push(adj);
 
-    // Note: The total amount paid would be `record.amount + sum(adjustments)`
     await this.recordRepo.update(recordId, {
       adjustments,
-      updatedAt: new Date().toISOString()
-    });
+    }, userId);
   }
 }
+

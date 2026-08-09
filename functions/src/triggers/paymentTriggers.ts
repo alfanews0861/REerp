@@ -1,8 +1,7 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import { PlotBooking } from '@real-estate-erp/types';
-import { EventPublisher } from '@real-estate-erp/events';
-import { BookingPaymentEvents } from '@real-estate-erp/events';
+import { DefaultEventPublisher, FirestoreEventStore, BookingPaymentEvents } from '@real-estate-erp/events';
 
 export const onPaymentUpdated = functions.firestore
   .document('bookings/{bookingId}')
@@ -16,10 +15,13 @@ export const onPaymentUpdated = functions.firestore
 
     if (!wasFullyPaid && isFullyPaid) {
       // The booking just became fully paid
-      const publisher = new EventPublisher(admin.firestore());
-      await publisher.publish({
+      const store = new FirestoreEventStore(admin.firestore());
+      const publisher = new DefaultEventPublisher(store);
+      
+      const event = {
+        eventId: `evt_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
         aggregateId: after.id,
-        aggregateType: 'Booking' as any, // Cast since we added it to types but EventPublisher might have old type definition cached in memory during build
+        aggregateType: 'Booking',
         eventType: BookingPaymentEvents.BOOKING_FULLY_PAID,
         payload: {
           bookingId: after.id,
@@ -27,8 +29,12 @@ export const onPaymentUpdated = functions.firestore
           finalSaleAmount: after.finalSaleAmount
         },
         actor: 'SYSTEM',
-        metadata: {}
-      });
+        metadata: {},
+        timestamp: new Date().toISOString(),
+        version: 1
+      };
+      
+      await publisher.publish(event);
       console.log(`Published BOOKING_FULLY_PAID for booking ${after.id}`);
     }
   });

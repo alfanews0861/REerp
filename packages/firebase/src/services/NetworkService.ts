@@ -83,7 +83,7 @@ export class NetworkService {
       hierarchyTransfers: transfers,
       updatedBy: userId,
       updatedAt: new Date().toISOString()
-    });
+    }, userId);
 
     // TODO: Update all descendants' ancestor arrays (Cascade update)
     // This requires a batch update of all members where `ancestors` array contains `memberId`

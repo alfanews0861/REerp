@@ -1,15 +1,15 @@
-import { BaseRepository } from '../BaseRepository';
-import { FIRESTORE_COLLECTIONS } from '../../constants/collections';
+import { BaseRepository } from './BaseRepository';
+import { FIRESTORE_COLLECTIONS } from '../constants/collections';
 import {
   NetworkMemberModel,
   NetworkPositionModel,
   NetworkTeamModel,
-} from '../../models/network';
+} from '../models/network';
 import {
   networkMemberConverter,
   networkPositionConverter,
   networkTeamConverter,
-} from '../../converters/typedConverters';
+} from '../converters/typedConverters';
 
 export class NetworkMemberRepository extends BaseRepository<NetworkMemberModel> {
   constructor() {

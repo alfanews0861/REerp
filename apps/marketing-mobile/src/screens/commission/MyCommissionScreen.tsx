@@ -22,7 +22,7 @@ export const MyCommissionScreen = () => {
           <View style={styles.listItem}>
             <View>
               <Text style={styles.bookingId}>{item.bookingId}</Text>
-              <Text style={styles.status(item.status)}>{item.status}</Text>
+              <Text style={getStatusStyle(item.status)}>{item.status}</Text>
             </View>
             <Text style={styles.amount}>{item.amount}</Text>
           </View>
@@ -41,13 +41,14 @@ const styles = StyleSheet.create({
   summaryValue: { color: '#FFF', fontSize: 32, fontWeight: 'bold', marginTop: 4 },
   listItem: { backgroundColor: '#FFF', padding: 16, borderRadius: 8, marginBottom: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   bookingId: { fontSize: 16, fontWeight: '600' },
-  status: (status: string) => ({
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: status === 'PAID' ? '#16A34A' : '#D97706',
-    marginTop: 4
-  }),
   amount: { fontSize: 18, fontWeight: 'bold', color: '#1F2937' }
+});
+
+const getStatusStyle = (status: string) => ({
+  fontSize: 12,
+  fontWeight: 'bold' as const,
+  color: status === 'PAID' ? '#16A34A' : '#D97706',
+  marginTop: 4
 });
 
 export default MyCommissionScreen;

@@ -11,6 +11,17 @@ export class CommissionEngine {
     const bookingDoc = await this.db.collection('bookings').doc(bookingId).get();
     if (!bookingDoc.exists) throw new Error('Booking not found');
     
+    // Idempotency check: Prevent duplicate commission calculation for the same booking
+    const existingPools = await this.db.collection('commission_pools')
+      .where('bookingId', '==', bookingId)
+      .limit(1)
+      .get();
+      
+    if (!existingPools.empty) {
+      console.log(`Commission already calculated for booking ${bookingId}. Skipping duplicate run.`);
+      return;
+    }
+    
     const booking = bookingDoc.data() as PlotBooking;
     
     // Create the initial pool

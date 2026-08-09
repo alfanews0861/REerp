@@ -13,16 +13,14 @@ vi.mock('firebase-admin', () => {
   };
 });
 
-import * as admin from 'firebase-admin';
+
 
 describe('NetworkService', () => {
   let service: NetworkService;
-  let db: any;
 
   beforeEach(() => {
     vi.clearAllMocks();
     service = new NetworkService();
-    db = admin.firestore();
   });
 
   it('should validate move correctly for valid move', async () => {

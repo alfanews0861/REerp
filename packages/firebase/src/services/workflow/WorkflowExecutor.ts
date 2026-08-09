@@ -34,7 +34,9 @@ export class WorkflowExecutor {
       // Ideal Implementation requires Repo method: this.instanceRepo.findActiveByEntity(entityId, definitionId)
       // Since it's an abstract simulation here, we will just log the intent. 
       // For true idempotency, this should run in a transaction checking for existing active instances.
-    } catch(e) {}
+    } catch(e) {
+      // Ignored: Not critical for the simulation, real implementation should handle
+    }
 
     const initialStage = definition.stages.find(s => s.isInitial);
     if (!initialStage) throw new Error('Workflow has no initial stage');

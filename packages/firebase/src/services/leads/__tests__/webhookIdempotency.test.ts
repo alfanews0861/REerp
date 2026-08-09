@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach } from 'vitest';
 import { LeadAcquisitionService } from '../LeadAcquisitionService';
 import { LeadCaptureRequestDTO } from '../dto';
 

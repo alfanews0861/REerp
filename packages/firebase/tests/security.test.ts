@@ -1,3 +1,4 @@
+import { describe, it, beforeAll, afterAll, beforeEach } from 'vitest';
 import { assertFails, assertSucceeds, initializeTestEnvironment, RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
@@ -8,6 +9,8 @@ beforeAll(async () => {
   testEnv = await initializeTestEnvironment({
     projectId: 'real-estate-erp-test',
     firestore: {
+      host: '127.0.0.1',
+      port: 8080,
       rules: readFileSync(resolve(__dirname, '../../../firestore.rules'), 'utf8'),
     },
   });

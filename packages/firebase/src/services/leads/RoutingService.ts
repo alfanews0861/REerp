@@ -1,6 +1,6 @@
-import { LeadRoutingStrategy, RoundRobinState } from '@real-estate-erp/types';
+import { LeadRoutingStrategy } from '@real-estate-erp/types';
 import { LeadCaptureRequestDTO } from './dto';
-import * as admin from 'firebase-admin';
+import { getFirestore, Transaction } from 'firebase-admin/firestore';
 
 export class RoutingService {
   /**
@@ -15,8 +15,8 @@ export class RoutingService {
   }> {
     let strategy: LeadRoutingStrategy = 'OWNER';
     let ownerId = dto.ownerId;
-    let telecallerId = dto.telecallerId;
-    let networkMemberId = dto.networkMemberId;
+    const telecallerId = dto.telecallerId;
+    const networkMemberId = dto.networkMemberId;
 
     // Preserve explicit ownership from DTO if provided
     if (ownerId || telecallerId || networkMemberId) {
@@ -48,11 +48,11 @@ export class RoutingService {
    * Round-robin implementation with Firebase Transactions.
    */
   private async executeRoundRobin(groupId: string): Promise<string | null> {
-    const db = admin.firestore();
+    const db = getFirestore();
     const stateRef = db.collection('routing_states').doc(groupId);
     
     try {
-      return await db.runTransaction(async (t: admin.firestore.Transaction) => {
+      return await db.runTransaction(async (t: Transaction) => {
         const doc = await t.get(stateRef);
         
         // Default mock list if not configured
@@ -61,8 +61,8 @@ export class RoutingService {
 
         if (doc.exists) {
           const data = doc.data();
-          if (data?.activeUsers?.length > 0) activeUsers = data.activeUsers;
-          if (typeof data?.lastAssignedIndex === 'number') lastAssignedIndex = data.lastAssignedIndex;
+          if (data && data.activeUsers?.length > 0) activeUsers = data.activeUsers;
+          if (data && typeof data.lastAssignedIndex === 'number') lastAssignedIndex = data.lastAssignedIndex;
         }
 
         if (activeUsers.length === 0) return null;

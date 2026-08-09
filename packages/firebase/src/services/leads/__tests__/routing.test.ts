@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach } from 'vitest';
 import { RoutingService } from '../RoutingService';
 
 describe('RoutingService', () => {
