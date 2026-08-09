@@ -5,26 +5,25 @@ import { resolve } from 'path';
 
 let testEnv: RulesTestEnvironment;
 
-beforeAll(async () => {
-  testEnv = await initializeTestEnvironment({
-    projectId: 'real-estate-erp-test',
-    firestore: {
-      host: '127.0.0.1',
-      port: 8080,
-      rules: readFileSync(resolve(__dirname, '../../../firestore.rules'), 'utf8'),
-    },
-  });
-});
-
-afterAll(async () => {
-  await testEnv.cleanup();
-});
-
-beforeEach(async () => {
-  await testEnv.clearFirestore();
-});
-
 describe('Firestore Security Rules: Documents, Notifications, After-Sales', () => {
+  beforeAll(async () => {
+    testEnv = await initializeTestEnvironment({
+      projectId: 'real-estate-erp-test',
+      firestore: {
+        host: '127.0.0.1',
+        port: 8080,
+        rules: readFileSync(resolve(__dirname, '../../../firestore.rules'), 'utf8'),
+      },
+    });
+  });
+
+  afterAll(async () => {
+    await testEnv.cleanup();
+  });
+
+  beforeEach(async () => {
+    await testEnv.clearFirestore();
+  });
   it('Customer A cannot read Customer B documents', async () => {
     const dbAdmin = testEnv.withSecurityRulesDisabled().firestore();
     await dbAdmin.collection('documents').doc('docB').set({
