@@ -18,13 +18,13 @@ export const LocationProvider = ({ children }: { children: ReactNode }) => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const requestPermission = async () => {
-    let { status } = await Location.requestForegroundPermissionsAsync();
+    const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
       setErrorMsg('Permission to access location was denied');
       return;
     }
 
-    let currentLocation = await Location.getCurrentPositionAsync({});
+    const currentLocation = await Location.getCurrentPositionAsync({});
     setLocation(currentLocation);
   };
 

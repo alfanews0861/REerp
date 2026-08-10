@@ -14,6 +14,7 @@ export default defineConfig({
       '@real-estate-erp/ui': path.resolve(__dirname, '../../packages/ui/src'),
       '@real-estate-erp/hooks': path.resolve(__dirname, '../../packages/hooks/src'),
     },
+    dedupe: ['react', 'react-dom'],
   },
   server: {
     port: 3000,
@@ -22,5 +23,13 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
+  },
+  test: {
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        singleFork: true,
+      },
+    },
   },
 });

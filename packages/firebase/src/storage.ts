@@ -1,7 +1,7 @@
-import { ref, uploadBytes, getDownloadURL, deleteObject, StorageReference } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { getFirebaseInstance } from './config';
 
-export function getStorageRef(path: string): StorageReference {
+export function getStorageRef(path: string): any {
   const { storage } = getFirebaseInstance();
   return ref(storage, path);
 }

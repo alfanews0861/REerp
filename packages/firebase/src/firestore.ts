@@ -1,8 +1,6 @@
 import {
   collection,
   doc,
-  CollectionReference,
-  DocumentReference,
   FirestoreDataConverter,
   QueryDocumentSnapshot,
 } from 'firebase/firestore';
@@ -25,12 +23,12 @@ export function createTypedConverter<T extends { id?: string }>(): FirestoreData
   };
 }
 
-export function getTypedCollection<T extends { id?: string }>(path: string): CollectionReference<T> {
+export function getTypedCollection<T extends { id?: string }>(path: string): any {
   const { db } = getFirebaseInstance();
   return collection(db, path).withConverter(createTypedConverter<T>());
 }
 
-export function getTypedDoc<T extends { id?: string }>(path: string, id: string): DocumentReference<T> {
+export function getTypedDoc<T extends { id?: string }>(path: string, id: string): any {
   const { db } = getFirebaseInstance();
   return doc(db, path, id).withConverter(createTypedConverter<T>());
 }

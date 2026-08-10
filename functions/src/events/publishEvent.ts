@@ -3,10 +3,6 @@ import * as admin from 'firebase-admin';
 import * as crypto from 'crypto';
 import { FirestoreEventStore, DefaultEventPublisher, Event, EventSchema } from '@real-estate-erp/events';
 
-const db = admin.firestore();
-const eventStore = new FirestoreEventStore(db);
-const eventPublisher = new DefaultEventPublisher(eventStore);
-
 export const publishEvent = functions.https.onCall(async (data, context) => {
   // Validate authentication
   if (!context.auth) {
@@ -15,6 +11,10 @@ export const publishEvent = functions.https.onCall(async (data, context) => {
       'User must be authenticated to publish events.'
     );
   }
+
+  const db = admin.firestore();
+  const eventStore = new FirestoreEventStore(db);
+  const eventPublisher = new DefaultEventPublisher(eventStore);
 
   // Construct the full Event object
   const event: Event = {

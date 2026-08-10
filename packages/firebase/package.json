@@ -6,8 +6,8 @@
   "module": "./src/index.ts",
   "types": "./src/index.ts",
   "scripts": {
-    "build": "tsc --build",
-    "type-check": "tsc --noEmit",
+    "build": "echo \"Skipped build for pure TS package\"",
+    "type-check": "tsc --noEmit --emitDeclarationOnly false",
     "lint": "eslint src",
     "test": "vitest run",
     "clean": "rimraf dist"

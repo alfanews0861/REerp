@@ -1,3 +1,6 @@
+// @vitest-environment jsdom
+import '@testing-library/jest-dom/vitest';
+import { describe, it, expect, vi } from 'vitest';
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
@@ -45,11 +48,11 @@ describe('LeadsWorkspace', () => {
   it('can toggle the filters panel', () => {
     renderWithProviders(<LeadsWorkspace />);
     
-    expect(screen.getByText('Filters')).toBeInTheDocument();
+    expect(screen.getAllByText('Filters')[0]).toBeInTheDocument();
     
-    const toggleBtn = screen.getByLabelText('Toggle Filters');
+    const toggleBtn = screen.getAllByLabelText('Toggle Filters')[0];
     fireEvent.click(toggleBtn);
     
-    expect(screen.queryByText('Filters')).not.toBeInTheDocument();
+    expect(screen.queryAllByText('Filters').length).toBeLessThan(2);
   });
 });

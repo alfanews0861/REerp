@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Box } from '@mui/material';
-import { paymentService } from '@real-estate-erp/firebase/src/realestate/services/PaymentService';
+import { paymentService } from '@real-estate-erp/firebase';
 
 export const AddPaymentDialog = ({ open, onClose, booking, onPaymentComplete }: any) => {
   const [formData, setFormData] = useState({

@@ -21,10 +21,10 @@ export const LeadsGrid: React.FC<LeadsGridProps> = ({ leads, selected, onSelectC
       id: 'fullName',
       label: 'Name',
       minWidth: 150,
-      format: (value: string, row: Lead) => (
+      format: (value: any, row?: Lead) => (
         <Box 
           sx={{ cursor: 'pointer', color: 'primary.main', fontWeight: 500 }}
-          onClick={() => dispatch(setSelectedLeadId(row.id))}
+          onClick={() => row && dispatch(setSelectedLeadId(row.id))}
         >
           {value}
         </Box>
@@ -36,7 +36,7 @@ export const LeadsGrid: React.FC<LeadsGridProps> = ({ leads, selected, onSelectC
       id: 'status',
       label: 'Status',
       minWidth: 150,
-      format: (value: string) => <StatusChip status={value} />
+      format: (value: any) => <StatusChip status={value as any} />
     },
     { id: 'source', label: 'Source', minWidth: 120 },
     { id: 'city', label: 'City', minWidth: 100 },
@@ -44,13 +44,13 @@ export const LeadsGrid: React.FC<LeadsGridProps> = ({ leads, selected, onSelectC
       id: 'createdAt', 
       label: 'Created', 
       minWidth: 120,
-      format: (value: string) => new Date(value).toLocaleDateString()
+      format: (value: any) => new Date(value).toLocaleDateString()
     },
     { 
       id: 'aiIntentScore', 
       label: 'Intent', 
       minWidth: 80,
-      format: (value: number) => (
+      format: (value: any) => (
         <Typography color={value > 75 ? 'success.main' : value > 40 ? 'warning.main' : 'error.main'}>
           {value}
         </Typography>

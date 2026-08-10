@@ -40,9 +40,19 @@ const events_1 = require("@real-estate-erp/events");
 // import { LeadCreatedHandler } from '../modules/leads/handlers';
 // import { NotificationHandler } from '../modules/notifications/handlers';
 const CommissionHandler_1 = require("./handlers/CommissionHandler");
+const KPIAggregatorHandler_1 = require("./handlers/KPIAggregatorHandler");
 const dispatcher = new events_1.EventDispatcher();
-// Register handlers
+const kpiHandler = new KPIAggregatorHandler_1.KPIAggregatorHandler();
+// Register existing handlers
 dispatcher.subscribe('BOOKING_FULLY_PAID', new CommissionHandler_1.CommissionHandler());
+// Register KPI aggregations
+const kpiEvents = [
+    'LEAD_CAPTURED', 'LEAD_QUALIFIED', 'SITE_VISIT_COMPLETED',
+    'PLOT_BOOKED', 'BOOKING_CREATED', 'BOOKING_FULLY_PAID', 'PLOT_REGISTERED',
+    'PAYMENT_RECEIVED', 'COMMISSION_APPROVED',
+    'AFTER_SALES_CREATED', 'AFTER_SALES_RESOLVED'
+];
+kpiEvents.forEach(evt => dispatcher.subscribe(evt, kpiHandler));
 exports.onEventCreated = functions.firestore
     .document('events/{eventId}')
     .onCreate(async (snapshot, _context) => {

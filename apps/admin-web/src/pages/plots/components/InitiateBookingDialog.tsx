@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Typography, Box } from '@mui/material';
-import { inventoryBookingService } from '@real-estate-erp/firebase/src/realestate/services/InventoryBookingService';
+import { inventoryBookingService } from '@real-estate-erp/firebase';
 
 export const InitiateBookingDialog = ({ open, onClose, plot, onBookingComplete }: any) => {
   const [formData, setFormData] = useState({

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Box, Typography } from '@mui/material';
-import { registrationService } from '@real-estate-erp/firebase/src/realestate/services/RegistrationService';
+import { registrationService } from '@real-estate-erp/firebase';
 
 export const CompleteRegistrationDialog = ({ open, onClose, booking, onRegistrationComplete }: any) => {
   const [formData, setFormData] = useState({

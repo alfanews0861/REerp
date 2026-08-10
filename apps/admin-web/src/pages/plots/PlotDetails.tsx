@@ -3,7 +3,7 @@ import { Box, Typography, Button, Paper, Grid, Divider } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getFirebaseInstance } from '@real-estate-erp/firebase';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
-import { StatusChip, PageHeader } from '@real-estate-erp/ui';
+import { StatusChip } from '@real-estate-erp/ui';
 import { InitiateBookingDialog } from './components/InitiateBookingDialog';
 import { AddPaymentDialog } from './components/AddPaymentDialog';
 import { CompleteRegistrationDialog } from './components/CompleteRegistrationDialog';
@@ -31,7 +31,7 @@ export const PlotDetails = () => {
         const plotRef = doc(db, 'plots', id);
         const plotSnap = await getDoc(plotRef);
         if (plotSnap.exists()) {
-          const plotData = { id: plotSnap.id, ...plotSnap.data() };
+          const plotData = { id: plotSnap.id, ...plotSnap.data() } as any;
           setPlot(plotData);
 
           // Fetch active booking if booked or registered
@@ -65,12 +65,10 @@ export const PlotDetails = () => {
 
   return (
     <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 3 }}>
-      <PageHeader 
-        title={`Plot ${plot.plotNumber}`} 
-        action={
-          <Button variant="outlined" onClick={() => navigate(-1)}>Back</Button>
-        }
-      />
+      <Box display="flex" justifyContent="space-between" alignItems="center">
+        <Typography variant="h4">{`Plot ${plot.plotNumber}`}</Typography>
+        <Button variant="outlined" onClick={() => navigate(-1)}>Back</Button>
+      </Box>
       
       <Grid container spacing={3}>
         <Grid item xs={12} md={8}>

@@ -1,7 +1,6 @@
 import { collection, query, where, getDocs, doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
-import { db } from '@real-estate-erp/firebase'; // Assuming standard firebase export
+import { getFirebaseInstance } from '@real-estate-erp/firebase';
 import { DocumentRecord, DocumentVisibility, DocumentStatus } from '@real-estate-erp/types';
-import { v4 as uuidv4 } from 'uuid';
 
 export class DocumentService {
   private static collectionName = 'documents';
@@ -9,7 +8,8 @@ export class DocumentService {
   static async uploadDocument(
     documentData: Omit<DocumentRecord, 'id' | 'createdAt' | 'updatedAt' | 'version' | 'status'>
   ): Promise<DocumentRecord> {
-    const id = uuidv4();
+    const { db } = getFirebaseInstance();
+    const id = crypto.randomUUID();
     const now = new Date().toISOString();
     
     const docRecord: DocumentRecord = {
@@ -27,6 +27,7 @@ export class DocumentService {
   }
 
   static async getDocumentsByEntity(entityType: string, entityId: string): Promise<DocumentRecord[]> {
+    const { db } = getFirebaseInstance();
     const q = query(
       collection(db, this.collectionName),
       where('entityType', '==', entityType),
@@ -37,18 +38,20 @@ export class DocumentService {
   }
 
   static async updateDocumentVisibility(id: string, visibility: DocumentVisibility): Promise<void> {
+    const { db } = getFirebaseInstance();
     const docRef = doc(db, this.collectionName, id);
     await updateDoc(docRef, { visibility, updatedAt: new Date().toISOString() });
   }
 
   static async replaceDocument(id: string, newFileReference: string, newUploaderId: string): Promise<DocumentRecord> {
+    const { db } = getFirebaseInstance();
     const docRef = doc(db, this.collectionName, id);
     const snap = await getDoc(docRef);
     if (!snap.exists()) throw new Error('Document not found');
     
     const oldDoc = snap.data() as DocumentRecord;
     
-    const newDocId = uuidv4();
+    const newDocId = crypto.randomUUID();
     const now = new Date().toISOString();
     
     const newDoc: DocumentRecord = {

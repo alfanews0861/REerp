@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 
-export const LeadDetailScreen: React.FC = ({ route, navigation }: any) => {
+export const LeadDetailScreen: React.FC = ({ route, _navigation }: any) => {
   // Mock Lead Data
   const lead = {
     id: route?.params?.leadId || '1',

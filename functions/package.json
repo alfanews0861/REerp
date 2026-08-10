@@ -4,8 +4,8 @@
   "private": true,
   "main": "lib/index.js",
   "scripts": {
-    "build": "tsc",
-    "build:watch": "tsc --watch",
+    "build": "esbuild src/index.ts --bundle --platform=node --target=node20 --outfile=lib/index.js --external:firebase-admin --external:firebase-functions",
+    "build:watch": "esbuild src/index.ts --bundle --platform=node --target=node20 --outfile=lib/index.js --external:firebase-admin --external:firebase-functions --watch",
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
@@ -15,7 +15,7 @@
     "type-check": "tsc --noEmit"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": "20"
   },
   "dependencies": {
     "@real-estate-erp/events": "workspace:*",
@@ -29,6 +29,7 @@
     "@types/jest": "^30.0.0",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
+    "esbuild": "^0.28.2",
     "eslint": "^8.57.0",
     "jest": "^30.4.2",
     "ts-jest": "^29.4.12",

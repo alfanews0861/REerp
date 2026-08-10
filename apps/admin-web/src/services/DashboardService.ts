@@ -1,11 +1,12 @@
-import { collection, doc, getDoc } from 'firebase/firestore';
-import { db } from '@real-estate-erp/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { getFirebaseInstance } from '@real-estate-erp/firebase';
 import { ExecutiveDashboardData, CommandCenterKPIs, DashboardFilter } from '@real-estate-erp/types';
 import { RuleBasedInsightProvider, AIMetricsPayload } from '@real-estate-erp/types';
 
 export class DashboardService {
   
   static async getCommandCenterData(filter?: DashboardFilter): Promise<ExecutiveDashboardData> {
+    const { db } = getFirebaseInstance();
     const companyId = filter?.companyId || 'company_overview';
     
     let docId = `${companyId}_global`;

@@ -6,7 +6,7 @@ import { Card } from '../../components/Card';
 import { Input } from '../../components/Input';
 
 export default function LeadDetailsScreen() {
-  const { id } = useLocalSearchParams();
+  useLocalSearchParams<{ id: string }>();
   const lead = {
     name: 'Alice Smith',
     phone: '+1234567890',

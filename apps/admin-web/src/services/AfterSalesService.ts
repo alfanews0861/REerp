@@ -1,13 +1,13 @@
 import { collection, query, where, getDocs, doc, setDoc, updateDoc, getDoc } from 'firebase/firestore';
-import { db } from '@real-estate-erp/firebase';
+import { getFirebaseInstance } from '@real-estate-erp/firebase';
 import { AfterSalesCase, AfterSalesStatus } from '@real-estate-erp/types';
-import { v4 as uuidv4 } from 'uuid';
 
 export class AfterSalesService {
   private static collectionName = 'after_sales';
 
   static async createCase(caseData: Omit<AfterSalesCase, 'id' | 'createdAt' | 'updatedAt' | 'openedAt' | 'status'>): Promise<AfterSalesCase> {
-    const id = uuidv4();
+    const { db } = getFirebaseInstance();
+    const id = crypto.randomUUID();
     const now = new Date().toISOString();
     
     const newCase: AfterSalesCase = {
@@ -25,6 +25,7 @@ export class AfterSalesService {
   }
 
   static async getCasesByCustomer(customerId: string): Promise<AfterSalesCase[]> {
+    const { db } = getFirebaseInstance();
     const q = query(
       collection(db, this.collectionName),
       where('customerId', '==', customerId)
@@ -34,6 +35,7 @@ export class AfterSalesService {
   }
 
   static async updateCaseStatus(id: string, status: AfterSalesStatus, resolution?: string): Promise<void> {
+    const { db } = getFirebaseInstance();
     const docRef = doc(db, this.collectionName, id);
     const updateData: Partial<AfterSalesCase> = { 
       status, 
@@ -51,6 +53,7 @@ export class AfterSalesService {
   }
 
   static async assignCase(id: string, assignToId: string, assignedById: string): Promise<void> {
+    const { db } = getFirebaseInstance();
     const docRef = doc(db, this.collectionName, id);
     const snap = await getDoc(docRef);
     if (!snap.exists()) throw new Error('Case not found');

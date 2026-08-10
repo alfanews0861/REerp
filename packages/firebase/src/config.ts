@@ -1,18 +1,18 @@
-import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
-import { getAuth, connectAuthEmulator, Auth } from 'firebase/auth';
-import { getFirestore, connectFirestoreEmulator, Firestore } from 'firebase/firestore';
-import { getStorage, connectStorageEmulator, FirebaseStorage } from 'firebase/storage';
-import { getFunctions, connectFunctionsEmulator, Functions } from 'firebase/functions';
+import { initializeApp, getApps, getApp } from 'firebase/app';
+import { getAuth, connectAuthEmulator } from 'firebase/auth';
+import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { getStorage, connectStorageEmulator } from 'firebase/storage';
+import { getFunctions, connectFunctionsEmulator } from 'firebase/functions';
 import { getMessaging, Messaging, isSupported } from 'firebase/messaging';
 import { FirebaseClientConfig } from '@real-estate-erp/types';
 
 export interface FirebaseInstance {
-  app: FirebaseApp;
-  auth: Auth;
-  db: Firestore;
-  storage: FirebaseStorage;
-  functions: Functions;
-  messaging: Messaging | null;
+  app: any;
+  auth: any;
+  db: any;
+  storage: any;
+  functions: any;
+  messaging: any | null;
 }
 
 let firebaseInstance: FirebaseInstance | null = null;

@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommissionHandler = void 0;
 const commission_engine_1 = require("../../services/commission-engine");
 class CommissionHandler {
+    eventType = 'BOOKING_FULLY_PAID';
     engine = new commission_engine_1.CommissionEngine();
     async handle(event) {
         if (event.eventType === 'BOOKING_FULLY_PAID') {

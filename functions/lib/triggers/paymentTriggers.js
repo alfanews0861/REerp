@@ -36,31 +36,35 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.onPaymentUpdated = void 0;
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
-const events_1 = require("@repo/events");
-const events_2 = require("@repo/events");
+const events_1 = require("@real-estate-erp/events");
 exports.onPaymentUpdated = functions.firestore
     .document('bookings/{bookingId}')
-    .onUpdate(async (change, context) => {
+    .onUpdate(async (change, _context) => {
     const before = change.before.data();
     const after = change.after.data();
     // Check if the payment schedule has changed and if all payments are now paid
-    const wasFullyPaid = before.paymentSchedule.every(p => p.status === 'PAID' && p.amountPaid >= p.amountDue);
-    const isFullyPaid = after.paymentSchedule.every(p => p.status === 'PAID' && p.amountPaid >= p.amountDue);
+    const wasFullyPaid = before.paymentSchedule.every((p) => p.status === 'PAID' && p.amountPaid >= p.amountDue);
+    const isFullyPaid = after.paymentSchedule.every((p) => p.status === 'PAID' && p.amountPaid >= p.amountDue);
     if (!wasFullyPaid && isFullyPaid) {
         // The booking just became fully paid
-        const publisher = new events_1.EventPublisher(admin.firestore());
-        await publisher.publish({
+        const store = new events_1.FirestoreEventStore(admin.firestore());
+        const publisher = new events_1.DefaultEventPublisher(store);
+        const event = {
+            eventId: `evt_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
             aggregateId: after.id,
-            aggregateType: 'Booking', // Cast since we added it to types but EventPublisher might have old type definition cached in memory during build
-            eventType: events_2.BookingPaymentEvents.BOOKING_FULLY_PAID,
+            aggregateType: 'Booking',
+            eventType: events_1.BookingPaymentEvents.BOOKING_FULLY_PAID,
             payload: {
                 bookingId: after.id,
                 projectId: after.projectId,
                 finalSaleAmount: after.finalSaleAmount
             },
             actor: 'SYSTEM',
-            metadata: {}
-        });
+            metadata: {},
+            timestamp: new Date().toISOString(),
+            version: 1
+        };
+        await publisher.publish(event);
         console.log(`Published BOOKING_FULLY_PAID for booking ${after.id}`);
     }
 });

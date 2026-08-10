@@ -1,7 +1,7 @@
-import { Customer360Profile, CustomerTimelineItem, DocumentRecord, AfterSalesCase, Interaction, PlotBooking } from '@real-estate-erp/types';
-import { PersonRepository, InteractionRepository, LeadRepository } from '@real-estate-erp/firebase'; // Assuming these exist per subagent
-import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
-import { db } from '@real-estate-erp/firebase';
+import { Customer360Profile, CustomerTimelineItem, Interaction, PlotBooking } from '@real-estate-erp/types';
+import { PersonRepository, LeadRepository } from '@real-estate-erp/firebase'; // Assuming these exist per subagent
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { getFirebaseInstance } from '@real-estate-erp/firebase';
 import { DocumentService } from './DocumentService';
 import { AfterSalesService } from './AfterSalesService';
 
@@ -11,6 +11,8 @@ export class Customer360Service {
     const person = await personRepo.findById(customerId);
     
     if (!person) return null;
+
+    const { db } = getFirebaseInstance();
 
     // Fetch related bookings to calculate financials
     const bookingsSnap = await getDocs(query(collection(db, 'bookings'), where('customerId', '==', customerId)));
@@ -27,7 +29,6 @@ export class Customer360Service {
       }
     }
 
-    const leadRepo = new LeadRepository();
     const leadsCount = await getDocs(query(collection(db, 'leads'), where('personId', '==', customerId))).then(s => s.size);
     const siteVisitsCount = await getDocs(query(collection(db, 'siteVisits'), where('personId', '==', customerId))).then(s => s.size);
     const documents = await DocumentService.getDocumentsByEntity('Person', customerId);
@@ -52,6 +53,7 @@ export class Customer360Service {
 
   static async getCustomerTimeline(customerId: string): Promise<CustomerTimelineItem[]> {
     const timeline: CustomerTimelineItem[] = [];
+    const { db } = getFirebaseInstance();
 
     // 1. Interactions
     const interactionsSnap = await getDocs(query(collection(db, 'interactions'), where('personId', '==', customerId)));

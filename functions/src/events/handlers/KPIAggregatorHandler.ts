@@ -102,12 +102,13 @@ export class KPIAggregatorHandler implements EventHandler<DimensionedEvent> {
         };
         
       // Payments
-      case 'PAYMENT_RECEIVED':
+      case 'PAYMENT_RECEIVED': {
         const amount = event.payload.amount || 0;
         return { 
           collectedAmount: FieldValue.increment(amount),
           outstandingAmount: FieldValue.increment(-amount)
         };
+      }
         
       // Commission
       case 'COMMISSION_APPROVED':

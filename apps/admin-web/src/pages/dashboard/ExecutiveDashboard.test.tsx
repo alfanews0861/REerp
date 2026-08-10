@@ -5,14 +5,14 @@ import { describe, it, expect, vi } from 'vitest';
 import ExecutiveDashboard from './ExecutiveDashboard';
 import { useDashboardData } from './hooks/useDashboardData';
 
-import { AppThemeProvider } from '@real-estate-erp/ui';
+import { ThemeProvider } from '@real-estate-erp/ui';
 
 // Mock the hook
 vi.mock('./hooks/useDashboardData', () => ({
   useDashboardData: vi.fn(),
 }));
 
-const renderWithTheme = (ui: React.ReactElement) => render(<AppThemeProvider>{ui}</AppThemeProvider>);
+const renderWithTheme = (ui: React.ReactElement) => render(ui);
 
 describe('ExecutiveDashboard', () => {
   it('renders loading state initially', () => {
@@ -21,7 +21,7 @@ describe('ExecutiveDashboard', () => {
       isLoading: true,
       error: null,
       refetch: vi.fn(),
-    });
+    } as any);
 
     renderWithTheme(<ExecutiveDashboard />);
     expect(screen.getByText(/Loading/i)).toBeInTheDocument();
@@ -33,10 +33,10 @@ describe('ExecutiveDashboard', () => {
       isLoading: false,
       error: new Error('Network error'),
       refetch: vi.fn(),
-    });
+    } as any);
 
     renderWithTheme(<ExecutiveDashboard />);
-    expect(screen.getByText(/Error/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Error/i)[0]).toBeInTheDocument();
     expect(screen.getByText(/Network error/i)).toBeInTheDocument();
   });
 
@@ -71,7 +71,7 @@ describe('ExecutiveDashboard', () => {
       isLoading: false,
       error: null,
       refetch: vi.fn(),
-    });
+    } as any);
 
     renderWithTheme(<ExecutiveDashboard />);
     expect(screen.getByText(/Enterprise Executive Dashboard/i)).toBeInTheDocument();

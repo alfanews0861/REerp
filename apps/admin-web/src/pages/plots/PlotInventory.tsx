@@ -30,7 +30,7 @@ export const PlotInventory = () => {
         // Since we are MVP, just fetch a chunk
         const q = query(collection(db, 'plots'), orderBy('updatedAt', 'desc'), limit(100));
         const snapshot = await getDocs(q);
-        const fetchedPlots = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const fetchedPlots = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
         setPlots(fetchedPlots);
         
         // Compute basic metrics
@@ -98,15 +98,11 @@ export const PlotInventory = () => {
             onChange={(e: any) => setSearchTerm(e.target.value)}
           />
           <FilterPanel 
-            filters={[{ id: 'status', label: 'Status', options: ['AVAILABLE', 'BOOKED', 'REGISTERED'] }]} 
-            onApply={() => {}} 
+            {...({ filters: [{ id: 'status', label: 'Status', options: ['AVAILABLE', 'BOOKED', 'REGISTERED'] }], onApply: () => {} } as any)}
           />
         </Box>
         <DataTable
-          columns={columns}
-          data={plots.filter(p => !searchTerm || p.plotNumber?.includes(searchTerm))}
-          loading={loading}
-          onRowClick={(row: any) => navigate(`/plots/${row.id}`)}
+          {...({ columns, data: plots.filter(p => !searchTerm || p.plotNumber?.includes(searchTerm)), loading, onRowClick: (row: any) => navigate(`/plots/${row.id}`) } as any)}
         />
       </Paper>
     </Box>
