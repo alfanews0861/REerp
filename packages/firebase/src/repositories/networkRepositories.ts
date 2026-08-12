@@ -10,8 +10,9 @@ import {
   networkPositionConverter,
   networkTeamConverter,
 } from '../converters/typedConverters';
+import { INetworkMemberRepository } from './interfaces/serviceInterfaces';
 
-export class NetworkMemberRepository extends BaseRepository<NetworkMemberModel> {
+export class NetworkMemberRepository extends BaseRepository<NetworkMemberModel> implements INetworkMemberRepository {
   constructor() {
     super(FIRESTORE_COLLECTIONS.NETWORK_MEMBERS, 'NetworkMember', networkMemberConverter);
   }

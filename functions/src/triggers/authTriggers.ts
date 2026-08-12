@@ -1,5 +1,6 @@
-import * as functions from 'firebase-functions/v2';
-import * as authV1 from 'firebase-functions/v1/auth';
+import { beforeUserCreated } from 'firebase-functions/v2/identity';
+import { onDocumentWritten } from 'firebase-functions/v2/firestore';
+import { onCustomEventPublished } from 'firebase-functions/v2/eventarc';
 import * as admin from 'firebase-admin';
 
 // Default permissions matrix for backend claims sync
@@ -18,7 +19,7 @@ const DEFAULT_ROLE_PERMISSIONS: Record<string, string[]> = {
 };
 
 // 1. Auto create user profile & assign default role on User Creation
-export const onUserCreated = functions.identity.beforeUserCreated(async (event) => {
+export const onUserCreated = beforeUserCreated(async (event) => {
   const user = event.data;
   const db = admin.firestore();
   const defaultRole = 'customer';
@@ -53,9 +54,7 @@ export const onUserCreated = functions.identity.beforeUserCreated(async (event) 
 });
 
 // 2. Auto Sync Custom Claims on Firestore User Document write/update
-export const onUserProfileUpdated = functions.firestore.onDocumentWritten(
-  'users/{uid}',
-  async (event) => {
+export const handleUserProfileUpdated = async (event: any) => {
     const uid = event.params.uid;
     const afterData = event.data?.after.data();
 
@@ -74,23 +73,37 @@ export const onUserProfileUpdated = functions.firestore.onDocumentWritten(
     };
 
     await admin.auth().setCustomUserClaims(uid, claims);
-  }
+};
+
+export const onUserProfileUpdated = onDocumentWritten(
+  {
+    document: 'users/{uid}',
+    region: 'asia-south1'
+  },
+  handleUserProfileUpdated
 );
 
-// 3. Deactivate deleted users and revoke refresh tokens
-export const onUserDeleted = authV1.user().onDelete(async (user) => {
-  const db = admin.firestore();
 
-  // Mark Firestore profile as inactive / suspended
-  await db.collection('users').doc(user.uid).set(
-    {
-      status: 'inactive',
-      deletedAt: admin.firestore.FieldValue.serverTimestamp(),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-    },
-    { merge: true }
-  );
+// 3. Deactivate deleted users and revoke refresh tokens (Via Eventarc)
+export const onUserDeleted = onCustomEventPublished(
+  'firebase.auth.v1.user.delete',
+  async (event) => {
+    const uid = event.data?.uid;
+    if (!uid) return;
+    
+    const db = admin.firestore();
 
-  // Revoke refresh tokens
-  await admin.auth().revokeRefreshTokens(user.uid);
-});
+    // Mark Firestore profile as inactive / suspended
+    await db.collection('users').doc(uid).set(
+      {
+        status: 'inactive',
+        deletedAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
+
+    // Revoke refresh tokens
+    await admin.auth().revokeRefreshTokens(uid);
+  }
+);

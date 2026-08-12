@@ -13,8 +13,8 @@ export default defineConfig({
       '@real-estate-erp/firebase': path.resolve(__dirname, '../../packages/firebase/src'),
       '@real-estate-erp/ui': path.resolve(__dirname, '../../packages/ui/src'),
       '@real-estate-erp/hooks': path.resolve(__dirname, '../../packages/hooks/src'),
+      '@mui/icons-material': '@mui/icons-material/esm',
     },
-    dedupe: ['react', 'react-dom'],
   },
   server: {
     port: 3000,

@@ -1,0 +1,13 @@
+src/pages/crm/leads/LeadsWorkspace.test.tsx(3,32): error TS6133: 'vi' is declared but its value is never read.
+src/pages/crm/site-visits/SiteVisitsWorkspace.tsx(15,17): error TS6133: 'fetchNextPage' is declared but its value is never read.
+src/pages/crm/site-visits/SiteVisitsWorkspace.tsx(15,32): error TS6133: 'hasNextPage' is declared but its value is never read.
+src/pages/dashboard/ExecutiveDashboard.test.tsx(8,1): error TS6133: 'ThemeProvider' is declared but its value is never read.
+src/pages/marketing/campaigns/CampaignList.tsx(1,17): error TS6133: 'useState' is declared but its value is never read.
+src/pages/marketing/network/NetworkWorkspace.tsx(7,28): error TS6133: 'event' is declared but its value is never read.
+src/pages/plots/components/AddPaymentDialog.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/pages/plots/components/CompleteRegistrationDialog.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/pages/plots/components/InitiateBookingDialog.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/pages/plots/PlotDetails.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/pages/plots/PlotInventory.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/services/Customer360Service.ts(2,28): error TS6133: 'LeadRepository' is declared but its value is never read.
+src/services/DocumentService.ts(3,46): error TS6133: 'DocumentStatus' is declared but its value is never read.

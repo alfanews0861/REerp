@@ -1,13 +1,13 @@
-import * as functions from 'firebase-functions';
+import { onDocumentUpdated } from 'firebase-functions/v2/firestore';
 import * as admin from 'firebase-admin';
 import { PlotBooking } from '@real-estate-erp/types';
-import { DefaultEventPublisher, FirestoreEventStore, BookingPaymentEvents } from '@real-estate-erp/events';
+import { DefaultEventPublisher, BookingPaymentEvents } from '@real-estate-erp/events';
+import { FirestoreEventStore } from '@real-estate-erp/events/src/store/FirestoreEventStore';
 
-export const onPaymentUpdated = functions.firestore
-  .document('bookings/{bookingId}')
-  .onUpdate(async (change, _context) => {
-    const before = change.before.data() as PlotBooking;
-    const after = change.after.data() as PlotBooking;
+export const handlePaymentUpdated = async (event: any) => {
+    const before = event.data?.before.data() as PlotBooking;
+    const after = event.data?.after.data() as PlotBooking;
+    if (!before || !after) return;
 
     // Check if the payment schedule has changed and if all payments are now paid
     const wasFullyPaid = before.paymentSchedule.every((p: any) => p.status === 'PAID' && p.amountPaid >= p.amountDue);
@@ -18,7 +18,7 @@ export const onPaymentUpdated = functions.firestore
       const store = new FirestoreEventStore(admin.firestore());
       const publisher = new DefaultEventPublisher(store);
       
-      const event = {
+      const evt = {
         eventId: `evt_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
         aggregateId: after.id,
         aggregateType: 'Booking' as any,
@@ -34,7 +34,16 @@ export const onPaymentUpdated = functions.firestore
         version: 1
       };
       
-      await publisher.publish(event);
+      await publisher.publish(evt);
       console.log(`Published BOOKING_FULLY_PAID for booking ${after.id}`);
     }
-  });
+};
+
+export const onPaymentUpdated = onDocumentUpdated(
+  {
+    document: 'bookings/{bookingId}',
+    region: 'asia-south1'
+  },
+  handlePaymentUpdated
+);
+

@@ -1,4 +1,4 @@
-import * as functions from 'firebase-functions';
+import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import { EventDispatcher, Event } from '@real-estate-erp/events';
 
 // Example Handlers - In a real app, you would import these from feature modules
@@ -24,10 +24,9 @@ const kpiEvents = [
 
 kpiEvents.forEach(evt => dispatcher.subscribe(evt, kpiHandler as any));
 
-export const onEventCreated = functions.firestore
-  .document('events/{eventId}')
-  .onCreate(async (snapshot, _context) => {
-    const eventData = snapshot.data();
+export const handleEventCreated = async (cloudEvent: any) => {
+    const eventData = cloudEvent.data?.data();
+    if (!eventData) return;
     
     // Convert Firestore Timestamp back to ISO string if necessary,
     // though the Event object should already be well-formed from publisher.
@@ -46,4 +45,13 @@ export const onEventCreated = functions.firestore
       // Or throw so Firebase can retry if retry is enabled on the function.
       throw error;
     }
-  });
+};
+
+export const onEventCreated = onDocumentCreated(
+  {
+    document: 'events/{eventId}',
+    region: 'asia-south1'
+  },
+  handleEventCreated
+);
+

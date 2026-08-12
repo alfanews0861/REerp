@@ -1,11 +1,10 @@
-import * as functions from 'firebase-functions';
+import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import * as admin from 'firebase-admin';
 
-export const onCompanyCreated = functions.firestore
-  .document('companies/{companyId}')
-  .onCreate(async (snap, context) => {
-    const companyId = context.params.companyId;
-    const companyData = snap.data();
+export const handleCompanyCreated = async (event: any) => {
+    const companyId = event.params.companyId;
+    const companyData = event.data?.data();
+    if (!companyData) return;
     
     console.log(`Setting up default organization configuration for company ${companyId}`);
 
@@ -120,4 +119,13 @@ export const onCompanyCreated = functions.firestore
 
     await batch.commit();
     console.log(`Default organization configuration setup complete for company ${companyId}`);
-  });
+};
+
+export const onCompanyCreated = onDocumentCreated(
+  {
+    document: 'companies/{companyId}',
+    region: 'asia-south1'
+  },
+  handleCompanyCreated
+);
+

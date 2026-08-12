@@ -1,16 +1,19 @@
-import * as functions from 'firebase-functions';
+import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import * as admin from 'firebase-admin';
 import * as crypto from 'crypto';
-import { FirestoreEventStore, DefaultEventPublisher, Event, EventSchema } from '@real-estate-erp/events';
+import { DefaultEventPublisher, Event, EventSchema } from '@real-estate-erp/events';
+import { FirestoreEventStore } from '@real-estate-erp/events/src/store/FirestoreEventStore';
 
-export const publishEvent = functions.https.onCall(async (data, context) => {
+export const publishEvent = onCall(async (request) => {
   // Validate authentication
-  if (!context.auth) {
-    throw new functions.https.HttpsError(
+  if (!request.auth) {
+    throw new HttpsError(
       'unauthenticated',
       'User must be authenticated to publish events.'
     );
   }
+
+  const data = request.data;
 
   const db = admin.firestore();
   const eventStore = new FirestoreEventStore(db);
@@ -24,11 +27,11 @@ export const publishEvent = functions.https.onCall(async (data, context) => {
     eventType: data.eventType,
     timestamp: new Date().toISOString(),
     version: data.version || 1, // Optional logic to determine next version
-    actor: context.auth.uid,
+    actor: request.auth.uid,
     payload: data.payload,
     metadata: {
       ...data.metadata,
-      sourceIp: context.rawRequest.ip,
+      sourceIp: request.rawRequest.ip,
     },
   };
 
@@ -36,7 +39,7 @@ export const publishEvent = functions.https.onCall(async (data, context) => {
   try {
     EventSchema.parse(event);
   } catch (error) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       'invalid-argument',
       'Event payload does not match schema.',
       error
@@ -48,7 +51,7 @@ export const publishEvent = functions.https.onCall(async (data, context) => {
     return { success: true, eventId: event.eventId };
   } catch (error: any) {
     console.error('Error publishing event:', error);
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       'internal',
       'Failed to publish event.',
       error.message

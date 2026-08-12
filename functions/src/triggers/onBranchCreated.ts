@@ -1,11 +1,10 @@
-import * as functions from 'firebase-functions';
+import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import * as admin from 'firebase-admin';
 
-export const onBranchCreated = functions.firestore
-  .document('branches/{branchId}')
-  .onCreate(async (snap, context) => {
-    const branchId = context.params.branchId;
-    const branchData = snap.data();
+export const handleBranchCreated = async (event: any) => {
+    const branchData = event.data?.data();
+    if (!branchData) return;
+    const branchId = event.params.branchId;
     
     console.log(`Branch ${branchId} created for company ${branchData.companyId}`);
 
@@ -29,4 +28,13 @@ export const onBranchCreated = functions.firestore
       isDeleted: false,
       version: 1,
     });
-  });
+};
+
+export const onBranchCreated = onDocumentCreated(
+  {
+    document: 'branches/{branchId}',
+    region: 'asia-south1'
+  },
+  handleBranchCreated
+);
+

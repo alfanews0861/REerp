@@ -1,22 +1,31 @@
 import { PlotBooking, Lead, CommissionStatus, CommissionAdjustment } from '@real-estate-erp/types';
-import { CommissionRuleRepository, CommissionPoolRepository, CommissionRecordRepository } from '../repositories/commissionRepositories';
 import { NetworkService } from './NetworkService';
-import { NetworkMemberRepository } from '../repositories/networkRepositories';
-import { where } from 'firebase/firestore';
+import {
+  ICommissionPoolRepository,
+  ICommissionRecordRepository,
+  ICommissionRuleRepository,
+  INetworkMemberRepository,
+} from '../repositories/interfaces/serviceInterfaces';
 
 export class CommissionService {
-  private ruleRepo: CommissionRuleRepository;
-  private poolRepo: CommissionPoolRepository;
-  private recordRepo: CommissionRecordRepository;
+  private ruleRepo: ICommissionRuleRepository;
+  private poolRepo: ICommissionPoolRepository;
+  private recordRepo: ICommissionRecordRepository;
   private networkService: NetworkService;
-  private memberRepo: NetworkMemberRepository;
+  private memberRepo: INetworkMemberRepository;
 
-  constructor() {
-    this.ruleRepo = new CommissionRuleRepository();
-    this.poolRepo = new CommissionPoolRepository();
-    this.recordRepo = new CommissionRecordRepository();
-    this.networkService = new NetworkService();
-    this.memberRepo = new NetworkMemberRepository();
+  constructor(
+    ruleRepo: ICommissionRuleRepository,
+    poolRepo: ICommissionPoolRepository,
+    recordRepo: ICommissionRecordRepository,
+    networkService: NetworkService,
+    memberRepo: INetworkMemberRepository
+  ) {
+    this.ruleRepo = ruleRepo;
+    this.poolRepo = poolRepo;
+    this.recordRepo = recordRepo;
+    this.networkService = networkService;
+    this.memberRepo = memberRepo;
   }
 
   /**
@@ -30,7 +39,7 @@ export class CommissionService {
     }
     
     // Idempotency Check: Prevent duplicate calculation
-    const existingPools = await this.poolRepo.findAll([where('bookingId', '==', booking.id)]);
+    const existingPools = await this.poolRepo.findAll([{ field: 'bookingId', op: '==', value: booking.id }]);
     const activePool = existingPools.find(p => p.status !== 'REVERSED');
     if (activePool) {
       console.log(`Commission already calculated for booking ${booking.id}. Pool ID: ${activePool.id}`);
@@ -50,8 +59,8 @@ export class CommissionService {
 
     // 2. Fetch all active commission rules for this project/company
     const allRules = await this.ruleRepo.findAll([
-      where('active', '==', true),
-      where('companyId', '==', ownerMember.companyId)
+      { field: 'active', op: '==', value: true },
+      { field: 'companyId', op: '==', value: ownerMember.companyId }
     ]);
 
     const pool = {
@@ -126,7 +135,7 @@ export class CommissionService {
    * Reverses an entire commission pool (e.g. due to booking cancellation).
    */
   async reverseCommission(bookingId: string, reason: string, userId: string): Promise<void> {
-    const pools = await this.poolRepo.findAll([where('bookingId', '==', bookingId)]);
+    const pools = await this.poolRepo.findAll([{ field: 'bookingId', op: '==', value: bookingId }]);
     for (const pool of pools) {
       if (pool.status === 'REVERSED') continue;
       
@@ -134,7 +143,7 @@ export class CommissionService {
         status: 'REVERSED',
       }, userId);
 
-      const records = await this.recordRepo.findAll([where('poolId', '==', pool.id)]);
+      const records = await this.recordRepo.findAll([{ field: 'poolId', op: '==', value: pool.id }]);
       for (const record of records) {
         await this.recordRepo.update(record.id, {
           status: 'REVERSED',

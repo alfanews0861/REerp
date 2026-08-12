@@ -1,12 +1,12 @@
-import * as functions from 'firebase-functions';
+import { onDocumentUpdated } from 'firebase-functions/v2/firestore';
 import * as admin from 'firebase-admin';
 
-export const onTeamUpdated = functions.firestore
-  .document('teams/{teamId}')
-  .onUpdate(async (change, context) => {
-    const teamId = context.params.teamId;
-    const beforeData = change.before.data();
-    const afterData = change.after.data();
+export const handleTeamUpdated = async (event: any) => {
+    const beforeData = event.data?.before.data();
+    const afterData = event.data?.after.data();
+    if (!beforeData || !afterData) return;
+    
+    const teamId = event.params.teamId;
     
     console.log(`Team ${teamId} updated`);
 
@@ -47,4 +47,13 @@ export const onTeamUpdated = functions.firestore
     });
 
     await batch.commit();
-  });
+};
+
+export const onTeamUpdated = onDocumentUpdated(
+  {
+    document: 'teams/{teamId}',
+    region: 'asia-south1'
+  },
+  handleTeamUpdated
+);
+

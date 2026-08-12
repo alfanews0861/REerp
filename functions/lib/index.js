@@ -40433,6 +40433,20 @@ var index_exports = {};
 __export(index_exports, {
   captureLeadWebhook: () => captureLeadWebhook,
   dailySystemCleanup: () => dailySystemCleanup,
+  handleBlockCreated: () => handleBlockCreated,
+  handleBranchCreated: () => handleBranchCreated,
+  handleCompanyCreated: () => handleCompanyCreated,
+  handleDepartmentCreated: () => handleDepartmentCreated,
+  handleEventCreated: () => handleEventCreated,
+  handleLayoutCreated: () => handleLayoutCreated,
+  handleLeadCreated: () => handleLeadCreated,
+  handleLeadUpdated: () => handleLeadUpdated,
+  handlePaymentUpdated: () => handlePaymentUpdated,
+  handlePlotCreated: () => handlePlotCreated,
+  handlePlotPriceChanged: () => handlePlotPriceChanged,
+  handleProjectCreated: () => handleProjectCreated,
+  handleTeamUpdated: () => handleTeamUpdated,
+  handleUserProfileUpdated: () => handleUserProfileUpdated,
   hourlyBookingExpiry: () => hourlyBookingExpiry,
   onBlockCreated: () => onBlockCreated,
   onBranchCreated: () => onBranchCreated,
@@ -40463,8 +40477,9 @@ if (!admin.apps.length) {
 }
 
 // src/triggers/authTriggers.ts
-var functions = __toESM(require("firebase-functions/v2"));
-var authV1 = __toESM(require("firebase-functions/v1/auth"));
+var import_identity = require("firebase-functions/v2/identity");
+var import_firestore = require("firebase-functions/v2/firestore");
+var import_eventarc = require("firebase-functions/v2/eventarc");
 var admin2 = __toESM(require("firebase-admin"));
 var DEFAULT_ROLE_PERMISSIONS = {
   super_admin: ["*:*"],
@@ -40479,19 +40494,19 @@ var DEFAULT_ROLE_PERMISSIONS = {
   driver: ["vehicle:read", "vehicle:update", "attendance:create", "attendance:read", "dashboard:read", "notifications:read"],
   customer: ["dashboard:read", "booking:read", "payments:read", "customer:read", "customer:update", "notifications:read"]
 };
-var onUserCreated = functions.identity.beforeUserCreated(async (event) => {
-  const user2 = event.data;
+var onUserCreated = (0, import_identity.beforeUserCreated)(async (event) => {
+  const user = event.data;
   const db = admin2.firestore();
   const defaultRole = "customer";
   const permissions = DEFAULT_ROLE_PERMISSIONS[defaultRole] || [];
-  if (user2) {
-    await db.collection("users").doc(user2.uid).set(
+  if (user) {
+    await db.collection("users").doc(user.uid).set(
       {
-        uid: user2.uid,
-        email: user2.email || "",
-        displayName: user2.displayName || user2.email?.split("@")[0] || "User",
-        phoneNumber: user2.phoneNumber || null,
-        photoURL: user2.photoURL || null,
+        uid: user.uid,
+        email: user.email || "",
+        displayName: user.displayName || user.email?.split("@")[0] || "User",
+        phoneNumber: user.phoneNumber || null,
+        photoURL: user.photoURL || null,
         role: defaultRole,
         status: "active",
         permissions,
@@ -40509,37 +40524,46 @@ var onUserCreated = functions.identity.beforeUserCreated(async (event) => {
     }
   };
 });
-var onUserProfileUpdated = functions.firestore.onDocumentWritten(
-  "users/{uid}",
+var handleUserProfileUpdated = async (event) => {
+  const uid = event.params.uid;
+  const afterData = event.data?.after.data();
+  if (!afterData) return;
+  const role = afterData.role || "customer";
+  const customPermissions = afterData.permissions || [];
+  const basePermissions = DEFAULT_ROLE_PERMISSIONS[role] || [];
+  const combinedPermissions = Array.from(/* @__PURE__ */ new Set([...basePermissions, ...customPermissions]));
+  const claims = {
+    role,
+    permissions: combinedPermissions,
+    tenantId: afterData.tenantId || null,
+    admin: role === "super_admin"
+  };
+  await admin2.auth().setCustomUserClaims(uid, claims);
+};
+var onUserProfileUpdated = (0, import_firestore.onDocumentWritten)(
+  {
+    document: "users/{uid}",
+    region: "asia-south1"
+  },
+  handleUserProfileUpdated
+);
+var onUserDeleted = (0, import_eventarc.onCustomEventPublished)(
+  "firebase.auth.v1.user.delete",
   async (event) => {
-    const uid = event.params.uid;
-    const afterData = event.data?.after.data();
-    if (!afterData) return;
-    const role = afterData.role || "customer";
-    const customPermissions = afterData.permissions || [];
-    const basePermissions = DEFAULT_ROLE_PERMISSIONS[role] || [];
-    const combinedPermissions = Array.from(/* @__PURE__ */ new Set([...basePermissions, ...customPermissions]));
-    const claims = {
-      role,
-      permissions: combinedPermissions,
-      tenantId: afterData.tenantId || null,
-      admin: role === "super_admin"
-    };
-    await admin2.auth().setCustomUserClaims(uid, claims);
+    const uid = event.data?.uid;
+    if (!uid) return;
+    const db = admin2.firestore();
+    await db.collection("users").doc(uid).set(
+      {
+        status: "inactive",
+        deletedAt: admin2.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin2.firestore.FieldValue.serverTimestamp()
+      },
+      { merge: true }
+    );
+    await admin2.auth().revokeRefreshTokens(uid);
   }
 );
-var onUserDeleted = authV1.user().onDelete(async (user2) => {
-  const db = admin2.firestore();
-  await db.collection("users").doc(user2.uid).set(
-    {
-      status: "inactive",
-      deletedAt: admin2.firestore.FieldValue.serverTimestamp(),
-      updatedAt: admin2.firestore.FieldValue.serverTimestamp()
-    },
-    { merge: true }
-  );
-  await admin2.auth().revokeRefreshTokens(user2.uid);
-});
 
 // src/triggers/scheduledTasks.ts
 var import_scheduler = require("firebase-functions/v2/scheduler");
@@ -42598,8 +42622,8 @@ function utcTimestampToDateString(utcTimestamp) {
   }
   return void 0;
 }
-async function getIdTokenResult(user2, forceRefresh = false) {
-  const userInternal = getModularInstance(user2);
+async function getIdTokenResult(user, forceRefresh = false) {
+  const userInternal = getModularInstance(user);
   const token = await userInternal.getIdToken(forceRefresh);
   const claims = _parseToken(token);
   _assert(
@@ -42660,7 +42684,7 @@ function _tokenExpiresIn(token) {
   );
   return Number(parsedToken.exp) - Number(parsedToken.iat);
 }
-async function _logoutIfInvalidated(user2, promise, bypassAuthState = false) {
+async function _logoutIfInvalidated(user, promise, bypassAuthState = false) {
   if (bypassAuthState) {
     return promise;
   }
@@ -42668,8 +42692,8 @@ async function _logoutIfInvalidated(user2, promise, bypassAuthState = false) {
     return await promise;
   } catch (e) {
     if (e instanceof FirebaseError && isUserInvalidated(e)) {
-      if (user2.auth.currentUser === user2) {
-        await user2.auth.signOut();
+      if (user.auth.currentUser === user) {
+        await user.auth.signOut();
       }
     }
     throw e;
@@ -42679,8 +42703,8 @@ function isUserInvalidated({ code }) {
   return code === `auth/${"user-disabled"}` || code === `auth/${"user-token-expired"}`;
 }
 var ProactiveRefresh = class {
-  constructor(user2) {
-    this.user = user2;
+  constructor(user) {
+    this.user = user;
     this.isRunning = false;
     this.timerId = null;
     this.errorBackoff = 3e4;
@@ -42764,11 +42788,11 @@ var UserMetadata = class {
     };
   }
 };
-async function _reloadWithoutSaving(user2) {
+async function _reloadWithoutSaving(user) {
   var _a;
-  const auth4 = user2.auth;
-  const idToken = await user2.getIdToken();
-  const response = await _logoutIfInvalidated(user2, getAccountInfo(auth4, { idToken }));
+  const auth4 = user.auth;
+  const idToken = await user.getIdToken();
+  const response = await _logoutIfInvalidated(user, getAccountInfo(auth4, { idToken }));
   _assert(
     response === null || response === void 0 ? void 0 : response.users.length,
     auth4,
@@ -42776,11 +42800,11 @@ async function _reloadWithoutSaving(user2) {
     /* AuthErrorCode.INTERNAL_ERROR */
   );
   const coreAccount = response.users[0];
-  user2._notifyReloadListener(coreAccount);
+  user._notifyReloadListener(coreAccount);
   const newProviderData = ((_a = coreAccount.providerUserInfo) === null || _a === void 0 ? void 0 : _a.length) ? extractProviderData(coreAccount.providerUserInfo) : [];
-  const providerData = mergeProviderData(user2.providerData, newProviderData);
-  const oldIsAnonymous = user2.isAnonymous;
-  const newIsAnonymous = !(user2.email && coreAccount.passwordHash) && !(providerData === null || providerData === void 0 ? void 0 : providerData.length);
+  const providerData = mergeProviderData(user.providerData, newProviderData);
+  const oldIsAnonymous = user.isAnonymous;
+  const newIsAnonymous = !(user.email && coreAccount.passwordHash) && !(providerData === null || providerData === void 0 ? void 0 : providerData.length);
   const isAnonymous = !oldIsAnonymous ? false : newIsAnonymous;
   const updates = {
     uid: coreAccount.localId,
@@ -42794,10 +42818,10 @@ async function _reloadWithoutSaving(user2) {
     metadata: new UserMetadata(coreAccount.createdAt, coreAccount.lastLoginAt),
     isAnonymous
   };
-  Object.assign(user2, updates);
+  Object.assign(user, updates);
 }
-async function reload(user2) {
-  const userInternal = getModularInstance(user2);
+async function reload(user) {
+  const userInternal = getModularInstance(user);
   await _reloadWithoutSaving(userInternal);
   await userInternal.auth._persistUserIfCurrent(userInternal);
   userInternal.auth._notifyListenersIfCurrent(userInternal);
@@ -42999,26 +43023,26 @@ var UserImpl = class _UserImpl {
   reload() {
     return reload(this);
   }
-  _assign(user2) {
-    if (this === user2) {
+  _assign(user) {
+    if (this === user) {
       return;
     }
     _assert(
-      this.uid === user2.uid,
+      this.uid === user.uid,
       this.auth,
       "internal-error"
       /* AuthErrorCode.INTERNAL_ERROR */
     );
-    this.displayName = user2.displayName;
-    this.photoURL = user2.photoURL;
-    this.email = user2.email;
-    this.emailVerified = user2.emailVerified;
-    this.phoneNumber = user2.phoneNumber;
-    this.isAnonymous = user2.isAnonymous;
-    this.tenantId = user2.tenantId;
-    this.providerData = user2.providerData.map((userInfo) => Object.assign({}, userInfo));
-    this.metadata._copy(user2.metadata);
-    this.stsTokenManager._assign(user2.stsTokenManager);
+    this.displayName = user.displayName;
+    this.photoURL = user.photoURL;
+    this.email = user.email;
+    this.emailVerified = user.emailVerified;
+    this.phoneNumber = user.phoneNumber;
+    this.isAnonymous = user.isAnonymous;
+    this.tenantId = user.tenantId;
+    this.providerData = user.providerData.map((userInfo) => Object.assign({}, userInfo));
+    this.metadata._copy(user.metadata);
+    this.stsTokenManager._assign(user.stsTokenManager);
   }
   _clone(auth4) {
     const newUser = new _UserImpl(Object.assign(Object.assign({}, this), { auth: auth4, stsTokenManager: this.stsTokenManager._clone() }));
@@ -43142,7 +43166,7 @@ var UserImpl = class _UserImpl {
     assertStringOrUndefined(_redirectEventId, auth4.name);
     assertStringOrUndefined(createdAt, auth4.name);
     assertStringOrUndefined(lastLoginAt, auth4.name);
-    const user2 = new _UserImpl({
+    const user = new _UserImpl({
       uid,
       auth: auth4,
       email,
@@ -43157,12 +43181,12 @@ var UserImpl = class _UserImpl {
       lastLoginAt
     });
     if (providerData && Array.isArray(providerData)) {
-      user2.providerData = providerData.map((userInfo) => Object.assign({}, userInfo));
+      user.providerData = providerData.map((userInfo) => Object.assign({}, userInfo));
     }
     if (_redirectEventId) {
-      user2._redirectEventId = _redirectEventId;
+      user._redirectEventId = _redirectEventId;
     }
-    return user2;
+    return user;
   }
   /**
    * Initialize a User from an idToken server response
@@ -43172,14 +43196,14 @@ var UserImpl = class _UserImpl {
   static async _fromIdTokenResponse(auth4, idTokenResponse, isAnonymous = false) {
     const stsTokenManager = new StsTokenManager();
     stsTokenManager.updateFromServerResponse(idTokenResponse);
-    const user2 = new _UserImpl({
+    const user = new _UserImpl({
       uid: idTokenResponse.localId,
       auth: auth4,
       stsTokenManager,
       isAnonymous
     });
-    await _reloadWithoutSaving(user2);
-    return user2;
+    await _reloadWithoutSaving(user);
+    return user;
   }
   /**
    * Initialize a User from an idToken server response
@@ -43197,7 +43221,7 @@ var UserImpl = class _UserImpl {
     const isAnonymous = !(coreAccount.email && coreAccount.passwordHash) && !(providerData === null || providerData === void 0 ? void 0 : providerData.length);
     const stsTokenManager = new StsTokenManager();
     stsTokenManager.updateFromIdToken(idToken);
-    const user2 = new _UserImpl({
+    const user = new _UserImpl({
       uid: coreAccount.localId,
       auth: auth4,
       stsTokenManager,
@@ -43215,8 +43239,8 @@ var UserImpl = class _UserImpl {
       metadata: new UserMetadata(coreAccount.createdAt, coreAccount.lastLoginAt),
       isAnonymous: !(coreAccount.email && coreAccount.passwordHash) && !(providerData === null || providerData === void 0 ? void 0 : providerData.length)
     };
-    Object.assign(user2, updates);
-    return user2;
+    Object.assign(user, updates);
+    return user;
   }
 };
 var instanceCache = /* @__PURE__ */ new Map();
@@ -43272,8 +43296,8 @@ var PersistenceUserManager = class _PersistenceUserManager {
     this.boundEventHandler = auth4._onStorageEvent.bind(auth4);
     this.persistence._addListener(this.fullUserKey, this.boundEventHandler);
   }
-  setCurrentUser(user2) {
-    return this.persistence._set(this.fullUserKey, user2.toJSON());
+  setCurrentUser(user) {
+    return this.persistence._set(this.fullUserKey, user.toJSON());
   }
   async getCurrentUser() {
     const blob = await this.persistence._get(this.fullUserKey);
@@ -43316,9 +43340,9 @@ var PersistenceUserManager = class _PersistenceUserManager {
       try {
         const blob = await persistence._get(key);
         if (blob) {
-          const user2 = UserImpl._fromJSON(auth4, blob);
+          const user = UserImpl._fromJSON(auth4, blob);
           if (persistence !== selectedPersistence) {
-            userToMigrate = user2;
+            userToMigrate = user;
           }
           selectedPersistence = persistence;
           break;
@@ -43421,9 +43445,9 @@ var AuthMiddlewareQueue = class {
     this.queue = [];
   }
   pushCallback(callback, onAbort) {
-    const wrappedCallback = (user2) => new Promise((resolve, reject) => {
+    const wrappedCallback = (user) => new Promise((resolve, reject) => {
       try {
-        const result = callback(user2);
+        const result = callback(user);
         resolve(result);
       } catch (e) {
         reject(e);
@@ -43655,17 +43679,17 @@ var AuthImpl = class {
     if (this._deleted) {
       return;
     }
-    const user2 = await this.assertedPersistence.getCurrentUser();
-    if (!this.currentUser && !user2) {
+    const user = await this.assertedPersistence.getCurrentUser();
+    if (!this.currentUser && !user) {
       return;
     }
-    if (this.currentUser && user2 && this.currentUser.uid === user2.uid) {
-      this._currentUser._assign(user2);
+    if (this.currentUser && user && this.currentUser.uid === user.uid) {
+      this._currentUser._assign(user);
       await this.currentUser.getIdToken();
       return;
     }
     await this._updateCurrentUser(
-      user2,
+      user,
       /* skipBeforeStateCallbacks */
       true
     );
@@ -43673,8 +43697,8 @@ var AuthImpl = class {
   async initializeCurrentUserFromIdToken(idToken) {
     try {
       const response = await getAccountInfo(this, { idToken });
-      const user2 = await UserImpl._fromGetAccountInfoResponse(this, response, idToken);
-      await this.directlySetCurrentUser(user2);
+      const user = await UserImpl._fromGetAccountInfoResponse(this, response, idToken);
+      await this.directlySetCurrentUser(user);
     } catch (err) {
       console.warn("FirebaseServerApp could not login user with provided authIdToken: ", err);
       await this.directlySetCurrentUser(null);
@@ -43744,15 +43768,15 @@ var AuthImpl = class {
     }
     return result;
   }
-  async reloadAndSetCurrentUserOrClear(user2) {
+  async reloadAndSetCurrentUserOrClear(user) {
     try {
-      await _reloadWithoutSaving(user2);
+      await _reloadWithoutSaving(user);
     } catch (e) {
       if ((e === null || e === void 0 ? void 0 : e.code) !== `auth/${"network-request-failed"}`) {
         return this.directlySetCurrentUser(null);
       }
     }
-    return this.directlySetCurrentUser(user2);
+    return this.directlySetCurrentUser(user);
   }
   useDeviceLanguage() {
     this.languageCode = _getUserLanguage();
@@ -43764,34 +43788,34 @@ var AuthImpl = class {
     if (_isFirebaseServerApp(this.app)) {
       return Promise.reject(_serverAppCurrentUserOperationNotSupportedError(this));
     }
-    const user2 = userExtern ? getModularInstance(userExtern) : null;
-    if (user2) {
+    const user = userExtern ? getModularInstance(userExtern) : null;
+    if (user) {
       _assert(
-        user2.auth.config.apiKey === this.config.apiKey,
+        user.auth.config.apiKey === this.config.apiKey,
         this,
         "invalid-user-token"
         /* AuthErrorCode.INVALID_AUTH */
       );
     }
-    return this._updateCurrentUser(user2 && user2._clone(this));
+    return this._updateCurrentUser(user && user._clone(this));
   }
-  async _updateCurrentUser(user2, skipBeforeStateCallbacks = false) {
+  async _updateCurrentUser(user, skipBeforeStateCallbacks = false) {
     if (this._deleted) {
       return;
     }
-    if (user2) {
+    if (user) {
       _assert(
-        this.tenantId === user2.tenantId,
+        this.tenantId === user.tenantId,
         this,
         "tenant-id-mismatch"
         /* AuthErrorCode.TENANT_ID_MISMATCH */
       );
     }
     if (!skipBeforeStateCallbacks) {
-      await this.beforeStateQueue.runMiddleware(user2);
+      await this.beforeStateQueue.runMiddleware(user);
     }
     return this.queue(async () => {
-      await this.directlySetCurrentUser(user2);
+      await this.directlySetCurrentUser(user);
       this.notifyAuthListeners();
     });
   }
@@ -43904,9 +43928,9 @@ var AuthImpl = class {
       currentUser: (_a = this._currentUser) === null || _a === void 0 ? void 0 : _a.toJSON()
     };
   }
-  async _setRedirectUser(user2, popupRedirectResolver) {
+  async _setRedirectUser(user, popupRedirectResolver) {
     const redirectManager = await this.getOrInitRedirectPersistenceManager(popupRedirectResolver);
-    return user2 === null ? redirectManager.removeCurrentUser() : redirectManager.setCurrentUser(user2);
+    return user === null ? redirectManager.removeCurrentUser() : redirectManager.setCurrentUser(user);
   }
   async getOrInitRedirectPersistenceManager(popupRedirectResolver) {
     if (!this.redirectPersistenceManager) {
@@ -43941,14 +43965,14 @@ var AuthImpl = class {
     }
     return null;
   }
-  async _persistUserIfCurrent(user2) {
-    if (user2 === this.currentUser) {
-      return this.queue(async () => this.directlySetCurrentUser(user2));
+  async _persistUserIfCurrent(user) {
+    if (user === this.currentUser) {
+      return this.queue(async () => this.directlySetCurrentUser(user));
     }
   }
   /** Notifies listeners only if the user is current */
-  _notifyListenersIfCurrent(user2) {
-    if (user2 === this.currentUser) {
+  _notifyListenersIfCurrent(user) {
+    if (user === this.currentUser) {
       this.notifyAuthListeners();
     }
   }
@@ -44022,16 +44046,16 @@ var AuthImpl = class {
    * should only be called from within a queued callback. This is necessary
    * because the queue shouldn't rely on another queued callback.
    */
-  async directlySetCurrentUser(user2) {
-    if (this.currentUser && this.currentUser !== user2) {
+  async directlySetCurrentUser(user) {
+    if (this.currentUser && this.currentUser !== user) {
       this._currentUser._stopProactiveRefresh();
     }
-    if (user2 && this.isProactiveRefreshEnabled) {
-      user2._startProactiveRefresh();
+    if (user && this.isProactiveRefreshEnabled) {
+      user._startProactiveRefresh();
     }
-    this.currentUser = user2;
-    if (user2) {
-      await this.assertedPersistence.setCurrentUser(user2);
+    this.currentUser = user;
+    if (user) {
+      await this.assertedPersistence.setCurrentUser(user);
     } else {
       await this.assertedPersistence.removeCurrentUser();
     }
@@ -45016,8 +45040,8 @@ var AuthInterop = class {
     if (this.internalListeners.has(listener)) {
       return;
     }
-    const unsubscribe = this.auth.onIdTokenChanged((user2) => {
-      listener((user2 === null || user2 === void 0 ? void 0 : user2.stsTokenManager.accessToken) || null);
+    const unsubscribe = this.auth.onIdTokenChanged((user) => {
+      listener((user === null || user === void 0 ? void 0 : user.stsTokenManager.accessToken) || null);
     });
     this.internalListeners.set(listener, unsubscribe);
     this.updateProactiveRefresh();
@@ -45922,8 +45946,8 @@ var Deferred2 = class {
   }
 };
 var OAuthToken = class {
-  constructor(value, user2) {
-    this.user = user2;
+  constructor(value, user) {
+    this.user = user;
     this.type = "OAuth";
     this.headers = /* @__PURE__ */ new Map();
     this.headers.set("Authorization", `Bearer ${value}`);
@@ -45952,10 +45976,10 @@ var FirebaseAuthCredentialsProvider = class {
   start(asyncQueue, changeListener) {
     hardAssert(this.tokenListener === void 0);
     let lastTokenId = this.tokenCounter;
-    const guardedChangeListener = (user2) => {
+    const guardedChangeListener = (user) => {
       if (this.tokenCounter !== lastTokenId) {
         lastTokenId = this.tokenCounter;
-        return changeListener(user2);
+        return changeListener(user);
       } else {
         return Promise.resolve();
       }
@@ -52549,22 +52573,22 @@ var MemoryPersistence = class {
   }
   setNetworkEnabled() {
   }
-  getIndexManager(user2) {
+  getIndexManager(user) {
     return this.indexManager;
   }
-  getDocumentOverlayCache(user2) {
-    let overlay = this.overlays[user2.toKey()];
+  getDocumentOverlayCache(user) {
+    let overlay = this.overlays[user.toKey()];
     if (!overlay) {
       overlay = new MemoryDocumentOverlayCache();
-      this.overlays[user2.toKey()] = overlay;
+      this.overlays[user.toKey()] = overlay;
     }
     return overlay;
   }
-  getMutationQueue(user2, indexManager) {
-    let queue = this.mutationQueues[user2.toKey()];
+  getMutationQueue(user, indexManager) {
+    let queue = this.mutationQueues[user.toKey()];
     if (!queue) {
       queue = new MemoryMutationQueue(indexManager, this.referenceDelegate);
-      this.mutationQueues[user2.toKey()] = queue;
+      this.mutationQueues[user.toKey()] = queue;
     }
     return queue;
   }
@@ -52704,10 +52728,10 @@ var LocalStoreImpl = class {
     this.bundleCache = persistence.getBundleCache();
     this.initializeUserComponents(initialUser);
   }
-  initializeUserComponents(user2) {
-    this.documentOverlayCache = this.persistence.getDocumentOverlayCache(user2);
-    this.indexManager = this.persistence.getIndexManager(user2);
-    this.mutationQueue = this.persistence.getMutationQueue(user2, this.indexManager);
+  initializeUserComponents(user) {
+    this.documentOverlayCache = this.persistence.getDocumentOverlayCache(user);
+    this.indexManager = this.persistence.getIndexManager(user);
+    this.mutationQueue = this.persistence.getMutationQueue(user, this.indexManager);
     this.localDocuments = new LocalDocumentsView(this.remoteDocuments, this.mutationQueue, this.documentOverlayCache, this.indexManager);
     this.remoteDocuments.setIndexManager(this.indexManager);
     this.queryEngine.initialize(this.localDocuments, this.indexManager);
@@ -52719,13 +52743,13 @@ var LocalStoreImpl = class {
 function newLocalStore(persistence, queryEngine, initialUser, serializer) {
   return new LocalStoreImpl(persistence, queryEngine, initialUser, serializer);
 }
-async function localStoreHandleUserChange(localStore, user2) {
+async function localStoreHandleUserChange(localStore, user) {
   const localStoreImpl = debugCast(localStore);
   const result = await localStoreImpl.persistence.runTransaction("Handle user change", "readonly", (txn) => {
     let oldBatches;
     return localStoreImpl.mutationQueue.getAllMutationBatches(txn).next((promisedOldBatches) => {
       oldBatches = promisedOldBatches;
-      localStoreImpl.initializeUserComponents(user2);
+      localStoreImpl.initializeUserComponents(user);
       return localStoreImpl.mutationQueue.getAllMutationBatches(txn);
     }).next((newBatches) => {
       const removedBatchIds = [];
@@ -53311,7 +53335,7 @@ var MemorySharedClientState = class {
     this.localState = new LocalClientState();
     return Promise.resolve();
   }
-  handleUserChange(user2, removedBatchIds, addedBatchIds) {
+  handleUserChange(user, removedBatchIds, addedBatchIds) {
   }
   setOnlineState(onlineState) {
   }
@@ -57414,7 +57438,7 @@ async function restartNetwork(remoteStore) {
   );
   await enableNetworkInternal(remoteStoreImpl);
 }
-async function remoteStoreHandleCredentialChange(remoteStore, user2) {
+async function remoteStoreHandleCredentialChange(remoteStore, user) {
   const remoteStoreImpl = debugCast(remoteStore);
   remoteStoreImpl.asyncQueue.verifyOperationInProgress();
   logDebug(LOG_TAG$5, "RemoteStore received new credentials");
@@ -57430,7 +57454,7 @@ async function remoteStoreHandleCredentialChange(remoteStore, user2) {
       /* OnlineState.Unknown */
     );
   }
-  await remoteStoreImpl.remoteSyncer.handleCredentialChange(user2);
+  await remoteStoreImpl.remoteSyncer.handleCredentialChange(user);
   remoteStoreImpl.offlineCauses.delete(
     3
     /* OfflineCause.CredentialChange */
@@ -58829,15 +58853,15 @@ async function applyDocChanges(syncEngineImpl, queryView, changes, remoteEvent) 
   updateTrackedLimbos(syncEngineImpl, queryView.targetId, viewChange.limboChanges);
   return viewChange.snapshot;
 }
-async function syncEngineHandleCredentialChange(syncEngine, user2) {
+async function syncEngineHandleCredentialChange(syncEngine, user) {
   const syncEngineImpl = debugCast(syncEngine);
-  const userChanged = !syncEngineImpl.currentUser.isEqual(user2);
+  const userChanged = !syncEngineImpl.currentUser.isEqual(user);
   if (userChanged) {
-    logDebug(LOG_TAG$3, "User change. New user:", user2.toKey());
-    const result = await localStoreHandleUserChange(syncEngineImpl.localStore, user2);
-    syncEngineImpl.currentUser = user2;
+    logDebug(LOG_TAG$3, "User change. New user:", user.toKey());
+    const result = await localStoreHandleUserChange(syncEngineImpl.localStore, user);
+    syncEngineImpl.currentUser = user;
     rejectOutstandingPendingWritesCallbacks(syncEngineImpl, "'waitForPendingWrites' promise is rejected due to a user change.");
-    syncEngineImpl.sharedClientState.handleUserChange(user2, result.removedBatchIds, result.addedBatchIds);
+    syncEngineImpl.sharedClientState.handleUserChange(user, result.removedBatchIds, result.addedBatchIds);
     await syncEngineEmitNewSnapsAndNotifyLocalStore(syncEngineImpl, result.affectedDocuments);
   }
 }
@@ -59270,10 +59294,10 @@ var FirestoreClient = class {
     this.authCredentialListener = () => Promise.resolve();
     this.appCheckCredentialListener = () => Promise.resolve();
     this._uninitializedComponentsProvider = componentProvider;
-    this.authCredentials.start(asyncQueue, async (user2) => {
-      logDebug(LOG_TAG$2, "Received user=", user2.uid);
-      await this.authCredentialListener(user2);
-      this.user = user2;
+    this.authCredentials.start(asyncQueue, async (user) => {
+      logDebug(LOG_TAG$2, "Received user=", user.uid);
+      await this.authCredentialListener(user);
+      this.user = user;
     });
     this.appCheckCredentials.start(asyncQueue, (newAppCheckToken) => {
       logDebug(LOG_TAG$2, "Received new app check token=", newAppCheckToken);
@@ -59325,10 +59349,10 @@ async function setOfflineComponentProvider(client, offlineComponentProvider) {
   const configuration = client.configuration;
   await offlineComponentProvider.initialize(configuration);
   let currentUser = configuration.initialUser;
-  client.setCredentialChangeListener(async (user2) => {
-    if (!currentUser.isEqual(user2)) {
-      await localStoreHandleUserChange(offlineComponentProvider.localStore, user2);
-      currentUser = user2;
+  client.setCredentialChangeListener(async (user) => {
+    if (!currentUser.isEqual(user)) {
+      await localStoreHandleUserChange(offlineComponentProvider.localStore, user);
+      currentUser = user;
     }
   });
   offlineComponentProvider.persistence.setDatabaseDeletedListener(() => client.terminate());
@@ -59339,8 +59363,8 @@ async function setOnlineComponentProvider(client, onlineComponentProvider) {
   const offlineComponents = await ensureOfflineComponents(client);
   logDebug(LOG_TAG$2, "Initializing OnlineComponentProvider");
   await onlineComponentProvider.initialize(offlineComponents, client.configuration);
-  client.setCredentialChangeListener((user2) => remoteStoreHandleCredentialChange(onlineComponentProvider.remoteStore, user2));
-  client.setAppCheckTokenChangeListener((_, user2) => remoteStoreHandleCredentialChange(onlineComponentProvider.remoteStore, user2));
+  client.setCredentialChangeListener((user) => remoteStoreHandleCredentialChange(onlineComponentProvider.remoteStore, user));
+  client.setAppCheckTokenChangeListener((_, user) => remoteStoreHandleCredentialChange(onlineComponentProvider.remoteStore, user));
   client._onlineComponents = onlineComponentProvider;
 }
 function canFallbackFromIndexedDbError(error) {
@@ -59491,11 +59515,11 @@ function cloneLongPollingOptions(options) {
 }
 var LOG_TAG$1 = "ComponentProvider";
 var datastoreInstances = /* @__PURE__ */ new Map();
-function removeComponents(firestore23) {
-  const datastore = datastoreInstances.get(firestore23);
+function removeComponents(firestore15) {
+  const datastore = datastoreInstances.get(firestore15);
   if (datastore) {
     logDebug(LOG_TAG$1, "Removing Datastore");
-    datastoreInstances.delete(firestore23);
+    datastoreInstances.delete(firestore15);
     datastore.terminate();
   }
 }
@@ -59643,11 +59667,11 @@ var Firestore$1 = class {
 var Query = class _Query {
   // This is the lite version of the Query class in the main SDK.
   /** @hideconstructor protected */
-  constructor(firestore23, converter, _query) {
+  constructor(firestore15, converter, _query) {
     this.converter = converter;
     this._query = _query;
     this.type = "query";
-    this.firestore = firestore23;
+    this.firestore = firestore15;
   }
   withConverter(converter) {
     return new _Query(this.firestore, converter, this._query);
@@ -59655,11 +59679,11 @@ var Query = class _Query {
 };
 var DocumentReference = class _DocumentReference {
   /** @hideconstructor */
-  constructor(firestore23, converter, _key) {
+  constructor(firestore15, converter, _key) {
     this.converter = converter;
     this._key = _key;
     this.type = "document";
-    this.firestore = firestore23;
+    this.firestore = firestore15;
   }
   get _path() {
     return this._key.path;
@@ -59689,8 +59713,8 @@ var DocumentReference = class _DocumentReference {
 };
 var CollectionReference = class _CollectionReference extends Query {
   /** @hideconstructor */
-  constructor(firestore23, converter, _path) {
-    super(firestore23, converter, newQueryForPath(_path));
+  constructor(firestore15, converter, _path) {
+    super(firestore15, converter, newQueryForPath(_path));
     this._path = _path;
     this.type = "collection";
   }
@@ -59975,28 +59999,28 @@ var Firestore = class extends Firestore$1 {
     }
   }
 };
-function ensureFirestoreConfigured(firestore23) {
-  if (firestore23._terminated) {
+function ensureFirestoreConfigured(firestore15) {
+  if (firestore15._terminated) {
     throw new FirestoreError(Code.FAILED_PRECONDITION, "The client has already been terminated.");
   }
-  if (!firestore23._firestoreClient) {
-    configureFirestore(firestore23);
+  if (!firestore15._firestoreClient) {
+    configureFirestore(firestore15);
   }
-  return firestore23._firestoreClient;
+  return firestore15._firestoreClient;
 }
-function configureFirestore(firestore23) {
+function configureFirestore(firestore15) {
   var _a, _b, _c;
-  const settings = firestore23._freezeSettings();
-  const databaseInfo = makeDatabaseInfo(firestore23._databaseId, ((_a = firestore23._app) === null || _a === void 0 ? void 0 : _a.options.appId) || "", firestore23._persistenceKey, settings);
-  if (!firestore23._componentsProvider) {
+  const settings = firestore15._freezeSettings();
+  const databaseInfo = makeDatabaseInfo(firestore15._databaseId, ((_a = firestore15._app) === null || _a === void 0 ? void 0 : _a.options.appId) || "", firestore15._persistenceKey, settings);
+  if (!firestore15._componentsProvider) {
     if (((_b = settings.localCache) === null || _b === void 0 ? void 0 : _b._offlineComponentProvider) && ((_c = settings.localCache) === null || _c === void 0 ? void 0 : _c._onlineComponentProvider)) {
-      firestore23._componentsProvider = {
+      firestore15._componentsProvider = {
         _offline: settings.localCache._offlineComponentProvider,
         _online: settings.localCache._onlineComponentProvider
       };
     }
   }
-  firestore23._firestoreClient = new FirestoreClient(firestore23._authCredentials, firestore23._appCheckCredentials, firestore23._queue, databaseInfo, firestore23._componentsProvider && buildComponentProvider(firestore23._componentsProvider));
+  firestore15._firestoreClient = new FirestoreClient(firestore15._authCredentials, firestore15._appCheckCredentials, firestore15._queue, databaseInfo, firestore15._componentsProvider && buildComponentProvider(firestore15._componentsProvider));
 }
 function buildComponentProvider(componentsProvider) {
   const online = componentsProvider === null || componentsProvider === void 0 ? void 0 : componentsProvider._online.build();
@@ -60321,10 +60345,10 @@ var UserDataReader = class {
     }, this.databaseId, this.serializer, this.ignoreUndefinedProperties);
   }
 };
-function newUserDataReader(firestore23) {
-  const settings = firestore23._freezeSettings();
-  const serializer = newSerializer(firestore23._databaseId);
-  return new UserDataReader(firestore23._databaseId, !!settings.ignoreUndefinedProperties, serializer);
+function newUserDataReader(firestore15) {
+  const settings = firestore15._freezeSettings();
+  const serializer = newSerializer(firestore15._databaseId);
+  return new UserDataReader(firestore15._databaseId, !!settings.ignoreUndefinedProperties, serializer);
 }
 function parseSetData(userDataReader, methodName, targetDoc, input, hasConverter, options = {}) {
   const context = userDataReader.createContext(options.merge || options.mergeFields ? 2 : 0, methodName, targetDoc, hasConverter);
@@ -61190,9 +61214,9 @@ function applyFirestoreDataConverter(converter, value, options) {
   return convertedValue;
 }
 var LiteUserDataWriter = class extends AbstractUserDataWriter {
-  constructor(firestore23) {
+  constructor(firestore15) {
     super();
-    this.firestore = firestore23;
+    this.firestore = firestore15;
   }
   convertBytes(bytes) {
     return new Bytes(bytes);
@@ -61425,14 +61449,14 @@ function resultChangeType(type) {
 }
 function getDoc(reference) {
   reference = cast(reference, DocumentReference);
-  const firestore23 = cast(reference.firestore, Firestore);
-  const client = ensureFirestoreConfigured(firestore23);
-  return firestoreClientGetDocumentViaSnapshotListener(client, reference._key).then((snapshot) => convertToDocSnapshot(firestore23, reference, snapshot));
+  const firestore15 = cast(reference.firestore, Firestore);
+  const client = ensureFirestoreConfigured(firestore15);
+  return firestoreClientGetDocumentViaSnapshotListener(client, reference._key).then((snapshot) => convertToDocSnapshot(firestore15, reference, snapshot));
 }
 var ExpUserDataWriter = class extends AbstractUserDataWriter {
-  constructor(firestore23) {
+  constructor(firestore15) {
     super();
-    this.firestore = firestore23;
+    this.firestore = firestore15;
   }
   convertBytes(bytes) {
     return new Bytes(bytes);
@@ -61449,25 +61473,25 @@ var ExpUserDataWriter = class extends AbstractUserDataWriter {
 };
 function getDocs(query2) {
   query2 = cast(query2, Query);
-  const firestore23 = cast(query2.firestore, Firestore);
-  const client = ensureFirestoreConfigured(firestore23);
-  const userDataWriter = new ExpUserDataWriter(firestore23);
+  const firestore15 = cast(query2.firestore, Firestore);
+  const client = ensureFirestoreConfigured(firestore15);
+  const userDataWriter = new ExpUserDataWriter(firestore15);
   validateHasExplicitOrderByForLimitToLast(query2._query);
-  return firestoreClientGetDocumentsViaSnapshotListener(client, query2._query).then((snapshot) => new QuerySnapshot(firestore23, userDataWriter, query2, snapshot));
+  return firestoreClientGetDocumentsViaSnapshotListener(client, query2._query).then((snapshot) => new QuerySnapshot(firestore15, userDataWriter, query2, snapshot));
 }
 function setDoc(reference, data, options) {
   reference = cast(reference, DocumentReference);
-  const firestore23 = cast(reference.firestore, Firestore);
+  const firestore15 = cast(reference.firestore, Firestore);
   const convertedValue = applyFirestoreDataConverter(reference.converter, data, options);
-  const dataReader = newUserDataReader(firestore23);
+  const dataReader = newUserDataReader(firestore15);
   const parsed = parseSetData(dataReader, "setDoc", reference._key, convertedValue, reference.converter !== null, options);
   const mutation = parsed.toMutation(reference._key, Precondition.none());
-  return executeWrite(firestore23, [mutation]);
+  return executeWrite(firestore15, [mutation]);
 }
 function updateDoc(reference, fieldOrUpdateData, value, ...moreFieldsAndValues) {
   reference = cast(reference, DocumentReference);
-  const firestore23 = cast(reference.firestore, Firestore);
-  const dataReader = newUserDataReader(firestore23);
+  const firestore15 = cast(reference.firestore, Firestore);
+  const dataReader = newUserDataReader(firestore15);
   fieldOrUpdateData = getModularInstance(fieldOrUpdateData);
   let parsed;
   if (typeof fieldOrUpdateData === "string" || fieldOrUpdateData instanceof FieldPath) {
@@ -61476,30 +61500,30 @@ function updateDoc(reference, fieldOrUpdateData, value, ...moreFieldsAndValues) 
     parsed = parseUpdateData(dataReader, "updateDoc", reference._key, fieldOrUpdateData);
   }
   const mutation = parsed.toMutation(reference._key, Precondition.exists(true));
-  return executeWrite(firestore23, [mutation]);
+  return executeWrite(firestore15, [mutation]);
 }
 function deleteDoc(reference) {
-  const firestore23 = cast(reference.firestore, Firestore);
+  const firestore15 = cast(reference.firestore, Firestore);
   const mutations = [new DeleteMutation(reference._key, Precondition.none())];
-  return executeWrite(firestore23, mutations);
+  return executeWrite(firestore15, mutations);
 }
 function addDoc(reference, data) {
-  const firestore23 = cast(reference.firestore, Firestore);
+  const firestore15 = cast(reference.firestore, Firestore);
   const docRef = doc(reference);
   const convertedValue = applyFirestoreDataConverter(reference.converter, data);
   const dataReader = newUserDataReader(reference.firestore);
   const parsed = parseSetData(dataReader, "addDoc", docRef._key, convertedValue, reference.converter !== null, {});
   const mutation = parsed.toMutation(docRef._key, Precondition.exists(false));
-  return executeWrite(firestore23, [mutation]).then(() => docRef);
+  return executeWrite(firestore15, [mutation]).then(() => docRef);
 }
-function executeWrite(firestore23, mutations) {
-  const client = ensureFirestoreConfigured(firestore23);
+function executeWrite(firestore15, mutations) {
+  const client = ensureFirestoreConfigured(firestore15);
   return firestoreClientWrite(client, mutations);
 }
-function convertToDocSnapshot(firestore23, ref2, snapshot) {
+function convertToDocSnapshot(firestore15, ref2, snapshot) {
   const doc2 = snapshot.docs.get(ref2._key);
-  const userDataWriter = new ExpUserDataWriter(firestore23);
-  return new DocumentSnapshot(firestore23, userDataWriter, ref2._key, doc2, new SnapshotMetadata(snapshot.hasPendingWrites, snapshot.fromCache), ref2.converter);
+  const userDataWriter = new ExpUserDataWriter(firestore15);
+  return new DocumentSnapshot(firestore15, userDataWriter, ref2._key, doc2, new SnapshotMetadata(snapshot.hasPendingWrites, snapshot.fromCache), ref2.converter);
 }
 var DEFAULT_TRANSACTION_OPTIONS = {
   maxAttempts: 5
@@ -61509,9 +61533,9 @@ function validateTransactionOptions(options) {
     throw new FirestoreError(Code.INVALID_ARGUMENT, "Max attempts must be at least 1");
   }
 }
-function validateReference(documentRef, firestore23) {
+function validateReference(documentRef, firestore15) {
   documentRef = getModularInstance(documentRef);
-  if (documentRef.firestore !== firestore23) {
+  if (documentRef.firestore !== firestore15) {
     throw new FirestoreError(Code.INVALID_ARGUMENT, "Provided document reference is from a different Firestore instance.");
   } else {
     return documentRef;
@@ -61603,12 +61627,12 @@ var Transaction = class extends Transaction$1 {
     ), ref2.converter));
   }
 };
-function runTransaction(firestore23, updateFunction, options) {
-  firestore23 = cast(firestore23, Firestore);
+function runTransaction(firestore15, updateFunction, options) {
+  firestore15 = cast(firestore15, Firestore);
   const optionsWithDefaults = Object.assign(Object.assign({}, DEFAULT_TRANSACTION_OPTIONS), options);
   validateTransactionOptions(optionsWithDefaults);
-  const client = ensureFirestoreConfigured(firestore23);
-  return firestoreClientTransaction(client, (internalTransaction) => updateFunction(new Transaction(firestore23, internalTransaction)), optionsWithDefaults);
+  const client = ensureFirestoreConfigured(firestore15);
+  return firestoreClientTransaction(client, (internalTransaction) => updateFunction(new Transaction(firestore15, internalTransaction)), optionsWithDefaults);
 }
 registerFirestore("node");
 
@@ -64030,8 +64054,8 @@ var PermissionContext = (0, import_react3.createContext)(void 0);
 
 // ../packages/firebase/src/functions.ts
 async function callCloudFunction(name9, data) {
-  const { functions: functions12 } = getFirebaseInstance();
-  const callable = httpsCallable(functions12, name9);
+  const { functions } = getFirebaseInstance();
+  const callable = httpsCallable(functions, name9);
   const result = await callable(data);
   return result.data;
 }
@@ -70298,365 +70322,6 @@ var WorkflowExecutor = class {
   }
 };
 
-// ../packages/firebase/src/services/leads/validators.ts
-var LeadValidator = class {
-  static validateCaptureRequest(dto) {
-    const errors = [];
-    if (!dto.companyId) errors.push("companyId is required");
-    if (!dto.branchId) errors.push("branchId is required");
-    if (!dto.sourceCode) errors.push("sourceCode is required");
-    if (!dto.firstName) errors.push("firstName is required");
-    if (!dto.phone) errors.push("phone is required");
-    if (errors.length > 0) {
-      throw new Error(`Lead validation failed: ${errors.join(", ")}`);
-    }
-  }
-};
-
-// ../packages/firebase/src/services/leads/DuplicateDetectionService.ts
-var DuplicateDetectionService = class {
-  personRepository;
-  constructor() {
-    this.personRepository = new PersonRepository();
-  }
-  async detectDuplicate(context) {
-    let matchedPerson = null;
-    let confidenceScore = 0;
-    if (context.phone) {
-      const persons = await this.personRepository.findByMobile(context.phone);
-      if (persons.length > 0) {
-        matchedPerson = persons[0];
-        confidenceScore += 50;
-      }
-    }
-    if (context.email) {
-      const persons = await this.personRepository.findByEmail(context.email);
-      if (persons.length > 0) {
-        if (!matchedPerson) {
-          matchedPerson = persons[0];
-        }
-        confidenceScore += 30;
-      }
-    }
-    if ((context.pan || context.aadhaar) && matchedPerson) {
-      const hasIdentity = matchedPerson.identities?.some(
-        (id) => context.pan && id.type === "PAN" && id.idNumber === context.pan || context.aadhaar && id.type === "AADHAAR" && id.idNumber === context.aadhaar
-      );
-      if (hasIdentity) {
-        confidenceScore += 20;
-      }
-    }
-    if (!matchedPerson && (context.pan || context.aadhaar)) {
-    }
-    if (matchedPerson) {
-      return {
-        isDuplicate: true,
-        matchedPersonId: matchedPerson.id,
-        confidenceScore: Math.min(confidenceScore, 100)
-      };
-    }
-    return {
-      isDuplicate: false,
-      confidenceScore: 0
-    };
-  }
-};
-
-// ../packages/firebase/src/services/leads/CampaignAttributionService.ts
-var CampaignAttributionService = class {
-  /**
-   * Generates a new touchpoint from a lead capture request.
-   */
-  createTouchpoint(dto) {
-    return {
-      id: `touch_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
-      campaignId: dto.campaignId || "ORGANIC",
-      sourceCode: dto.sourceCode,
-      medium: dto.utmMedium || "none",
-      channel: dto.campaignChannel || "OTHER",
-      touchpoint: dto.utmSource || dto.sourceCode,
-      timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      actor: dto.capturedByUserId || "SYSTEM",
-      metadata: {
-        utmCampaign: dto.utmCampaign,
-        referralCode: dto.referralCode
-      }
-    };
-  }
-  /**
-   * Computes the attribution model for a lead given its touchpoints.
-   */
-  computeAttribution(leadId, existingAttribution, newTouchpoint, model = "FIRST_TOUCH") {
-    const touchpoints = existingAttribution ? [...existingAttribution.touchpoints, newTouchpoint] : [newTouchpoint];
-    const sortedTouchpoints = [...touchpoints].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-    const firstTouch = sortedTouchpoints[0];
-    const lastTouch = sortedTouchpoints[sortedTouchpoints.length - 1];
-    return {
-      leadId,
-      firstTouchId: firstTouch.id,
-      lastTouchId: lastTouch.id,
-      touchpoints: sortedTouchpoints,
-      attributionModel: model
-    };
-  }
-};
-
-// ../packages/firebase/src/services/leads/LeadMatchingService.ts
-var LeadMatchingService = class {
-  duplicateDetectionService;
-  personService;
-  constructor() {
-    this.duplicateDetectionService = new DuplicateDetectionService();
-    this.personService = new PersonService();
-  }
-  async matchOrCreatePerson(dto, userId) {
-    const duplicateResult = await this.duplicateDetectionService.detectDuplicate({
-      phone: dto.phone,
-      email: dto.email,
-      pan: dto.pan,
-      aadhaar: dto.aadhaar
-    });
-    if (duplicateResult.isDuplicate && duplicateResult.matchedPersonId) {
-      return {
-        personId: duplicateResult.matchedPersonId,
-        isNewPerson: false,
-        confidenceScore: duplicateResult.confidenceScore
-      };
-    }
-    const newPersonInput = {
-      firstName: dto.firstName,
-      lastName: dto.lastName,
-      fullName: `${dto.firstName} ${dto.lastName}`.trim(),
-      displayName: `${dto.firstName} ${dto.lastName}`.trim(),
-      gender: "PREFER_NOT_TO_SAY",
-      classifications: ["LEAD"],
-      tags: [],
-      mobileNumbers: [dto.phone],
-      emailAddresses: dto.email ? [dto.email] : [],
-      primaryMobile: dto.phone,
-      primaryEmail: dto.email,
-      socialProfiles: [],
-      addresses: [],
-      identities: [],
-      communicationPreferences: {
-        phone: true,
-        whatsapp: !!dto.whatsappNumber,
-        sms: true,
-        email: !!dto.email,
-        doNotDisturb: false
-      },
-      relationships: []
-    };
-    if (dto.pan || dto.aadhaar) {
-      if (dto.pan) {
-        newPersonInput.identities.push({
-          type: "PAN",
-          idNumber: dto.pan
-        });
-      }
-      if (dto.aadhaar) {
-        newPersonInput.identities.push({
-          type: "AADHAAR",
-          idNumber: dto.aadhaar
-        });
-      }
-    }
-    const createdPerson = await this.personService.createPerson(newPersonInput, userId);
-    return {
-      personId: createdPerson.id,
-      isNewPerson: true,
-      confidenceScore: 100
-    };
-  }
-};
-
-// ../packages/firebase/src/services/leads/mapper.ts
-var LeadMapper = class {
-  static toInternalModel(dto, personId, touchpoint, routingDetails) {
-    return {
-      companyId: dto.companyId,
-      branchId: dto.branchId,
-      leadSourceId: dto.sourceCode,
-      firstName: dto.firstName,
-      lastName: dto.lastName,
-      email: dto.email,
-      phone: dto.phone,
-      altPhone: dto.altPhone,
-      status: "NEW",
-      // Matches LeadStatus 'NEW'
-      requirementDetails: dto.requirementDetails,
-      budgetMin: dto.budgetMin,
-      budgetMax: dto.budgetMax,
-      preferredLocation: dto.preferredLocation,
-      notes: dto.notes,
-      personId,
-      // Ownership and Routing
-      ownerId: routingDetails.ownerId,
-      telecallerId: routingDetails.telecallerId,
-      networkMemberId: routingDetails.networkMemberId,
-      routingStrategy: routingDetails.routingStrategy,
-      // Campaign
-      campaignId: touchpoint.campaignId,
-      source: dto.sourceCode,
-      aiIntentScore: 0,
-      // Timestamps
-      firstContactAt: (/* @__PURE__ */ new Date()).toISOString()
-    };
-  }
-};
-
-// ../packages/firebase/src/services/leads/LeadFactory.ts
-var LeadFactory = class {
-  static createNewLead(dto, personId, touchpoint, routingDetails) {
-    const mapped = LeadMapper.toInternalModel(dto, personId, touchpoint, routingDetails);
-    return {
-      ...mapped,
-      isActive: true
-    };
-  }
-};
-
-// ../packages/firebase/src/services/leads/LeadAcquisitionService.ts
-var import_firestore29 = require("firebase-admin/firestore");
-
-// ../packages/firebase/src/services/leads/RoutingService.ts
-var import_firestore28 = require("firebase-admin/firestore");
-var RoutingService = class {
-  /**
-   * Determine the routing for a newly captured lead based on business rules.
-   * Returns an object containing the assigned user IDs based on the strategy.
-   */
-  async routeLead(dto) {
-    let strategy = "OWNER";
-    let ownerId = dto.ownerId;
-    const telecallerId = dto.telecallerId;
-    const networkMemberId = dto.networkMemberId;
-    if (ownerId || telecallerId || networkMemberId) {
-      return { ownerId, telecallerId, networkMemberId, routingStrategy: "OWNER_PRESERVED" };
-    }
-    if (dto.campaignId) {
-      strategy = "CAMPAIGN_OWNER";
-      strategy = "ROUND_ROBIN";
-    } else if (dto.sourceCode === "WALK_IN" || dto.sourceCode === "DOOR_TO_DOOR") {
-      strategy = "SOURCE_OWNER";
-      ownerId = dto.capturedByUserId;
-    } else {
-      strategy = "ROUND_ROBIN";
-    }
-    if (strategy === "ROUND_ROBIN") {
-      const assigned = await this.executeRoundRobin("DEFAULT_GROUP");
-      ownerId = assigned || void 0;
-    }
-    return { ownerId, telecallerId, networkMemberId, routingStrategy: strategy };
-  }
-  /**
-   * Round-robin implementation with Firebase Transactions.
-   */
-  async executeRoundRobin(groupId) {
-    const db = (0, import_firestore28.getFirestore)();
-    const stateRef = db.collection("routing_states").doc(groupId);
-    try {
-      return await db.runTransaction(async (t) => {
-        const doc2 = await t.get(stateRef);
-        let activeUsers = ["user-101", "user-102", "user-103"];
-        let lastAssignedIndex = -1;
-        if (doc2.exists) {
-          const data = doc2.data();
-          if (data && data.activeUsers?.length > 0) activeUsers = data.activeUsers;
-          if (data && typeof data.lastAssignedIndex === "number") lastAssignedIndex = data.lastAssignedIndex;
-        }
-        if (activeUsers.length === 0) return null;
-        const nextIndex = (lastAssignedIndex + 1) % activeUsers.length;
-        const assignedUser = activeUsers[nextIndex];
-        t.set(stateRef, {
-          groupId,
-          activeUsers,
-          lastAssignedIndex: nextIndex,
-          updatedAt: (/* @__PURE__ */ new Date()).toISOString()
-        }, { merge: true });
-        return assignedUser;
-      });
-    } catch (e) {
-      console.error("Round robin transaction failed:", e);
-      return null;
-    }
-  }
-};
-
-// ../packages/firebase/src/services/leads/LeadAcquisitionService.ts
-var LeadAcquisitionService = class {
-  leadMatchingService;
-  campaignAttributionService;
-  routingService;
-  leadRepository;
-  interactionService;
-  workflowExecutor;
-  constructor() {
-    this.leadMatchingService = new LeadMatchingService();
-    this.campaignAttributionService = new CampaignAttributionService();
-    this.routingService = new RoutingService();
-    this.leadRepository = new LeadRepository();
-    this.interactionService = new InteractionService();
-    this.workflowExecutor = new WorkflowExecutor();
-  }
-  async acquireLead(dto, userId = "SYSTEM") {
-    LeadValidator.validateCaptureRequest(dto);
-    if (dto.eventId) {
-      const db = (0, import_firestore29.getFirestore)();
-      const eventRef = db.collection("processed_webhooks").doc(dto.eventId);
-      try {
-        await db.runTransaction(async (t) => {
-          const doc2 = await t.get(eventRef);
-          if (doc2.exists) {
-            throw new Error("ALREADY_PROCESSED");
-          }
-          t.set(eventRef, { processedAt: (/* @__PURE__ */ new Date()).toISOString(), sourceCode: dto.sourceCode });
-        });
-      } catch (e) {
-        if (e.message === "ALREADY_PROCESSED") {
-          throw e;
-        }
-        throw e;
-      }
-    }
-    const matchResult = await this.leadMatchingService.matchOrCreatePerson(dto, userId);
-    const routingDetails = await this.routingService.routeLead(dto);
-    const tempLeadId = `lead_${Date.now()}`;
-    const newTouchpoint = this.campaignAttributionService.createTouchpoint(dto);
-    const existingAttribution = null;
-    this.campaignAttributionService.computeAttribution(tempLeadId, existingAttribution, newTouchpoint);
-    const leadInput = LeadFactory.createNewLead(dto, matchResult.personId, newTouchpoint, routingDetails);
-    const lead = await this.leadRepository.create(leadInput, userId);
-    await this.interactionService.recordInteraction({
-      personId: matchResult.personId,
-      type: "NOTE",
-      // Standard fallback, can be derived from source
-      projectId: dto.projectId,
-      date: (/* @__PURE__ */ new Date()).toISOString(),
-      status: "COMPLETED",
-      priority: "MEDIUM",
-      notes: `Lead acquired from ${dto.sourceCode} via ${routingDetails.routingStrategy}`
-    }, userId);
-    try {
-      await this.workflowExecutor.startWorkflow(
-        "DEFAULT_LEAD_WORKFLOW",
-        // definitionId
-        lead.id,
-        // entityId
-        "Lead",
-        // entityType
-        userId,
-        // userId
-        {}
-        // context
-      );
-    } catch (error) {
-      console.warn("Failed to start workflow during lead acquisition:", error);
-    }
-    return lead;
-  }
-};
-
 // ../packages/firebase/src/organization/validators/companySchema.ts
 var companyBrandingSchema = external_exports.object({
   logoUrl: external_exports.string().url().optional().or(external_exports.literal("")),
@@ -71032,11 +70697,12 @@ var syncCustomClaims = (0, import_https2.onCall)(async (request) => {
 });
 
 // src/triggers/onCompanyCreated.ts
-var functions2 = __toESM(require("firebase-functions"));
+var import_firestore30 = require("firebase-functions/v2/firestore");
 var admin6 = __toESM(require("firebase-admin"));
-var onCompanyCreated = functions2.firestore.document("companies/{companyId}").onCreate(async (snap, context) => {
-  const companyId = context.params.companyId;
-  const companyData = snap.data();
+var handleCompanyCreated = async (event) => {
+  const companyId = event.params.companyId;
+  const companyData = event.data?.data();
+  if (!companyData) return;
   console.log(`Setting up default organization configuration for company ${companyId}`);
   const db = admin6.firestore();
   const batch = db.batch();
@@ -71138,14 +70804,22 @@ var onCompanyCreated = functions2.firestore.document("companies/{companyId}").on
   });
   await batch.commit();
   console.log(`Default organization configuration setup complete for company ${companyId}`);
-});
+};
+var onCompanyCreated = (0, import_firestore30.onDocumentCreated)(
+  {
+    document: "companies/{companyId}",
+    region: "asia-south1"
+  },
+  handleCompanyCreated
+);
 
 // src/triggers/onBranchCreated.ts
-var functions3 = __toESM(require("firebase-functions"));
+var import_firestore31 = require("firebase-functions/v2/firestore");
 var admin7 = __toESM(require("firebase-admin"));
-var onBranchCreated = functions3.firestore.document("branches/{branchId}").onCreate(async (snap, context) => {
-  const branchId = context.params.branchId;
-  const branchData = snap.data();
+var handleBranchCreated = async (event) => {
+  const branchData = event.data?.data();
+  if (!branchData) return;
+  const branchId = event.params.branchId;
   console.log(`Branch ${branchId} created for company ${branchData.companyId}`);
   const db = admin7.firestore();
   const auditRef = db.collection("audit_logs").doc();
@@ -71165,14 +70839,22 @@ var onBranchCreated = functions3.firestore.document("branches/{branchId}").onCre
     isDeleted: false,
     version: 1
   });
-});
+};
+var onBranchCreated = (0, import_firestore31.onDocumentCreated)(
+  {
+    document: "branches/{branchId}",
+    region: "asia-south1"
+  },
+  handleBranchCreated
+);
 
 // src/triggers/onDepartmentCreated.ts
-var functions4 = __toESM(require("firebase-functions"));
+var import_firestore32 = require("firebase-functions/v2/firestore");
 var admin8 = __toESM(require("firebase-admin"));
-var onDepartmentCreated = functions4.firestore.document("departments/{departmentId}").onCreate(async (snap, context) => {
-  const departmentId = context.params.departmentId;
-  const deptData = snap.data();
+var handleDepartmentCreated = async (event) => {
+  const departmentId = event.params.departmentId;
+  const deptData = event.data?.data();
+  if (!deptData) return;
   console.log(`Department ${departmentId} created for company ${deptData.companyId}`);
   const db = admin8.firestore();
   const auditRef = db.collection("audit_logs").doc();
@@ -71192,15 +70874,23 @@ var onDepartmentCreated = functions4.firestore.document("departments/{department
     isDeleted: false,
     version: 1
   });
-});
+};
+var onDepartmentCreated = (0, import_firestore32.onDocumentCreated)(
+  {
+    document: "departments/{departmentId}",
+    region: "asia-south1"
+  },
+  handleDepartmentCreated
+);
 
 // src/triggers/onTeamUpdated.ts
-var functions5 = __toESM(require("firebase-functions"));
+var import_firestore33 = require("firebase-functions/v2/firestore");
 var admin9 = __toESM(require("firebase-admin"));
-var onTeamUpdated = functions5.firestore.document("teams/{teamId}").onUpdate(async (change, context) => {
-  const teamId = context.params.teamId;
-  const beforeData = change.before.data();
-  const afterData = change.after.data();
+var handleTeamUpdated = async (event) => {
+  const beforeData = event.data?.before.data();
+  const afterData = event.data?.after.data();
+  if (!beforeData || !afterData) return;
+  const teamId = event.params.teamId;
   console.log(`Team ${teamId} updated`);
   const db = admin9.firestore();
   const batch = db.batch();
@@ -71230,86 +70920,149 @@ var onTeamUpdated = functions5.firestore.document("teams/{teamId}").onUpdate(asy
     version: 1
   });
   await batch.commit();
-});
+};
+var onTeamUpdated = (0, import_firestore33.onDocumentUpdated)(
+  {
+    document: "teams/{teamId}",
+    region: "asia-south1"
+  },
+  handleTeamUpdated
+);
 
 // src/triggers/projectTriggers.ts
-var functions6 = __toESM(require("firebase-functions"));
+var import_firestore34 = require("firebase-functions/v2/firestore");
 var admin10 = __toESM(require("firebase-admin"));
-var onProjectCreated = functions6.firestore.document("projects/{projectId}").onCreate(async (snap, context) => {
-  const data = snap.data();
-  console.log(`New Project Created: ${data.name} (${context.params.projectId})`);
+var handleProjectCreated = async (event) => {
+  const data = event.data?.data();
+  if (!data) return;
+  console.log(`New Project Created: ${data.name} (${event.params.projectId})`);
   await admin10.firestore().collection("audit_logs").add({
     action: "PROJECT_CREATED",
-    entityId: context.params.projectId,
+    entityId: event.params.projectId,
     timestamp: admin10.firestore.FieldValue.serverTimestamp(),
     details: { projectName: data.name }
   });
-});
-var onLayoutCreated = functions6.firestore.document("layouts/{layoutId}").onCreate(async (snap, context) => {
-  const data = snap.data();
-  console.log(`New Layout Created: ${data.name} (${context.params.layoutId})`);
+};
+var onProjectCreated = (0, import_firestore34.onDocumentCreated)(
+  {
+    document: "projects/{projectId}",
+    region: "asia-south1"
+  },
+  handleProjectCreated
+);
+var handleLayoutCreated = async (event) => {
+  const data = event.data?.data();
+  if (!data) return;
+  console.log(`New Layout Created: ${data.name} (${event.params.layoutId})`);
   await admin10.firestore().collection("audit_logs").add({
     action: "LAYOUT_CREATED",
-    entityId: context.params.layoutId,
+    entityId: event.params.layoutId,
     timestamp: admin10.firestore.FieldValue.serverTimestamp(),
     details: { layoutName: data.name, projectId: data.projectId }
   });
-});
-var onBlockCreated = functions6.firestore.document("blocks/{blockId}").onCreate(async (snap, context) => {
-  const data = snap.data();
-  console.log(`New Block Created: ${data.name} (${context.params.blockId})`);
+};
+var onLayoutCreated = (0, import_firestore34.onDocumentCreated)(
+  {
+    document: "layouts/{layoutId}",
+    region: "asia-south1"
+  },
+  handleLayoutCreated
+);
+var handleBlockCreated = async (event) => {
+  const data = event.data?.data();
+  if (!data) return;
+  console.log(`New Block Created: ${data.name} (${event.params.blockId})`);
   await admin10.firestore().collection("audit_logs").add({
     action: "BLOCK_CREATED",
-    entityId: context.params.blockId,
+    entityId: event.params.blockId,
     timestamp: admin10.firestore.FieldValue.serverTimestamp(),
     details: { blockName: data.name, layoutId: data.layoutId }
   });
-});
-var onPlotCreated = functions6.firestore.document("plots/{plotId}").onCreate(async (snap, context) => {
-  const data = snap.data();
-  console.log(`New Plot Created: ${data.plotNumber} (${context.params.plotId})`);
+};
+var onBlockCreated = (0, import_firestore34.onDocumentCreated)(
+  {
+    document: "blocks/{blockId}",
+    region: "asia-south1"
+  },
+  handleBlockCreated
+);
+var handlePlotCreated = async (event) => {
+  const data = event.data?.data();
+  if (!data) return;
+  console.log(`New Plot Created: ${data.plotNumber} (${event.params.plotId})`);
   await admin10.firestore().collection("audit_logs").add({
     action: "PLOT_CREATED",
-    entityId: context.params.plotId,
+    entityId: event.params.plotId,
     timestamp: admin10.firestore.FieldValue.serverTimestamp(),
     details: { plotNumber: data.plotNumber, blockId: data.blockId }
   });
-});
-var onPlotPriceChanged = functions6.firestore.document("plots/{plotId}").onUpdate(async (change, context) => {
-  const before = change.before.data();
-  const after = change.after.data();
+};
+var onPlotCreated = (0, import_firestore34.onDocumentCreated)(
+  {
+    document: "plots/{plotId}",
+    region: "asia-south1"
+  },
+  handlePlotCreated
+);
+var handlePlotPriceChanged = async (event) => {
+  const before = event.data?.before.data();
+  const after = event.data?.after.data();
+  if (!before || !after) return;
   if (before.price !== after.price) {
-    console.log(`Plot ${context.params.plotId} price changed from ${before.price} to ${after.price}`);
+    console.log(`Plot ${event.params.plotId} price changed from ${before.price} to ${after.price}`);
     await admin10.firestore().collection("audit_logs").add({
       action: "PLOT_PRICE_CHANGED",
-      entityId: context.params.plotId,
+      entityId: event.params.plotId,
       timestamp: admin10.firestore.FieldValue.serverTimestamp(),
       details: { oldPrice: before.price, newPrice: after.price }
     });
   }
-});
+};
+var onPlotPriceChanged = (0, import_firestore34.onDocumentUpdated)(
+  {
+    document: "plots/{plotId}",
+    region: "asia-south1"
+  },
+  handlePlotPriceChanged
+);
 
 // src/triggers/leadTriggers.ts
-var functions7 = __toESM(require("firebase-functions"));
-var onLeadCreated = functions7.firestore.document("leads/{leadId}").onCreate(async (snap, context) => {
-  const leadData = snap.data();
-  const leadId = context.params["leadId"];
+var import_firestore35 = require("firebase-functions/v2/firestore");
+var handleLeadCreated = async (event) => {
+  const leadData = event.data?.data();
+  if (!leadData) return;
+  const leadId = event.params["leadId"];
   console.log(`Lead Created: ${leadId}`, leadData);
-});
-var onLeadUpdated = functions7.firestore.document("leads/{leadId}").onUpdate(async (change, context) => {
-  const before = change.before.data();
-  const after = change.after.data();
-  const leadId = context.params["leadId"];
+};
+var onLeadCreated = (0, import_firestore35.onDocumentCreated)(
+  {
+    document: "leads/{leadId}",
+    region: "asia-south1"
+  },
+  handleLeadCreated
+);
+var handleLeadUpdated = async (event) => {
+  const before = event.data?.before.data();
+  const after = event.data?.after.data();
+  if (!before || !after) return;
+  const leadId = event.params["leadId"];
   if (before.assignedToUserId !== after.assignedToUserId) {
     console.log(`Lead Assigned: ${leadId} assigned to ${after.assignedToUserId}`);
   }
   if (before.status !== "qualified" && after.status === "qualified") {
     console.log(`Lead Qualified: ${leadId}`);
   }
-});
+};
+var onLeadUpdated = (0, import_firestore35.onDocumentUpdated)(
+  {
+    document: "leads/{leadId}",
+    region: "asia-south1"
+  },
+  handleLeadUpdated
+);
 
 // src/events/publishEvent.ts
-var functions8 = __toESM(require("firebase-functions"));
+var import_https3 = require("firebase-functions/v2/https");
 var admin11 = __toESM(require("firebase-admin"));
 var crypto = __toESM(require("crypto"));
 
@@ -71392,44 +71145,6 @@ var EventDispatcher = class {
   }
 };
 
-// ../packages/events/dist/store/FirestoreEventStore.js
-var FirestoreEventStore = class {
-  db;
-  collectionName = "events";
-  constructor(db) {
-    this.db = db;
-  }
-  async saveEvent(event) {
-    const eventRef = this.db.collection(this.collectionName).doc(event.eventId);
-    const doc2 = await eventRef.get();
-    if (doc2.exists) {
-      throw new Error(`Event with ID ${event.eventId} already exists. Events are immutable.`);
-    }
-    await eventRef.set({
-      ...event,
-      // Store timestamp as a Date object for better querying in Firestore
-      timestamp: new Date(event.timestamp)
-    });
-  }
-  async getEventsForAggregate(aggregateId) {
-    const snapshot = await this.db.collection(this.collectionName).where("aggregateId", "==", aggregateId).orderBy("version", "asc").get();
-    return snapshot.docs.map((doc2) => {
-      const data = doc2.data();
-      return {
-        ...data,
-        timestamp: data.timestamp.toDate().toISOString()
-      };
-    });
-  }
-  async getLatestVersion(aggregateId) {
-    const snapshot = await this.db.collection(this.collectionName).where("aggregateId", "==", aggregateId).orderBy("version", "desc").limit(1).get();
-    if (snapshot.empty) {
-      return 0;
-    }
-    return snapshot.docs[0].data().version;
-  }
-};
-
 // ../packages/events/dist/marketing.js
 var BookingPaymentEvents = {
   BOOKING_FULLY_PAID: "BOOKING_FULLY_PAID"
@@ -71486,14 +71201,53 @@ var CustomerNotificationEventType;
   CustomerNotificationEventType2["CUSTOMER_NOTIFICATION_PUBLISHED"] = "CUSTOMER_NOTIFICATION_PUBLISHED";
 })(CustomerNotificationEventType || (CustomerNotificationEventType = {}));
 
+// ../packages/events/src/store/FirestoreEventStore.ts
+var FirestoreEventStore = class {
+  db;
+  collectionName = "events";
+  constructor(db) {
+    this.db = db;
+  }
+  async saveEvent(event) {
+    const eventRef = this.db.collection(this.collectionName).doc(event.eventId);
+    const doc2 = await eventRef.get();
+    if (doc2.exists) {
+      throw new Error(`Event with ID ${event.eventId} already exists. Events are immutable.`);
+    }
+    await eventRef.set({
+      ...event,
+      // Store timestamp as a Date object for better querying in Firestore
+      timestamp: new Date(event.timestamp)
+    });
+  }
+  async getEventsForAggregate(aggregateId) {
+    const snapshot = await this.db.collection(this.collectionName).where("aggregateId", "==", aggregateId).orderBy("version", "asc").get();
+    return snapshot.docs.map((doc2) => {
+      const data = doc2.data();
+      return {
+        ...data,
+        timestamp: data.timestamp.toDate().toISOString()
+      };
+    });
+  }
+  async getLatestVersion(aggregateId) {
+    const snapshot = await this.db.collection(this.collectionName).where("aggregateId", "==", aggregateId).orderBy("version", "desc").limit(1).get();
+    if (snapshot.empty) {
+      return 0;
+    }
+    return snapshot.docs[0].data().version;
+  }
+};
+
 // src/events/publishEvent.ts
-var publishEvent = functions8.https.onCall(async (data, context) => {
-  if (!context.auth) {
-    throw new functions8.https.HttpsError(
+var publishEvent = (0, import_https3.onCall)(async (request) => {
+  if (!request.auth) {
+    throw new import_https3.HttpsError(
       "unauthenticated",
       "User must be authenticated to publish events."
     );
   }
+  const data = request.data;
   const db = admin11.firestore();
   const eventStore = new FirestoreEventStore(db);
   const eventPublisher = new DefaultEventPublisher(eventStore);
@@ -71505,17 +71259,17 @@ var publishEvent = functions8.https.onCall(async (data, context) => {
     timestamp: (/* @__PURE__ */ new Date()).toISOString(),
     version: data.version || 1,
     // Optional logic to determine next version
-    actor: context.auth.uid,
+    actor: request.auth.uid,
     payload: data.payload,
     metadata: {
       ...data.metadata,
-      sourceIp: context.rawRequest.ip
+      sourceIp: request.rawRequest.ip
     }
   };
   try {
     EventSchema2.parse(event);
   } catch (error) {
-    throw new functions8.https.HttpsError(
+    throw new import_https3.HttpsError(
       "invalid-argument",
       "Event payload does not match schema.",
       error
@@ -71526,7 +71280,7 @@ var publishEvent = functions8.https.onCall(async (data, context) => {
     return { success: true, eventId: event.eventId };
   } catch (error) {
     console.error("Error publishing event:", error);
-    throw new functions8.https.HttpsError(
+    throw new import_https3.HttpsError(
       "internal",
       "Failed to publish event.",
       error.message
@@ -71535,117 +71289,344 @@ var publishEvent = functions8.https.onCall(async (data, context) => {
 });
 
 // src/events/subscribeEvents.ts
-var functions9 = __toESM(require("firebase-functions"));
+var import_firestore36 = require("firebase-functions/v2/firestore");
 
-// src/services/commission-engine.ts
-var admin12 = __toESM(require("firebase-admin"));
-var CommissionEngine = class {
-  db = admin12.firestore();
+// src/events/handlers/CommissionHandler.ts
+var admin13 = __toESM(require("firebase-admin"));
+
+// ../packages/firebase/src/services/CommissionService.ts
+var CommissionService = class {
+  ruleRepo;
+  poolRepo;
+  recordRepo;
+  networkService;
+  memberRepo;
+  constructor(ruleRepo, poolRepo, recordRepo, networkService, memberRepo) {
+    this.ruleRepo = ruleRepo;
+    this.poolRepo = poolRepo;
+    this.recordRepo = recordRepo;
+    this.networkService = networkService;
+    this.memberRepo = memberRepo;
+  }
   /**
-   * Calculates commission for a given booking and generates CommissionRecords
+   * Evaluates the rules and calculates upward commission based on the lead owner's hierarchy.
+   * Triggered when BOOKING_FULLY_PAID event is received.
    */
-  async calculateCommission(bookingId) {
-    const bookingDoc = await this.db.collection("bookings").doc(bookingId).get();
-    if (!bookingDoc.exists) throw new Error("Booking not found");
-    const existingPools = await this.db.collection("commission_pools").where("bookingId", "==", bookingId).limit(1).get();
-    if (!existingPools.empty) {
-      console.log(`Commission already calculated for booking ${bookingId}. Skipping duplicate run.`);
+  async calculateCommission(booking, lead, saleValue, userId) {
+    if (!lead.ownerId && !lead.networkMemberId) {
+      console.warn("Lead has no owner/network member to attribute commission.");
       return;
     }
-    const booking = bookingDoc.data();
-    const poolRef = this.db.collection("commission_pools").doc();
+    const existingPools = await this.poolRepo.findAll([{ field: "bookingId", op: "==", value: booking.id }]);
+    const activePool = existingPools.find((p) => p.status !== "REVERSED");
+    if (activePool) {
+      console.log(`Commission already calculated for booking ${booking.id}. Pool ID: ${activePool.id}`);
+      return;
+    }
+    const ownerMemberId = lead.networkMemberId || lead.ownerId;
+    const ownerMember = await this.memberRepo.findById(ownerMemberId);
+    if (!ownerMember) {
+      console.warn(`Owner member ${ownerMemberId} not found in network.`);
+      return;
+    }
+    const ancestors = await this.networkService.getAncestors(ownerMember.id);
+    const hierarchy = [ownerMember, ...ancestors.reverse()];
+    const allRules = await this.ruleRepo.findAll([
+      { field: "active", op: "==", value: true },
+      { field: "companyId", op: "==", value: ownerMember.companyId }
+    ]);
     const pool = {
-      id: poolRef.id,
       bookingId: booking.id,
       projectId: booking.projectId,
       plotId: booking.plotId,
-      saleValue: booking.finalSaleAmount,
+      saleValue,
       totalCommissionCalculated: 0,
       status: "CALCULATED",
-      calculatedAt: (/* @__PURE__ */ new Date()).toISOString(),
-      updatedAt: (/* @__PURE__ */ new Date()).toISOString()
+      calculatedAt: (/* @__PURE__ */ new Date()).toISOString()
     };
-    const executiveId = booking.salesExecutiveId;
-    const networkMemberId = booking.marketingExecutiveId || executiveId;
-    if (!networkMemberId) {
-      console.warn("No network member assigned to booking", bookingId);
-      return;
-    }
-    const memberDoc = await this.db.collection("network_members").doc(networkMemberId).get();
-    if (!memberDoc.exists) {
-      console.warn("Network member not found for ID:", networkMemberId);
-      return;
-    }
-    const member = memberDoc.data();
-    const rulesSnapshot = await this.db.collection("commission_rules").where("projectId", "in", [booking.projectId, null]).where("active", "==", true).get();
-    const rules = rulesSnapshot.docs.map((d) => d.data());
-    rules.sort((a, b) => (b.priority || 0) - (a.priority || 0));
-    const eligibleMembers = [member.id, ...member.ancestors || []].reverse();
-    const batch = this.db.batch();
+    const createdPool = await this.poolRepo.create(pool, userId);
+    const createdPoolId = createdPool.id;
     let totalCalculated = 0;
-    for (const memId of eligibleMembers) {
-      const memDoc = await this.db.collection("network_members").doc(memId).get();
-      if (!memDoc.exists) continue;
-      const memData = memDoc.data();
-      const bestRule = rules.find(
-        (r) => (r.positionId === memData.positionId || !r.positionId) && (r.networkMemberId === memData.id || !r.networkMemberId)
-      );
-      if (bestRule) {
+    for (const member of hierarchy) {
+      const validRules = allRules.filter(
+        (r) => (!r.projectId || r.projectId === booking.projectId) && (!r.positionId || r.positionId === member.positionId) && (!r.networkMemberId || r.networkMemberId === member.id)
+      ).sort((a, b) => {
+        if (a.networkMemberId && !b.networkMemberId) return -1;
+        if (!a.networkMemberId && b.networkMemberId) return 1;
+        if (a.projectId && !b.projectId) return -1;
+        if (!a.projectId && b.projectId) return 1;
+        if (a.positionId && !b.positionId) return -1;
+        if (!a.positionId && b.positionId) return 1;
+        return b.priority - a.priority;
+      });
+      if (validRules.length > 0) {
+        const matchedRule = validRules[0];
         let amount = 0;
-        if (bestRule.commissionType === "PERCENTAGE" && bestRule.percentage) {
-          amount = booking.finalSaleAmount * bestRule.percentage / 100;
-        } else if (bestRule.commissionType === "FIXED_AMOUNT" && bestRule.fixedAmount) {
-          amount = bestRule.fixedAmount;
+        const percentage = Math.max(0, matchedRule.percentage || 0);
+        const fixedAmount = Math.max(0, matchedRule.fixedAmount || 0);
+        if (matchedRule.commissionType === "PERCENTAGE" && percentage > 0) {
+          amount = saleValue * percentage / 100;
+        } else if (matchedRule.commissionType === "FIXED_AMOUNT" && fixedAmount > 0) {
+          amount = fixedAmount;
         }
         if (amount > 0) {
-          const recordRef = this.db.collection("commission_records").doc();
           const record = {
-            id: recordRef.id,
-            poolId: pool.id,
+            poolId: createdPoolId,
             bookingId: booking.id,
             projectId: booking.projectId,
             plotId: booking.plotId,
-            networkMemberId: memData.id,
-            positionId: memData.positionId,
-            ruleId: bestRule.id,
-            saleValue: booking.finalSaleAmount,
-            percentageApplied: bestRule.percentage,
-            fixedAmountApplied: bestRule.fixedAmount,
+            networkMemberId: member.id,
+            positionId: member.positionId,
+            ruleId: matchedRule.id,
+            saleValue,
+            percentageApplied: matchedRule.percentage,
+            fixedAmountApplied: matchedRule.fixedAmount,
             amount,
             status: "PENDING",
-            calculatedAt: (/* @__PURE__ */ new Date()).toISOString(),
-            createdAt: (/* @__PURE__ */ new Date()).toISOString(),
-            updatedAt: (/* @__PURE__ */ new Date()).toISOString()
+            calculatedAt: (/* @__PURE__ */ new Date()).toISOString()
           };
-          batch.set(recordRef, record);
+          await this.recordRepo.create(record, userId);
           totalCalculated += amount;
         }
       }
     }
-    pool.totalCommissionCalculated = totalCalculated;
-    batch.set(poolRef, pool);
-    await batch.commit();
-    console.log(`Calculated commission for booking ${bookingId}: Total ${totalCalculated}`);
+    await this.poolRepo.update(createdPoolId, { totalCommissionCalculated: totalCalculated }, userId);
+  }
+  /**
+   * Reverses an entire commission pool (e.g. due to booking cancellation).
+   */
+  async reverseCommission(bookingId, reason, userId) {
+    const pools = await this.poolRepo.findAll([{ field: "bookingId", op: "==", value: bookingId }]);
+    for (const pool of pools) {
+      if (pool.status === "REVERSED") continue;
+      await this.poolRepo.update(pool.id, {
+        status: "REVERSED"
+      }, userId);
+      const records = await this.recordRepo.findAll([{ field: "poolId", op: "==", value: pool.id }]);
+      for (const record of records) {
+        await this.recordRepo.update(record.id, {
+          status: "REVERSED",
+          reversalReason: reason,
+          reversalDate: (/* @__PURE__ */ new Date()).toISOString()
+        }, userId);
+      }
+    }
+  }
+  /**
+   * Adds an adjustment to an existing commission record.
+   */
+  async addAdjustment(recordId, amount, reason, userId) {
+    const record = await this.recordRepo.findById(recordId);
+    if (!record) throw new Error("Record not found");
+    const adj = {
+      id: Date.now().toString(),
+      amount,
+      reason,
+      adjustedBy: userId,
+      adjustedAt: (/* @__PURE__ */ new Date()).toISOString()
+    };
+    const adjustments = record.adjustments || [];
+    adjustments.push(adj);
+    await this.recordRepo.update(recordId, {
+      adjustments
+    }, userId);
+  }
+};
+
+// ../packages/firebase/src/services/NetworkService.ts
+var NetworkService = class {
+  memberRepo;
+  constructor(memberRepo) {
+    this.memberRepo = memberRepo;
+  }
+  /**
+   * Retrieves the full ancestor chain for a member.
+   */
+  async getAncestors(memberId) {
+    const member = await this.memberRepo.findById(memberId);
+    if (!member || !member.ancestors || member.ancestors.length === 0) {
+      return [];
+    }
+    const ancestors = [];
+    for (const ancestorId of member.ancestors) {
+      const anc = await this.memberRepo.findById(ancestorId);
+      if (anc) {
+        ancestors.push(anc);
+      }
+    }
+    return ancestors.sort((a, b) => a.level - b.level);
+  }
+  /**
+   * Prevents circular hierarchy by ensuring the new parent is not a descendant of the member.
+   */
+  async validateNewParent(memberId, newParentId) {
+    if (memberId === newParentId) return false;
+    const newParent = await this.memberRepo.findById(newParentId);
+    if (!newParent) return false;
+    if (newParent.ancestors.includes(memberId)) {
+      return false;
+    }
+    return true;
+  }
+  /**
+   * Changes the parent of a member, updating ancestor arrays for the subtree.
+   */
+  async changeParent(memberId, newParentId, userId, reason) {
+    const member = await this.memberRepo.findById(memberId);
+    if (!member) throw new Error("Member not found");
+    let newAncestors = [];
+    if (newParentId) {
+      const valid = await this.validateNewParent(memberId, newParentId);
+      if (!valid) throw new Error("Invalid parent assignment: Circular dependency or self-parenting detected.");
+      const newParent = await this.memberRepo.findById(newParentId);
+      if (newParent) {
+        newAncestors = [...newParent.ancestors, newParent.id];
+      }
+    }
+    const transferRecord = {
+      id: Date.now().toString(),
+      previousParentId: member.parentMemberId,
+      newParentId,
+      reason,
+      transferredByUserId: userId,
+      transferredAt: (/* @__PURE__ */ new Date()).toISOString()
+    };
+    const transfers = member.hierarchyTransfers || [];
+    transfers.push(transferRecord);
+    await this.memberRepo.update(memberId, {
+      parentMemberId: newParentId,
+      ancestors: newAncestors,
+      hierarchyTransfers: transfers,
+      updatedBy: userId,
+      updatedAt: (/* @__PURE__ */ new Date()).toISOString()
+    }, userId);
+  }
+};
+
+// src/repositories/AdminCommissionRepositories.ts
+var admin12 = __toESM(require("firebase-admin"));
+function applyFilters(query2, filters) {
+  if (!filters) return query2;
+  let q = query2;
+  for (const filter of filters) {
+    q = q.where(filter.field, filter.op, filter.value);
+  }
+  return q;
+}
+var AdminCommissionPoolRepository = class {
+  db = admin12.firestore();
+  async findAll(filters) {
+    let query2 = this.db.collection(FIRESTORE_COLLECTIONS.COMMISSION_POOLS);
+    query2 = applyFilters(query2, filters);
+    const snap = await query2.get();
+    return snap.docs.map((d) => d.data());
+  }
+  async create(input, userId) {
+    const docRef = input.id ? this.db.collection(FIRESTORE_COLLECTIONS.COMMISSION_POOLS).doc(input.id) : this.db.collection(FIRESTORE_COLLECTIONS.COMMISSION_POOLS).doc();
+    const data = { ...input, id: docRef.id, createdBy: userId, updatedBy: userId, createdAt: (/* @__PURE__ */ new Date()).toISOString(), updatedAt: (/* @__PURE__ */ new Date()).toISOString() };
+    await docRef.set(data);
+    return data;
+  }
+  async update(id, input, userId) {
+    const docRef = this.db.collection(FIRESTORE_COLLECTIONS.COMMISSION_POOLS).doc(id);
+    const snap = await docRef.get();
+    if (!snap.exists) throw new Error("Not found");
+    const updateData = { ...input, updatedBy: userId, updatedAt: (/* @__PURE__ */ new Date()).toISOString() };
+    await docRef.update(updateData);
+    return { ...snap.data(), ...updateData };
+  }
+};
+var AdminCommissionRecordRepository = class {
+  db = admin12.firestore();
+  async findById(id) {
+    const snap = await this.db.collection(FIRESTORE_COLLECTIONS.COMMISSION_RECORDS).doc(id).get();
+    return snap.exists ? snap.data() : null;
+  }
+  async findAll(filters) {
+    let query2 = this.db.collection(FIRESTORE_COLLECTIONS.COMMISSION_RECORDS);
+    query2 = applyFilters(query2, filters);
+    const snap = await query2.get();
+    return snap.docs.map((d) => d.data());
+  }
+  async create(input, userId) {
+    const docRef = input.id ? this.db.collection(FIRESTORE_COLLECTIONS.COMMISSION_RECORDS).doc(input.id) : this.db.collection(FIRESTORE_COLLECTIONS.COMMISSION_RECORDS).doc();
+    const data = { ...input, id: docRef.id, createdBy: userId, updatedBy: userId, createdAt: (/* @__PURE__ */ new Date()).toISOString(), updatedAt: (/* @__PURE__ */ new Date()).toISOString() };
+    await docRef.set(data);
+    return data;
+  }
+  async update(id, input, userId) {
+    const docRef = this.db.collection(FIRESTORE_COLLECTIONS.COMMISSION_RECORDS).doc(id);
+    const snap = await docRef.get();
+    if (!snap.exists) throw new Error("Not found");
+    const updateData = { ...input, updatedBy: userId, updatedAt: (/* @__PURE__ */ new Date()).toISOString() };
+    await docRef.update(updateData);
+    return { ...snap.data(), ...updateData };
+  }
+};
+var AdminCommissionRuleRepository = class {
+  db = admin12.firestore();
+  async findAll(filters) {
+    let query2 = this.db.collection(FIRESTORE_COLLECTIONS.COMMISSION_RULES);
+    query2 = applyFilters(query2, filters);
+    const snap = await query2.get();
+    return snap.docs.map((d) => d.data());
+  }
+};
+var AdminNetworkMemberRepository = class {
+  db = admin12.firestore();
+  async findById(id) {
+    const snap = await this.db.collection(FIRESTORE_COLLECTIONS.NETWORK_MEMBERS).doc(id).get();
+    return snap.exists ? snap.data() : null;
+  }
+  async update(id, input, userId) {
+    const docRef = this.db.collection(FIRESTORE_COLLECTIONS.NETWORK_MEMBERS).doc(id);
+    const snap = await docRef.get();
+    if (!snap.exists) throw new Error("Not found");
+    const updateData = { ...input, updatedBy: userId, updatedAt: (/* @__PURE__ */ new Date()).toISOString() };
+    await docRef.update(updateData);
+    return { ...snap.data(), ...updateData };
   }
 };
 
 // src/events/handlers/CommissionHandler.ts
 var CommissionHandler = class {
   eventType = "BOOKING_FULLY_PAID";
-  engine = new CommissionEngine();
   async handle(event) {
     if (event.eventType === "BOOKING_FULLY_PAID") {
       const { bookingId } = event.payload;
       if (bookingId) {
         console.log(`CommissionHandler processing BOOKING_FULLY_PAID for booking ${bookingId}`);
-        await this.engine.calculateCommission(bookingId);
+        const db = admin13.firestore();
+        const bookingDoc = await db.collection("bookings").doc(bookingId).get();
+        if (!bookingDoc.exists) return;
+        const booking = bookingDoc.data();
+        const leadDoc = await db.collection("leads").where("personId", "==", booking.customerId).limit(1).get();
+        let lead = { ownerId: null, networkMemberId: null };
+        if (!leadDoc.empty) {
+          lead = leadDoc.docs[0].data();
+        } else {
+          lead = {
+            ownerId: booking.salesExecutiveId,
+            networkMemberId: booking.marketingExecutiveId || booking.salesExecutiveId
+          };
+        }
+        const networkRepo = new AdminNetworkMemberRepository();
+        const networkSvc = new NetworkService(networkRepo);
+        const commissionSvc = new CommissionService(
+          new AdminCommissionRuleRepository(),
+          new AdminCommissionPoolRepository(),
+          new AdminCommissionRecordRepository(),
+          networkSvc,
+          networkRepo
+        );
+        await commissionSvc.calculateCommission(booking, lead, booking.totalAmount || 0, "SYSTEM");
       }
     }
   }
 };
 
 // src/events/handlers/KPIAggregatorHandler.ts
-var admin13 = __toESM(require("firebase-admin"));
+var admin14 = __toESM(require("firebase-admin"));
 
 // src/utils/KPIRefs.ts
 var KPIRefs = class {
@@ -71676,7 +71657,7 @@ var KPIRefs = class {
 var KPIAggregatorHandler = class {
   eventType = "ALL_KPI_EVENTS";
   async handle(event) {
-    const db = admin13.firestore();
+    const db = admin14.firestore();
     const { companyId, projectId } = event.metadata;
     const dateIso = event.timestamp;
     if (!companyId) {
@@ -71705,7 +71686,7 @@ var KPIAggregatorHandler = class {
           transaction.set(ref2, increments, { merge: true });
         }
         transaction.set(idempotencyRef, {
-          processedAt: admin13.firestore.FieldValue.serverTimestamp(),
+          processedAt: admin14.firestore.FieldValue.serverTimestamp(),
           eventType: event.eventType
         });
       });
@@ -71715,7 +71696,7 @@ var KPIAggregatorHandler = class {
     }
   }
   getIncrementsForEvent(event) {
-    const FieldValue2 = admin13.firestore.FieldValue;
+    const FieldValue2 = admin14.firestore.FieldValue;
     const inc1 = FieldValue2.increment(1);
     const dec1 = FieldValue2.increment(-1);
     switch (event.eventType) {
@@ -71784,8 +71765,9 @@ var kpiEvents = [
   "AFTER_SALES_RESOLVED"
 ];
 kpiEvents.forEach((evt) => dispatcher.subscribe(evt, kpiHandler));
-var onEventCreated = functions9.firestore.document("events/{eventId}").onCreate(async (snapshot, _context) => {
-  const eventData = snapshot.data();
+var handleEventCreated = async (cloudEvent) => {
+  const eventData = cloudEvent.data?.data();
+  if (!eventData) return;
   const event = {
     ...eventData,
     timestamp: eventData.timestamp.toDate().toISOString()
@@ -71797,20 +71779,28 @@ var onEventCreated = functions9.firestore.document("events/{eventId}").onCreate(
     console.error(`Failed to process event ${event.eventId}:`, error);
     throw error;
   }
-});
+};
+var onEventCreated = (0, import_firestore36.onDocumentCreated)(
+  {
+    document: "events/{eventId}",
+    region: "asia-south1"
+  },
+  handleEventCreated
+);
 
 // src/triggers/paymentTriggers.ts
-var functions10 = __toESM(require("firebase-functions"));
-var admin14 = __toESM(require("firebase-admin"));
-var onPaymentUpdated = functions10.firestore.document("bookings/{bookingId}").onUpdate(async (change, _context) => {
-  const before = change.before.data();
-  const after = change.after.data();
+var import_firestore37 = require("firebase-functions/v2/firestore");
+var admin15 = __toESM(require("firebase-admin"));
+var handlePaymentUpdated = async (event) => {
+  const before = event.data?.before.data();
+  const after = event.data?.after.data();
+  if (!before || !after) return;
   const wasFullyPaid = before.paymentSchedule.every((p) => p.status === "PAID" && p.amountPaid >= p.amountDue);
   const isFullyPaid = after.paymentSchedule.every((p) => p.status === "PAID" && p.amountPaid >= p.amountDue);
   if (!wasFullyPaid && isFullyPaid) {
-    const store = new FirestoreEventStore(admin14.firestore());
+    const store = new FirestoreEventStore(admin15.firestore());
     const publisher = new DefaultEventPublisher(store);
-    const event = {
+    const evt = {
       eventId: `evt_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
       aggregateId: after.id,
       aggregateType: "Booking",
@@ -71825,15 +71815,383 @@ var onPaymentUpdated = functions10.firestore.document("bookings/{bookingId}").on
       timestamp: (/* @__PURE__ */ new Date()).toISOString(),
       version: 1
     };
-    await publisher.publish(event);
+    await publisher.publish(evt);
     console.log(`Published BOOKING_FULLY_PAID for booking ${after.id}`);
   }
-});
+};
+var onPaymentUpdated = (0, import_firestore37.onDocumentUpdated)(
+  {
+    document: "bookings/{bookingId}",
+    region: "asia-south1"
+  },
+  handlePaymentUpdated
+);
 
 // src/http/leadWebhooks.ts
-var functions11 = __toESM(require("firebase-functions"));
+var import_https4 = require("firebase-functions/v2/https");
 var crypto2 = __toESM(require("crypto"));
-var captureLeadWebhook = functions11.https.onRequest(async (req, res) => {
+
+// ../packages/firebase/src/services/leads/LeadAcquisitionService.ts
+var import_firestore39 = require("firebase-admin/firestore");
+
+// ../packages/firebase/src/services/leads/validators.ts
+var LeadValidator = class {
+  static validateCaptureRequest(dto) {
+    const errors = [];
+    if (!dto.companyId) errors.push("companyId is required");
+    if (!dto.branchId) errors.push("branchId is required");
+    if (!dto.sourceCode) errors.push("sourceCode is required");
+    if (!dto.firstName) errors.push("firstName is required");
+    if (!dto.phone) errors.push("phone is required");
+    if (errors.length > 0) {
+      throw new Error(`Lead validation failed: ${errors.join(", ")}`);
+    }
+  }
+};
+
+// ../packages/firebase/src/services/leads/DuplicateDetectionService.ts
+var DuplicateDetectionService = class {
+  personRepository;
+  constructor() {
+    this.personRepository = new PersonRepository();
+  }
+  async detectDuplicate(context) {
+    let matchedPerson = null;
+    let confidenceScore = 0;
+    if (context.phone) {
+      const persons = await this.personRepository.findByMobile(context.phone);
+      if (persons.length > 0) {
+        matchedPerson = persons[0];
+        confidenceScore += 50;
+      }
+    }
+    if (context.email) {
+      const persons = await this.personRepository.findByEmail(context.email);
+      if (persons.length > 0) {
+        if (!matchedPerson) {
+          matchedPerson = persons[0];
+        }
+        confidenceScore += 30;
+      }
+    }
+    if ((context.pan || context.aadhaar) && matchedPerson) {
+      const hasIdentity = matchedPerson.identities?.some(
+        (id) => context.pan && id.type === "PAN" && id.idNumber === context.pan || context.aadhaar && id.type === "AADHAAR" && id.idNumber === context.aadhaar
+      );
+      if (hasIdentity) {
+        confidenceScore += 20;
+      }
+    }
+    if (!matchedPerson && (context.pan || context.aadhaar)) {
+    }
+    if (matchedPerson) {
+      return {
+        isDuplicate: true,
+        matchedPersonId: matchedPerson.id,
+        confidenceScore: Math.min(confidenceScore, 100)
+      };
+    }
+    return {
+      isDuplicate: false,
+      confidenceScore: 0
+    };
+  }
+};
+
+// ../packages/firebase/src/services/leads/LeadMatchingService.ts
+var LeadMatchingService = class {
+  duplicateDetectionService;
+  personService;
+  constructor() {
+    this.duplicateDetectionService = new DuplicateDetectionService();
+    this.personService = new PersonService();
+  }
+  async matchOrCreatePerson(dto, userId) {
+    const duplicateResult = await this.duplicateDetectionService.detectDuplicate({
+      phone: dto.phone,
+      email: dto.email,
+      pan: dto.pan,
+      aadhaar: dto.aadhaar
+    });
+    if (duplicateResult.isDuplicate && duplicateResult.matchedPersonId) {
+      return {
+        personId: duplicateResult.matchedPersonId,
+        isNewPerson: false,
+        confidenceScore: duplicateResult.confidenceScore
+      };
+    }
+    const newPersonInput = {
+      firstName: dto.firstName,
+      lastName: dto.lastName,
+      fullName: `${dto.firstName} ${dto.lastName}`.trim(),
+      displayName: `${dto.firstName} ${dto.lastName}`.trim(),
+      gender: "PREFER_NOT_TO_SAY",
+      classifications: ["LEAD"],
+      tags: [],
+      mobileNumbers: [dto.phone],
+      emailAddresses: dto.email ? [dto.email] : [],
+      primaryMobile: dto.phone,
+      primaryEmail: dto.email,
+      socialProfiles: [],
+      addresses: [],
+      identities: [],
+      communicationPreferences: {
+        phone: true,
+        whatsapp: !!dto.whatsappNumber,
+        sms: true,
+        email: !!dto.email,
+        doNotDisturb: false
+      },
+      relationships: []
+    };
+    if (dto.pan || dto.aadhaar) {
+      if (dto.pan) {
+        newPersonInput.identities.push({
+          type: "PAN",
+          idNumber: dto.pan
+        });
+      }
+      if (dto.aadhaar) {
+        newPersonInput.identities.push({
+          type: "AADHAAR",
+          idNumber: dto.aadhaar
+        });
+      }
+    }
+    const createdPerson = await this.personService.createPerson(newPersonInput, userId);
+    return {
+      personId: createdPerson.id,
+      isNewPerson: true,
+      confidenceScore: 100
+    };
+  }
+};
+
+// ../packages/firebase/src/services/leads/CampaignAttributionService.ts
+var CampaignAttributionService = class {
+  /**
+   * Generates a new touchpoint from a lead capture request.
+   */
+  createTouchpoint(dto) {
+    return {
+      id: `touch_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+      campaignId: dto.campaignId || "ORGANIC",
+      sourceCode: dto.sourceCode,
+      medium: dto.utmMedium || "none",
+      channel: dto.campaignChannel || "OTHER",
+      touchpoint: dto.utmSource || dto.sourceCode,
+      timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+      actor: dto.capturedByUserId || "SYSTEM",
+      metadata: {
+        utmCampaign: dto.utmCampaign,
+        referralCode: dto.referralCode
+      }
+    };
+  }
+  /**
+   * Computes the attribution model for a lead given its touchpoints.
+   */
+  computeAttribution(leadId, existingAttribution, newTouchpoint, model = "FIRST_TOUCH") {
+    const touchpoints = existingAttribution ? [...existingAttribution.touchpoints, newTouchpoint] : [newTouchpoint];
+    const sortedTouchpoints = [...touchpoints].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+    const firstTouch = sortedTouchpoints[0];
+    const lastTouch = sortedTouchpoints[sortedTouchpoints.length - 1];
+    return {
+      leadId,
+      firstTouchId: firstTouch.id,
+      lastTouchId: lastTouch.id,
+      touchpoints: sortedTouchpoints,
+      attributionModel: model
+    };
+  }
+};
+
+// ../packages/firebase/src/services/leads/RoutingService.ts
+var import_firestore38 = require("firebase-admin/firestore");
+var RoutingService = class {
+  /**
+   * Determine the routing for a newly captured lead based on business rules.
+   * Returns an object containing the assigned user IDs based on the strategy.
+   */
+  async routeLead(dto) {
+    let strategy = "OWNER";
+    let ownerId = dto.ownerId;
+    const telecallerId = dto.telecallerId;
+    const networkMemberId = dto.networkMemberId;
+    if (ownerId || telecallerId || networkMemberId) {
+      return { ownerId, telecallerId, networkMemberId, routingStrategy: "OWNER_PRESERVED" };
+    }
+    if (dto.campaignId) {
+      strategy = "CAMPAIGN_OWNER";
+      strategy = "ROUND_ROBIN";
+    } else if (dto.sourceCode === "WALK_IN" || dto.sourceCode === "DOOR_TO_DOOR") {
+      strategy = "SOURCE_OWNER";
+      ownerId = dto.capturedByUserId;
+    } else {
+      strategy = "ROUND_ROBIN";
+    }
+    if (strategy === "ROUND_ROBIN") {
+      const assigned = await this.executeRoundRobin("DEFAULT_GROUP");
+      ownerId = assigned || void 0;
+    }
+    return { ownerId, telecallerId, networkMemberId, routingStrategy: strategy };
+  }
+  /**
+   * Round-robin implementation with Firebase Transactions.
+   */
+  async executeRoundRobin(groupId) {
+    const db = (0, import_firestore38.getFirestore)();
+    const stateRef = db.collection("routing_states").doc(groupId);
+    try {
+      return await db.runTransaction(async (t) => {
+        const doc2 = await t.get(stateRef);
+        let activeUsers = ["user-101", "user-102", "user-103"];
+        let lastAssignedIndex = -1;
+        if (doc2.exists) {
+          const data = doc2.data();
+          if (data && data.activeUsers?.length > 0) activeUsers = data.activeUsers;
+          if (data && typeof data.lastAssignedIndex === "number") lastAssignedIndex = data.lastAssignedIndex;
+        }
+        if (activeUsers.length === 0) return null;
+        const nextIndex = (lastAssignedIndex + 1) % activeUsers.length;
+        const assignedUser = activeUsers[nextIndex];
+        t.set(stateRef, {
+          groupId,
+          activeUsers,
+          lastAssignedIndex: nextIndex,
+          updatedAt: (/* @__PURE__ */ new Date()).toISOString()
+        }, { merge: true });
+        return assignedUser;
+      });
+    } catch (e) {
+      console.error("Round robin transaction failed:", e);
+      return null;
+    }
+  }
+};
+
+// ../packages/firebase/src/services/leads/mapper.ts
+var LeadMapper = class {
+  static toInternalModel(dto, personId, touchpoint, routingDetails) {
+    return {
+      companyId: dto.companyId,
+      branchId: dto.branchId,
+      leadSourceId: dto.sourceCode,
+      firstName: dto.firstName,
+      lastName: dto.lastName,
+      email: dto.email,
+      phone: dto.phone,
+      altPhone: dto.altPhone,
+      status: "NEW",
+      // Matches LeadStatus 'NEW'
+      requirementDetails: dto.requirementDetails,
+      budgetMin: dto.budgetMin,
+      budgetMax: dto.budgetMax,
+      preferredLocation: dto.preferredLocation,
+      notes: dto.notes,
+      personId,
+      // Ownership and Routing
+      ownerId: routingDetails.ownerId,
+      telecallerId: routingDetails.telecallerId,
+      networkMemberId: routingDetails.networkMemberId,
+      routingStrategy: routingDetails.routingStrategy,
+      // Campaign
+      campaignId: touchpoint.campaignId,
+      source: dto.sourceCode,
+      aiIntentScore: 0,
+      // Timestamps
+      firstContactAt: (/* @__PURE__ */ new Date()).toISOString()
+    };
+  }
+};
+
+// ../packages/firebase/src/services/leads/LeadFactory.ts
+var LeadFactory = class {
+  static createNewLead(dto, personId, touchpoint, routingDetails) {
+    const mapped = LeadMapper.toInternalModel(dto, personId, touchpoint, routingDetails);
+    return {
+      ...mapped,
+      isActive: true
+    };
+  }
+};
+
+// ../packages/firebase/src/services/leads/LeadAcquisitionService.ts
+var LeadAcquisitionService = class {
+  leadMatchingService;
+  campaignAttributionService;
+  routingService;
+  leadRepository;
+  interactionService;
+  workflowExecutor;
+  constructor() {
+    this.leadMatchingService = new LeadMatchingService();
+    this.campaignAttributionService = new CampaignAttributionService();
+    this.routingService = new RoutingService();
+    this.leadRepository = new LeadRepository();
+    this.interactionService = new InteractionService();
+    this.workflowExecutor = new WorkflowExecutor();
+  }
+  async acquireLead(dto, userId = "SYSTEM") {
+    LeadValidator.validateCaptureRequest(dto);
+    if (dto.eventId) {
+      const db = (0, import_firestore39.getFirestore)();
+      const eventRef = db.collection("processed_webhooks").doc(dto.eventId);
+      try {
+        await db.runTransaction(async (t) => {
+          const doc2 = await t.get(eventRef);
+          if (doc2.exists) {
+            throw new Error("ALREADY_PROCESSED");
+          }
+          t.set(eventRef, { processedAt: (/* @__PURE__ */ new Date()).toISOString(), sourceCode: dto.sourceCode });
+        });
+      } catch (e) {
+        if (e.message === "ALREADY_PROCESSED") {
+          throw e;
+        }
+        throw e;
+      }
+    }
+    const matchResult = await this.leadMatchingService.matchOrCreatePerson(dto, userId);
+    const routingDetails = await this.routingService.routeLead(dto);
+    const tempLeadId = `lead_${Date.now()}`;
+    const newTouchpoint = this.campaignAttributionService.createTouchpoint(dto);
+    const existingAttribution = null;
+    this.campaignAttributionService.computeAttribution(tempLeadId, existingAttribution, newTouchpoint);
+    const leadInput = LeadFactory.createNewLead(dto, matchResult.personId, newTouchpoint, routingDetails);
+    const lead = await this.leadRepository.create(leadInput, userId);
+    await this.interactionService.recordInteraction({
+      personId: matchResult.personId,
+      type: "NOTE",
+      // Standard fallback, can be derived from source
+      projectId: dto.projectId,
+      date: (/* @__PURE__ */ new Date()).toISOString(),
+      status: "COMPLETED",
+      priority: "MEDIUM",
+      notes: `Lead acquired from ${dto.sourceCode} via ${routingDetails.routingStrategy}`
+    }, userId);
+    try {
+      await this.workflowExecutor.startWorkflow(
+        "DEFAULT_LEAD_WORKFLOW",
+        // definitionId
+        lead.id,
+        // entityId
+        "Lead",
+        // entityType
+        userId,
+        // userId
+        {}
+        // context
+      );
+    } catch (error) {
+      console.warn("Failed to start workflow during lead acquisition:", error);
+    }
+    return lead;
+  }
+};
+
+// src/http/leadWebhooks.ts
+var captureLeadWebhook = (0, import_https4.onRequest)(async (req, res) => {
   if (req.method !== "POST") {
     res.status(405).send("Method Not Allowed");
     return;
@@ -71871,6 +72229,20 @@ var captureLeadWebhook = functions11.https.onRequest(async (req, res) => {
 0 && (module.exports = {
   captureLeadWebhook,
   dailySystemCleanup,
+  handleBlockCreated,
+  handleBranchCreated,
+  handleCompanyCreated,
+  handleDepartmentCreated,
+  handleEventCreated,
+  handleLayoutCreated,
+  handleLeadCreated,
+  handleLeadUpdated,
+  handlePaymentUpdated,
+  handlePlotCreated,
+  handlePlotPriceChanged,
+  handleProjectCreated,
+  handleTeamUpdated,
+  handleUserProfileUpdated,
   hourlyBookingExpiry,
   onBlockCreated,
   onBranchCreated,

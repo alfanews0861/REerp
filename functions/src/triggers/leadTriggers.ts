@@ -1,22 +1,28 @@
-import * as functions from 'firebase-functions';
+import { onDocumentCreated, onDocumentUpdated } from 'firebase-functions/v2/firestore';
 
-
-export const onLeadCreated = functions.firestore
-  .document('leads/{leadId}')
-  .onCreate(async (snap, context) => {
-    const leadData = snap.data();
-    const leadId = context.params['leadId'];
+export const handleLeadCreated = async (event: any) => {
+    const leadData = event.data?.data();
+    if (!leadData) return;
+    const leadId = event.params['leadId'];
     console.log(`Lead Created: ${leadId}`, leadData);
 
     // Additional logic like push notifications, webhook integrations, etc.
-  });
+};
 
-export const onLeadUpdated = functions.firestore
-  .document('leads/{leadId}')
-  .onUpdate(async (change, context) => {
-    const before = change.before.data();
-    const after = change.after.data();
-    const leadId = context.params['leadId'];
+export const onLeadCreated = onDocumentCreated(
+  {
+    document: 'leads/{leadId}',
+    region: 'asia-south1'
+  },
+  handleLeadCreated
+);
+
+
+export const handleLeadUpdated = async (event: any) => {
+    const before = event.data?.before.data();
+    const after = event.data?.after.data();
+    if (!before || !after) return;
+    const leadId = event.params['leadId'];
 
     if (before.assignedToUserId !== after.assignedToUserId) {
       console.log(`Lead Assigned: ${leadId} assigned to ${after.assignedToUserId}`);
@@ -27,4 +33,13 @@ export const onLeadUpdated = functions.firestore
       console.log(`Lead Qualified: ${leadId}`);
       // Start qualification workflows
     }
-  });
+};
+
+export const onLeadUpdated = onDocumentUpdated(
+  {
+    document: 'leads/{leadId}',
+    region: 'asia-south1'
+  },
+  handleLeadUpdated
+);
+

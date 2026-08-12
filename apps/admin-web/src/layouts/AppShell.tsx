@@ -23,29 +23,27 @@ import {
   useTheme,
   Collapse,
 } from '@mui/material';
-import {
-  Menu as MenuIcon,
-  Search as SearchIcon,
-  Notifications as NotificationsIcon,
-  DarkMode,
-  LightMode,
+import MenuIcon from '@mui/icons-material/Menu';
+import SearchIcon from '@mui/icons-material/Search';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import DarkMode from '@mui/icons-material/DarkMode';
+import LightMode from '@mui/icons-material/LightMode';
 
-  ExpandLess,
-  ExpandMore,
-  Dashboard,
-  People,
-  BusinessCenter,
-  Map,
-  Campaign,
-  EventNote,
-  Payment,
-  Badge as BadgeIcon,
-  DirectionsCar,
-  Receipt,
-  BarChart,
-  Settings,
-  AdminPanelSettings,
-} from '@mui/icons-material';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import Dashboard from '@mui/icons-material/Dashboard';
+import People from '@mui/icons-material/People';
+import BusinessCenter from '@mui/icons-material/BusinessCenter';
+import Map from '@mui/icons-material/Map';
+import Campaign from '@mui/icons-material/Campaign';
+import EventNote from '@mui/icons-material/EventNote';
+import Payment from '@mui/icons-material/Payment';
+import BadgeIcon from '@mui/icons-material/Badge';
+import DirectionsCar from '@mui/icons-material/DirectionsCar';
+import Receipt from '@mui/icons-material/Receipt';
+import BarChart from '@mui/icons-material/BarChart';
+import Settings from '@mui/icons-material/Settings';
+import AdminPanelSettings from '@mui/icons-material/AdminPanelSettings';
 import { Outlet, Link as RouterLink, useLocation } from 'react-router-dom';
 import { useThemeMode } from '@real-estate-erp/ui';
 

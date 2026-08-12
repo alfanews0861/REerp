@@ -1,11 +1,11 @@
 import { NetworkMember, NetworkHierarchyTransfer } from '@real-estate-erp/types';
-import { NetworkMemberRepository } from '../repositories/networkRepositories';
+import { INetworkMemberRepository } from '../repositories/interfaces/serviceInterfaces';
 
 export class NetworkService {
-  private memberRepo: NetworkMemberRepository;
+  private memberRepo: INetworkMemberRepository;
 
-  constructor() {
-    this.memberRepo = new NetworkMemberRepository();
+  constructor(memberRepo: INetworkMemberRepository) {
+    this.memberRepo = memberRepo;
   }
 
   /**

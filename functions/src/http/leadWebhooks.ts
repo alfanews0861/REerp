@@ -1,8 +1,9 @@
-import * as functions from 'firebase-functions';
+import { onRequest } from 'firebase-functions/v2/https';
 import * as crypto from 'crypto';
-import { LeadAcquisitionService, LeadCaptureRequestDTO } from '@real-estate-erp/firebase';
+import { LeadCaptureRequestDTO } from '@real-estate-erp/firebase/src/services/leads/dto';
+import { LeadAcquisitionService } from '@real-estate-erp/firebase/src/services/leads/LeadAcquisitionService';
 
-export const captureLeadWebhook = functions.https.onRequest(async (req, res) => {
+export const captureLeadWebhook = onRequest(async (req, res) => {
   if (req.method !== 'POST') {
     res.status(405).send('Method Not Allowed');
     return;

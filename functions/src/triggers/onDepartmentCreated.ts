@@ -1,12 +1,12 @@
-import * as functions from 'firebase-functions';
+import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import * as admin from 'firebase-admin';
 
-export const onDepartmentCreated = functions.firestore
-  .document('departments/{departmentId}')
-  .onCreate(async (snap, context) => {
-    const departmentId = context.params.departmentId;
-    const deptData = snap.data();
+export const handleDepartmentCreated = async (event: any) => {
+    const departmentId = event.params.departmentId;
+    const deptData = event.data?.data();
     
+    if (!deptData) return;
+
     console.log(`Department ${departmentId} created for company ${deptData.companyId}`);
 
     const db = admin.firestore();
@@ -29,4 +29,13 @@ export const onDepartmentCreated = functions.firestore
       isDeleted: false,
       version: 1,
     });
-  });
+};
+
+export const onDepartmentCreated = onDocumentCreated(
+  {
+    document: 'departments/{departmentId}',
+    region: 'asia-south1'
+  },
+  handleDepartmentCreated
+);
+

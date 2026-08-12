@@ -40,3 +40,6 @@ Thumbs.db
 *.ntvs*
 *.njsproj
 *.sln
+
+functions/serviceAccountKey.json
+repository-tree.txt

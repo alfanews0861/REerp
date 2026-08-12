@@ -1,77 +1,117 @@
-import * as functions from 'firebase-functions';
+import { onDocumentCreated, onDocumentUpdated } from 'firebase-functions/v2/firestore';
 import * as admin from 'firebase-admin';
 
-export const onProjectCreated = functions.firestore
-  .document('projects/{projectId}')
-  .onCreate(async (snap, context) => {
-    const data = snap.data();
-    console.log(`New Project Created: ${data.name} (${context.params.projectId})`);
+export const handleProjectCreated = async (event: any) => {
+    const data = event.data?.data();
+    if (!data) return;
+    console.log(`New Project Created: ${data.name} (${event.params.projectId})`);
     
     // Log to AuditLogs or send notifications
     await admin.firestore().collection('audit_logs').add({
       action: 'PROJECT_CREATED',
-      entityId: context.params.projectId,
+      entityId: event.params.projectId,
       timestamp: admin.firestore.FieldValue.serverTimestamp(),
       details: { projectName: data.name }
     });
-  });
+};
 
-export const onLayoutCreated = functions.firestore
-  .document('layouts/{layoutId}')
-  .onCreate(async (snap, context) => {
-    const data = snap.data();
-    console.log(`New Layout Created: ${data.name} (${context.params.layoutId})`);
+export const onProjectCreated = onDocumentCreated(
+  {
+    document: 'projects/{projectId}',
+    region: 'asia-south1'
+  },
+  handleProjectCreated
+);
+
+
+export const handleLayoutCreated = async (event: any) => {
+    const data = event.data?.data();
+    if (!data) return;
+    console.log(`New Layout Created: ${data.name} (${event.params.layoutId})`);
     
     await admin.firestore().collection('audit_logs').add({
       action: 'LAYOUT_CREATED',
-      entityId: context.params.layoutId,
+      entityId: event.params.layoutId,
       timestamp: admin.firestore.FieldValue.serverTimestamp(),
       details: { layoutName: data.name, projectId: data.projectId }
     });
-  });
+};
 
-export const onBlockCreated = functions.firestore
-  .document('blocks/{blockId}')
-  .onCreate(async (snap, context) => {
-    const data = snap.data();
-    console.log(`New Block Created: ${data.name} (${context.params.blockId})`);
+export const onLayoutCreated = onDocumentCreated(
+  {
+    document: 'layouts/{layoutId}',
+    region: 'asia-south1'
+  },
+  handleLayoutCreated
+);
+
+
+export const handleBlockCreated = async (event: any) => {
+    const data = event.data?.data();
+    if (!data) return;
+    console.log(`New Block Created: ${data.name} (${event.params.blockId})`);
     
     await admin.firestore().collection('audit_logs').add({
       action: 'BLOCK_CREATED',
-      entityId: context.params.blockId,
+      entityId: event.params.blockId,
       timestamp: admin.firestore.FieldValue.serverTimestamp(),
       details: { blockName: data.name, layoutId: data.layoutId }
     });
-  });
+};
 
-export const onPlotCreated = functions.firestore
-  .document('plots/{plotId}')
-  .onCreate(async (snap, context) => {
-    const data = snap.data();
-    console.log(`New Plot Created: ${data.plotNumber} (${context.params.plotId})`);
+export const onBlockCreated = onDocumentCreated(
+  {
+    document: 'blocks/{blockId}',
+    region: 'asia-south1'
+  },
+  handleBlockCreated
+);
+
+
+export const handlePlotCreated = async (event: any) => {
+    const data = event.data?.data();
+    if (!data) return;
+    console.log(`New Plot Created: ${data.plotNumber} (${event.params.plotId})`);
     
     await admin.firestore().collection('audit_logs').add({
       action: 'PLOT_CREATED',
-      entityId: context.params.plotId,
+      entityId: event.params.plotId,
       timestamp: admin.firestore.FieldValue.serverTimestamp(),
       details: { plotNumber: data.plotNumber, blockId: data.blockId }
     });
-  });
+};
 
-export const onPlotPriceChanged = functions.firestore
-  .document('plots/{plotId}')
-  .onUpdate(async (change, context) => {
-    const before = change.before.data();
-    const after = change.after.data();
+export const onPlotCreated = onDocumentCreated(
+  {
+    document: 'plots/{plotId}',
+    region: 'asia-south1'
+  },
+  handlePlotCreated
+);
+
+
+export const handlePlotPriceChanged = async (event: any) => {
+    const before = event.data?.before.data();
+    const after = event.data?.after.data();
+    if (!before || !after) return;
 
     if (before.price !== after.price) {
-      console.log(`Plot ${context.params.plotId} price changed from ${before.price} to ${after.price}`);
+      console.log(`Plot ${event.params.plotId} price changed from ${before.price} to ${after.price}`);
       
       await admin.firestore().collection('audit_logs').add({
         action: 'PLOT_PRICE_CHANGED',
-        entityId: context.params.plotId,
+        entityId: event.params.plotId,
         timestamp: admin.firestore.FieldValue.serverTimestamp(),
         details: { oldPrice: before.price, newPrice: after.price }
       });
     }
-  });
+};
+
+export const onPlotPriceChanged = onDocumentUpdated(
+  {
+    document: 'plots/{plotId}',
+    region: 'asia-south1'
+  },
+  handlePlotPriceChanged
+);
+
