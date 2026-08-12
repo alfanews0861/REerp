@@ -1,0 +1,84 @@
+name: Android Debug APK Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - mobile-build
+
+jobs:
+  build:
+    name: Build Android Debug APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node 24.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9.1.0
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Make gradlew executable
+        working-directory: apps/marketing-mobile/android
+        run: chmod +x gradlew
+
+      - name: Build Android Debug APK
+        working-directory: apps/marketing-mobile/android
+        run: ./gradlew assembleDebug --stacktrace
+        env:
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+
+      - name: Verify APK Exists
+        working-directory: apps/marketing-mobile/android/app/build/outputs/apk/debug
+        run: |
+          if [ ! -f "app-debug.apk" ]; then
+            echo "::error::app-debug.apk not found!"
+            exit 1
+          fi
+          echo "APK generated successfully."
+          ls -lh app-debug.apk
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RealEstateERP-V1-debug-apk
+          path: apps/marketing-mobile/android/app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Build Summary
+        if: always()
+        run: |
+          echo "## RealEstateERP V1 Android Debug Build" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ job.status }}" = "success" ]; then
+            echo "**Status:** PASS" >> $GITHUB_STEP_SUMMARY
+            echo "**APK:** Generated" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Status:** FAIL" >> $GITHUB_STEP_SUMMARY
+            echo "**APK:** Not Generated" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "**Node:** 24.x" >> $GITHUB_STEP_SUMMARY
+          echo "**Java:** 17" >> $GITHUB_STEP_SUMMARY
+          echo "**Android Compile SDK:** 34" >> $GITHUB_STEP_SUMMARY
+          echo "**Android Target SDK:** 34" >> $GITHUB_STEP_SUMMARY
+          echo "**Application ID:** com.realestateerp.marketingmobile" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** 1.0.0" >> $GITHUB_STEP_SUMMARY
