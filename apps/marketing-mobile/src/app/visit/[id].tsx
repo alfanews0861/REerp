@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Button, Alert } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
-import { useLocation } from '../../src/providers/LocationProvider';
-import { queueOfflineMutation } from '../../src/services/backgroundSync';
+import { View, Text, StyleSheet, Alert, ScrollView } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocation } from '../../providers/LocationProvider';
+import { queueOfflineMutation } from '../../services/backgroundSync';
+import { Button } from '../../components/Button';
+import { Card } from '../../components/Card';
 import NetInfo from '@react-native-community/netinfo';
-// import { siteVisitService } from '@real-estate-erp/firebase'; // Assume this exists for online mutations
 
-export default function VisitDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+export default function VisitDetailRoute() {
+  const params = useLocalSearchParams<{ id?: string; visitId?: string }>();
+  const id = params?.id || params?.visitId || '101';
+  const router = useRouter();
   const [status, setStatus] = useState('SCHEDULED');
   const { location, errorMsg, requestPermission } = useLocation();
 
@@ -28,7 +31,6 @@ export default function VisitDetailScreen() {
 
   const handleStartVisit = async () => {
     const loc = await getGPSLocation();
-    
     const netInfo = await NetInfo.fetch();
     if (!netInfo.isConnected) {
       await queueOfflineMutation({
@@ -38,7 +40,6 @@ export default function VisitDetailScreen() {
       setStatus('IN_PROGRESS');
       Alert.alert('Offline', 'Visit started offline. Will sync later.');
     } else {
-      // await siteVisitService.startVisit(id, loc, 'mock-user-id');
       setStatus('IN_PROGRESS');
       Alert.alert('Visit Started', 'GPS coordinates captured.');
     }
@@ -54,47 +55,39 @@ export default function VisitDetailScreen() {
       });
       Alert.alert('Offline', 'Arrival recorded offline.');
     } else {
-      // await siteVisitService.markSiteArrival(id, loc, 'mock-user-id');
       Alert.alert('Arrived', 'Arrival location recorded.');
     }
   };
 
   const handleCompleteVisit = async () => {
-    const loc = await getGPSLocation();
-    const netInfo = await NetInfo.fetch();
-    if (!netInfo.isConnected) {
-      await queueOfflineMutation({
-        type: 'VISIT_COMPLETE',
-        payload: { visitId: id, location: loc, outcome: 'HOT', notes: 'Completed' },
-      });
-      setStatus('COMPLETED');
-      Alert.alert('Offline', 'Visit completed offline.');
-    } else {
-      // await siteVisitService.completeVisit(id, loc, { notes: 'Completed' }, 'HOT', 'mock-user-id');
-      setStatus('COMPLETED');
-      Alert.alert('Visit Completed', 'Feedback and outcome recorded.');
-    }
+    router.push({ pathname: '/visit/complete', params: { visitId: id } });
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Visit Details</Text>
-      <Text style={styles.text}>Visit ID: {id}</Text>
-      <Text style={styles.text}>Status: {status}</Text>
+    <ScrollView style={styles.container}>
+      <Card title="Site Visit Overview" style={styles.card}>
+        <Text style={styles.text}>Visit ID: <Text style={styles.bold}>{id}</Text></Text>
+        <Text style={styles.text}>Status: <Text style={[styles.bold, { color: status === 'IN_PROGRESS' ? '#d97706' : '#2563eb' }]}>{status}</Text></Text>
+        {location && (
+          <Text style={styles.gpsText}>
+            GPS: {location.coords.latitude.toFixed(4)}, {location.coords.longitude.toFixed(4)}
+          </Text>
+        )}
+      </Card>
       
-      <View style={styles.actions}>
+      <Card title="Actions" style={styles.card}>
         {status === 'SCHEDULED' && (
           <Button title="Start Visit" onPress={handleStartVisit} />
         )}
         {status === 'IN_PROGRESS' && (
-          <>
-            <Button title="Mark Arrival at Site" onPress={handleMarkArrival} color="#f0ad4e" />
+          <View style={styles.buttonStack}>
+            <Button title="Mark Arrival at Site" onPress={handleMarkArrival} variant="secondary" />
             <View style={{ height: 10 }} />
-            <Button title="Complete Visit" onPress={handleCompleteVisit} color="#5cb85c" />
-          </>
+            <Button title="Complete Visit & Checkout" onPress={handleCompleteVisit} />
+          </View>
         )}
-      </View>
-    </View>
+      </Card>
+    </ScrollView>
   );
 }
 
@@ -102,18 +95,27 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: '#f1f5f9',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  card: {
     marginBottom: 16,
   },
   text: {
     fontSize: 16,
+    color: '#334155',
     marginBottom: 8,
   },
-  actions: {
-    marginTop: 32,
+  bold: {
+    fontWeight: 'bold',
+    color: '#0f172a',
+  },
+  gpsText: {
+    fontSize: 13,
+    color: '#16a34a',
+    marginTop: 4,
+    fontWeight: '500',
+  },
+  buttonStack: {
+    marginTop: 8,
   },
 });

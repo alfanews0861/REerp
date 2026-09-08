@@ -7,8 +7,8 @@ const BACKGROUND_SYNC_TASK = 'background-sync-task';
 
 export interface OfflineMutation {
   id: string;
-  type: 'VISIT_START' | 'VISIT_ARRIVAL' | 'VISIT_COMPLETE';
-  payload: any;
+  type: 'VISIT_START' | 'VISIT_ARRIVAL' | 'VISIT_COMPLETE' | 'ADD_EXPENSE';
+  payload: Record<string, unknown>;
   timestamp: string;
 }
 
@@ -24,7 +24,9 @@ export async function queueOfflineMutation(mutation: Omit<OfflineMutation, 'id' 
   
   // Idempotency / deduplication logic: 
   // If a mutation for the same visitId and type already exists, don't duplicate.
-  const isDuplicate = queue.some(m => m.type === newMutation.type && m.payload.visitId === newMutation.payload.visitId);
+  const isDuplicate = queue.some(
+    m => m.type === newMutation.type && m.payload?.visitId && m.payload?.visitId === newMutation.payload?.visitId
+  );
   if (!isDuplicate) {
     queue.push(newMutation);
     await AsyncStorage.setItem('offline_mutations', JSON.stringify(queue));

@@ -1,21 +1,35 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Linking } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
 
-export const LeadDetailScreen: React.FC = ({ route, _navigation }: any) => {
+interface LeadDetailScreenProps {
+  leadId?: string;
+}
+
+export const LeadDetailScreen: React.FC<LeadDetailScreenProps> = ({ leadId: propLeadId }) => {
+  const params = useLocalSearchParams<{ id?: string }>();
+  const activeId = propLeadId || params?.id || '1';
+
   // Mock Lead Data
   const lead = {
-    id: route?.params?.leadId || '1',
-    name: 'John Doe',
-    phone: '+91 9876543210',
-    status: 'NEW',
+    id: activeId,
+    name: activeId === '2' ? 'Jane Smith' : 'John Doe',
+    phone: activeId === '2' ? '+91 9123456780' : '+91 9876543210',
+    status: activeId === '2' ? 'FOLLOW_UP' : 'NEW',
     source: 'Facebook Ads',
     campaign: 'Summer Festive Offer',
     interest: 'MEDIUM'
   };
 
   const logOfflineInteraction = (type: string) => {
-    console.log(`Logging ${type} interaction offline. Will sync when online.`);
-    // Real implementation would save to local SQLite/AsyncStorage and trigger sync
+    console.log(`Logging ${type} interaction offline for lead ${lead.id}. Will sync when online.`);
+    if (type === 'CALL') {
+      Linking.openURL(`tel:${lead.phone}`).catch(console.error);
+    } else if (type === 'WHATSAPP') {
+      Linking.openURL(`whatsapp://send?phone=${lead.phone}`).catch(console.error);
+    } else if (type === 'SMS') {
+      Linking.openURL(`sms:${lead.phone}`).catch(console.error);
+    }
   };
 
   return (

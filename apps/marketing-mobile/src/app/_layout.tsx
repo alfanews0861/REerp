@@ -15,6 +15,9 @@ export default function RootLayout() {
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="lead/[id]" options={{ title: 'Lead Details', headerShown: true }} />
+          <Stack.Screen name="commission/index" options={{ title: 'My Commission', headerShown: true }} />
+          <Stack.Screen name="network/index" options={{ title: 'My Network & Team', headerShown: true }} />
+          <Stack.Screen name="visit/[id]" options={{ title: 'Visit Details', headerShown: true }} />
           <Stack.Screen name="visit/start" options={{ title: 'Start Site Visit', headerShown: true }} />
           <Stack.Screen name="visit/complete" options={{ title: 'Complete Site Visit', headerShown: true }} />
         </Stack>

@@ -21,11 +21,19 @@ export default function VisitsScreen() {
           <Card style={styles.card}>
             <Text style={styles.property}>{item.property}</Text>
             <Text style={styles.time}>{item.time}</Text>
-            <Button
-              title="Start Visit"
-              onPress={() => router.push({ pathname: '/visit/start', params: { visitId: item.id } })}
-              style={styles.button}
-            />
+            <View style={styles.buttonRow}>
+              <Button
+                title="View Details"
+                variant="outline"
+                onPress={() => router.push(`/visit/${item.id}`)}
+                style={styles.actionButton}
+              />
+              <Button
+                title="Start Visit"
+                onPress={() => router.push({ pathname: '/visit/start', params: { visitId: item.id } })}
+                style={styles.actionButton}
+              />
+            </View>
           </Card>
         )}
       />
@@ -54,5 +62,13 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 8,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 8,
+  },
+  actionButton: {
+    flex: 1,
   },
 });

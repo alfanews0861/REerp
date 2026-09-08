@@ -5,13 +5,19 @@ import { Button } from '../../components/Button';
 import { useMutation } from '@tanstack/react-query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+interface ExpenseData {
+  type: string;
+  amount: string;
+  description: string;
+}
+
 export default function ExpensesScreen() {
   const [type, setType] = useState('');
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
 
   const submitExpense = useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: ExpenseData) => {
       // Offline-first approach: Save to local storage for background sync
       const existingQueue = await AsyncStorage.getItem('offline_mutations');
       const queue = existingQueue ? JSON.parse(existingQueue) : [];

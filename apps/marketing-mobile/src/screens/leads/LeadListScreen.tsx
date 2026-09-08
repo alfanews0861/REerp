@@ -16,12 +16,27 @@ const mockLeads: Lead[] = [
   { id: '3', name: 'Robert King', phone: '+91 8888888888', status: 'NEW', isAssignedToMe: false },
 ];
 
-export const LeadListScreen: React.FC = ({ navigation }: any) => {
+import { useRouter } from 'expo-router';
+
+interface LeadListScreenProps {
+  onSelectLead?: (leadId: string) => void;
+}
+
+export const LeadListScreen: React.FC<LeadListScreenProps> = ({ onSelectLead }) => {
+  const router = useRouter();
   const [filter, setFilter] = useState<'ALL' | 'MY_LEADS'>('MY_LEADS');
 
   const displayedLeads = filter === 'MY_LEADS' 
     ? mockLeads.filter(l => l.isAssignedToMe) 
     : mockLeads;
+
+  const handleLeadPress = (id: string) => {
+    if (onSelectLead) {
+      onSelectLead(id);
+    } else {
+      router.push(`/lead/${id}`);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -50,7 +65,7 @@ export const LeadListScreen: React.FC = ({ navigation }: any) => {
         renderItem={({ item }) => (
           <TouchableOpacity 
             style={styles.card}
-            onPress={() => navigation.navigate('LeadDetail', { leadId: item.id })}
+            onPress={() => handleLeadPress(item.id)}
           >
             <Text style={styles.name}>{item.name}</Text>
             <Text style={styles.phone}>{item.phone}</Text>

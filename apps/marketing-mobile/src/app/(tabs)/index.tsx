@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Card } from '../../components/Card';
 import { Button } from '../../components/Button';
 import { useRouter } from 'expo-router';
@@ -27,9 +27,22 @@ export default function HomeScreen() {
       </Card>
 
       <Card title="My Network & Commission" style={styles.card}>
-        <Text style={styles.text}>Network Level: SM</Text>
-        <Text style={styles.text}>Pending Commission: 1,50,000</Text>
-        <Button title="View My Network" onPress={() => router.push('/network')} variant="outline" />
+        <Text style={styles.text}>Network Level: SM (Sales Manager)</Text>
+        <Text style={styles.text}>Pending Commission: ₹15,000</Text>
+        <View style={styles.buttonRow}>
+          <Button
+            title="View Commissions"
+            onPress={() => router.push('/commission')}
+            variant="outline"
+            style={styles.actionButton}
+          />
+          <Button
+            title="View Team Network"
+            onPress={() => router.push('/network')}
+            variant="outline"
+            style={styles.actionButton}
+          />
+        </View>
       </Card>
     </ScrollView>
   );
@@ -54,5 +67,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#475569',
     marginBottom: 8,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 8,
+  },
+  actionButton: {
+    flex: 1,
   },
 });
