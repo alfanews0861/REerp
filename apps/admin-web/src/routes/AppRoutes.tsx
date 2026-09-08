@@ -25,6 +25,8 @@ const CommissionLedgerPage = lazy(() => import('../pages/marketing/commission/Co
 const CommissionRulesPage = lazy(() => import('../pages/marketing/commission/CommissionRulesPage'));
 const TelecallerWorkspace = lazy(() => import('../pages/marketing/telecaller/TelecallerWorkspace'));
 const MarketingReports = lazy(() => import('../pages/reports/MarketingReports'));
+const BookingsWorkspace = lazy(() => import('../pages/sales/BookingsWorkspace'));
+const PaymentsWorkspace = lazy(() => import('../pages/finance/PaymentsWorkspace'));
 
 const LoadingFallback = () => (
   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', minHeight: '50vh' }}>
@@ -95,8 +97,8 @@ export const AppRoutes: FC = () => {
             <Route path="/marketing/telecaller" element={<TelecallerWorkspace />} />
             
             {/* Sales & Finance */}
-            <Route path="/bookings" element={<Placeholder />} />
-            <Route path="/payments" element={<Placeholder />} />
+            <Route path="/bookings" element={<BookingsWorkspace />} />
+            <Route path="/payments" element={<PaymentsWorkspace />} />
             <Route path="/expenses" element={<Placeholder />} />
             
             {/* HR & Ops */}
