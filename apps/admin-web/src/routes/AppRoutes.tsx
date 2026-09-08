@@ -9,14 +9,22 @@ import {
 } from '@real-estate-erp/ui';
 import { AppShell } from '../layouts/AppShell';
 
-// Lazy loading placeholder for all modules
+// Lazy loading for all modules
 const Placeholder = lazy(() => import('../pages/PlaceholderPage'));
 const ExecutiveDashboard = lazy(() => import('../pages/dashboard/ExecutiveDashboard'));
+const CommandCenter = lazy(() => import('../pages/dashboard/CommandCenter'));
 const LeadsWorkspace = lazy(() => import('../pages/crm/leads/LeadsWorkspace'));
 const SiteVisitsWorkspace = lazy(() => import('../pages/crm/site-visits/SiteVisitsWorkspace'));
+const Customer360View = lazy(() => import('../pages/crm/Customer360View'));
 const PlotInventory = lazy(() => import('../pages/plots/PlotInventory'));
 const PlotDetails = lazy(() => import('../pages/plots/PlotDetails'));
+const CampaignList = lazy(() => import('../pages/marketing/campaigns/CampaignList'));
+const CampaignDetail = lazy(() => import('../pages/marketing/campaigns/CampaignDetail'));
 const NetworkWorkspace = lazy(() => import('../pages/marketing/network/NetworkWorkspace'));
+const CommissionLedgerPage = lazy(() => import('../pages/marketing/commission/CommissionLedgerPage'));
+const CommissionRulesPage = lazy(() => import('../pages/marketing/commission/CommissionRulesPage'));
+const TelecallerWorkspace = lazy(() => import('../pages/marketing/telecaller/TelecallerWorkspace'));
+const MarketingReports = lazy(() => import('../pages/reports/MarketingReports'));
 
 const LoadingFallback = () => (
   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', minHeight: '50vh' }}>
@@ -63,11 +71,13 @@ export const AppRoutes: FC = () => {
           <Route element={<AppShell />}>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<ExecutiveDashboard />} />
+            <Route path="/dashboard/command-center" element={<CommandCenter />} />
             
             {/* CRM */}
             <Route path="/crm/leads" element={<LeadsWorkspace />} />
             <Route path="/crm/site-visits" element={<SiteVisitsWorkspace />} />
-            <Route path="/crm/customers" element={<Placeholder />} />
+            <Route path="/crm/customers" element={<Customer360View />} />
+            <Route path="/crm/customers/:id" element={<Customer360View />} />
             
             {/* Projects & Plots */}
             <Route path="/projects" element={<Placeholder />} />
@@ -75,9 +85,14 @@ export const AppRoutes: FC = () => {
             <Route path="/plots/:id" element={<PlotDetails />} />
             
             {/* Marketing */}
-            <Route path="/marketing/campaigns" element={<Placeholder />} />
-            <Route path="/marketing/site-visits" element={<Placeholder />} />
+            <Route path="/marketing/campaigns" element={<CampaignList />} />
+            <Route path="/marketing/campaigns/details" element={<CampaignDetail />} />
+            <Route path="/marketing/campaigns/:id" element={<CampaignDetail />} />
+            <Route path="/marketing/site-visits" element={<SiteVisitsWorkspace />} />
             <Route path="/marketing/network" element={<NetworkWorkspace />} />
+            <Route path="/marketing/commission" element={<CommissionLedgerPage />} />
+            <Route path="/marketing/commission/rules" element={<CommissionRulesPage />} />
+            <Route path="/marketing/telecaller" element={<TelecallerWorkspace />} />
             
             {/* Sales & Finance */}
             <Route path="/bookings" element={<Placeholder />} />
@@ -89,7 +104,8 @@ export const AppRoutes: FC = () => {
             <Route path="/vehicles" element={<Placeholder />} />
             
             {/* Reports & Settings */}
-            <Route path="/reports" element={<Placeholder />} />
+            <Route path="/reports" element={<MarketingReports />} />
+            <Route path="/reports/marketing" element={<MarketingReports />} />
             <Route path="/analytics" element={<Placeholder />} />
             <Route path="/settings" element={<Placeholder />} />
             <Route path="/administration" element={<Placeholder />} />

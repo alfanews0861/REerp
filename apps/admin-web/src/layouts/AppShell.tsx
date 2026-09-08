@@ -60,13 +60,21 @@ export const AppShell = () => {
 
   // Navigation Items
   const navItems = [
-    { text: 'Dashboard', icon: <Dashboard />, path: '/dashboard' },
+    {
+      text: 'Dashboard',
+      icon: <Dashboard />,
+      children: [
+        { text: 'Executive Overview', path: '/dashboard' },
+        { text: 'Command Center', path: '/dashboard/command-center' },
+      ],
+    },
     {
       text: 'CRM',
       icon: <People />,
       children: [
         { text: 'Leads', path: '/crm/leads' },
-        { text: 'Customers', path: '/crm/customers' },
+        { text: 'Site Visits', path: '/crm/site-visits' },
+        { text: 'Customer 360', path: '/crm/customers' },
       ],
     },
     { text: 'Projects', icon: <BusinessCenter />, path: '/projects' },
@@ -76,7 +84,10 @@ export const AppShell = () => {
       icon: <Campaign />,
       children: [
         { text: 'Campaigns', path: '/marketing/campaigns' },
-        { text: 'Site Visits', path: '/marketing/site-visits' },
+        { text: 'Telecaller Queue', path: '/marketing/telecaller' },
+        { text: 'Marketing Network', path: '/marketing/network' },
+        { text: 'Commission Ledger', path: '/marketing/commission' },
+        { text: 'Commission Rules', path: '/marketing/commission/rules' },
       ],
     },
     { text: 'Bookings', icon: <EventNote />, path: '/bookings' },
@@ -112,9 +123,9 @@ export const AppShell = () => {
       <React.Fragment key={item.text}>
         <ListItem disablePadding sx={{ display: 'block' }}>
           <ListItemButton
-            component={item.path ? RouterLink : 'div'}
-            to={item.path}
-            onClick={() => item.children ? handleSubMenuToggle(item.text) : null}
+            component={item.children ? 'div' : RouterLink}
+            to={item.children ? undefined : item.path}
+            onClick={() => (item.children ? handleSubMenuToggle(item.text) : undefined)}
             sx={{
               minHeight: 48,
               justifyContent: isCollapsed ? 'center' : 'initial',

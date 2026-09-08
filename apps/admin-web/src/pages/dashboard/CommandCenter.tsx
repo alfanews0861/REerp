@@ -100,3 +100,6 @@ export const CommandCenter: React.FC = () => {
   );
 };
 
+export default CommandCenter;
+
+

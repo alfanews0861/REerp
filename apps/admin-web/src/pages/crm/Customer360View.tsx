@@ -1,17 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Customer360Profile, CustomerTimelineItem } from '@real-estate-erp/types';
 import { Customer360Service } from '../../services/Customer360Service';
 
-export const Customer360View: React.FC = () => {
+export const Customer360View = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [searchInput, setSearchInput] = useState('');
   const [activeTab, setActiveTab] = useState<'PROFILE' | 'TIMELINE' | 'DOCUMENTS' | 'AFTER_SALES'>('PROFILE');
   const [profile, setProfile] = useState<Customer360Profile | null>(null);
   const [timeline, setTimeline] = useState<CustomerTimelineItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(Boolean(id));
 
   useEffect(() => {
-    if (!id) return;
+    if (!id) {
+      setLoading(false);
+      return;
+    }
     const loadData = async () => {
       try {
         setLoading(true);
@@ -31,7 +36,44 @@ export const Customer360View: React.FC = () => {
   }, [id]);
 
   if (loading) return <div className="p-6">Loading Customer 360...</div>;
-  if (!profile) return <div className="p-6">Customer not found</div>;
+
+  if (!id) {
+    return (
+      <div className="p-6 max-w-4xl mx-auto">
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Customer 360 Overview</h1>
+        <p className="text-gray-500 mb-6">Search for a customer by Person ID to view complete lifetime relationship, bookings, documents, and timeline.</p>
+        <div className="bg-white p-6 rounded-lg shadow-sm border mb-6">
+          <div className="flex gap-3">
+            <input
+              type="text"
+              placeholder="Enter Customer / Person ID (e.g. CUST-1001)..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="flex-1 border rounded p-2"
+            />
+            <button
+              onClick={() => { if (searchInput.trim()) navigate(`/crm/customers/${searchInput.trim()}`); }}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            >
+              Search Customer
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="p-6">
+        <h1 className="text-xl font-bold text-gray-800 mb-2">Customer Not Found</h1>
+        <p className="text-gray-500 mb-4">No records found for Customer ID: {id}</p>
+        <button onClick={() => navigate('/crm/customers')} className="text-blue-600 hover:underline">
+          &larr; Back to Customer Search
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -130,3 +172,6 @@ export const Customer360View: React.FC = () => {
     </div>
   );
 };
+
+export default Customer360View;
+
