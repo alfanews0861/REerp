@@ -1,3 +1,5 @@
+import { describe, test, expect } from 'vitest';
+
 describe('CommissionEngine Hardening', () => {
   test('BOOKING_FULLY_PAID idempotency ensures duplicate triggers do not generate multiple pools', async () => {
     expect(true).toBe(true);

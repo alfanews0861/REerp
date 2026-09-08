@@ -23,12 +23,23 @@ function toConstraints(filters?: QueryFilter[]): QueryConstraint[] {
   return filters.map(f => where(f.field, f.op as any, f.value));
 }
 
+function isQueryFilterArray(arr?: any[]): arr is QueryFilter[] {
+  if (!arr || arr.length === 0) return false;
+  return typeof arr[0] === 'object' && arr[0] !== null && 'field' in arr[0] && 'op' in arr[0];
+}
+
 export class CommissionRuleRepository extends BaseRepository<CommissionRuleModel> implements ICommissionRuleRepository {
   constructor() {
     super(FIRESTORE_COLLECTIONS.COMMISSION_RULES, 'CommissionRule', commissionRuleConverter);
   }
-  async findAll(filters?: QueryFilter[]): Promise<CommissionRuleModel[]> {
-    return super.findAll(toConstraints(filters));
+  override async findAll(
+    filtersOrConstraints?: QueryFilter[] | QueryConstraint[],
+    includeDeleted: boolean = false
+  ): Promise<CommissionRuleModel[]> {
+    if (isQueryFilterArray(filtersOrConstraints)) {
+      return super.findAll(toConstraints(filtersOrConstraints), includeDeleted);
+    }
+    return super.findAll(filtersOrConstraints as QueryConstraint[] | undefined, includeDeleted);
   }
 }
 
@@ -36,8 +47,14 @@ export class CommissionPoolRepository extends BaseRepository<CommissionPoolModel
   constructor() {
     super(FIRESTORE_COLLECTIONS.COMMISSION_POOLS, 'CommissionPool', commissionPoolConverter);
   }
-  async findAll(filters?: QueryFilter[]): Promise<CommissionPoolModel[]> {
-    return super.findAll(toConstraints(filters));
+  override async findAll(
+    filtersOrConstraints?: QueryFilter[] | QueryConstraint[],
+    includeDeleted: boolean = false
+  ): Promise<CommissionPoolModel[]> {
+    if (isQueryFilterArray(filtersOrConstraints)) {
+      return super.findAll(toConstraints(filtersOrConstraints), includeDeleted);
+    }
+    return super.findAll(filtersOrConstraints as QueryConstraint[] | undefined, includeDeleted);
   }
 }
 
@@ -45,7 +62,14 @@ export class CommissionRecordRepository extends BaseRepository<CommissionRecordM
   constructor() {
     super(FIRESTORE_COLLECTIONS.COMMISSION_RECORDS, 'CommissionRecord', commissionRecordConverter);
   }
-  async findAll(filters?: QueryFilter[]): Promise<CommissionRecordModel[]> {
-    return super.findAll(toConstraints(filters));
+  override async findAll(
+    filtersOrConstraints?: QueryFilter[] | QueryConstraint[],
+    includeDeleted: boolean = false
+  ): Promise<CommissionRecordModel[]> {
+    if (isQueryFilterArray(filtersOrConstraints)) {
+      return super.findAll(toConstraints(filtersOrConstraints), includeDeleted);
+    }
+    return super.findAll(filtersOrConstraints as QueryConstraint[] | undefined, includeDeleted);
   }
 }
+

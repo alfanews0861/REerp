@@ -1,11 +1,12 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { KPIAggregatorHandler } from '../events/handlers/KPIAggregatorHandler';
 import { AggregateType } from '@real-estate-erp/events';
 
 // Mock firebase-admin
-jest.mock('firebase-admin', () => {
-  const mockSet = jest.fn();
-  const mockGet = jest.fn().mockResolvedValue({ exists: false });
-  const mockRunTransaction = jest.fn(async (cb) => {
+vi.mock('firebase-admin', () => {
+  const mockSet = vi.fn();
+  const mockGet = vi.fn().mockResolvedValue({ exists: false });
+  const mockRunTransaction = vi.fn(async (cb) => {
     return cb({
       get: mockGet,
       set: mockSet
@@ -13,14 +14,14 @@ jest.mock('firebase-admin', () => {
   });
 
   return {
-    firestore: Object.assign(jest.fn().mockReturnValue({
+    firestore: Object.assign(vi.fn().mockReturnValue({
       runTransaction: mockRunTransaction,
-      collection: jest.fn().mockReturnThis(),
-      doc: jest.fn().mockReturnThis()
+      collection: vi.fn().mockReturnThis(),
+      doc: vi.fn().mockReturnThis()
     }), {
       FieldValue: {
-        increment: jest.fn((val) => ({ _isIncrement: true, val })),
-        serverTimestamp: jest.fn(() => 'MOCK_TIMESTAMP')
+        increment: vi.fn((val) => ({ _isIncrement: true, val })),
+        serverTimestamp: vi.fn(() => 'MOCK_TIMESTAMP')
       }
     })
   };
@@ -33,7 +34,7 @@ describe('KPIAggregatorHandler', () => {
 
   beforeEach(() => {
     handler = new KPIAggregatorHandler();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should ignore events without companyId', async () => {
@@ -82,10 +83,10 @@ describe('KPIAggregatorHandler', () => {
   it('should ignore duplicate events (idempotency)', async () => {
     // Mock get to return { exists: true } for the idempotency doc
     const mockDb = admin.firestore();
-    (mockDb.runTransaction as jest.Mock).mockImplementationOnce(async (cb) => {
+    (mockDb.runTransaction as any).mockImplementationOnce(async (cb: any) => {
       return cb({
-        get: jest.fn().mockResolvedValue({ exists: true }), // Duplicate!
-        set: jest.fn()
+        get: vi.fn().mockResolvedValue({ exists: true }), // Duplicate!
+        set: vi.fn()
       });
     });
 

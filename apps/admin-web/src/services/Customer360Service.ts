@@ -1,5 +1,5 @@
 import { Customer360Profile, CustomerTimelineItem, Interaction, PlotBooking } from '@real-estate-erp/types';
-import { PersonRepository, LeadRepository } from '@real-estate-erp/firebase'; // Assuming these exist per subagent
+import { PersonRepository } from '@real-estate-erp/firebase'; // Assuming these exist per subagent
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { getFirebaseInstance } from '@real-estate-erp/firebase';
 import { DocumentService } from './DocumentService';

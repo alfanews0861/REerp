@@ -1,6 +1,6 @@
 import { collection, query, where, getDocs, doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { getFirebaseInstance } from '@real-estate-erp/firebase';
-import { DocumentRecord, DocumentVisibility, DocumentStatus } from '@real-estate-erp/types';
+import { DocumentRecord, DocumentVisibility } from '@real-estate-erp/types';
 
 export class DocumentService {
   private static collectionName = 'documents';

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import type { FC } from 'react';
 
-export const CampaignList: React.FC = () => {
+export const CampaignList: FC = () => {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">

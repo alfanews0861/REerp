@@ -1,6 +1,14 @@
 import * as admin from 'firebase-admin';
 import * as fs from 'fs';
 import * as path from 'path';
+import { CommissionService } from '@real-estate-erp/firebase/src/services/CommissionService';
+import {
+  AdminCommissionPoolRepository,
+  AdminCommissionRecordRepository,
+  AdminCommissionRuleRepository,
+  AdminNetworkMemberRepository,
+} from '../repositories/AdminCommissionRepositories';
+import { NetworkService } from '@real-estate-erp/firebase/src/services/NetworkService';
 
 // ---------------------------------------------------------
 // PHASE 0 — SAFETY SETUP
@@ -16,8 +24,8 @@ if (!admin.apps.length) {
 }
 
 const db = admin.firestore();
-const auth = admin.auth();
 const TEST_NS = `V1TEST-2026-08-11-${Date.now()}`;
+
 
 const reportLines: string[] = [];
 reportLines.push('# V1 LIVE VERIFICATION REPORT');
@@ -176,11 +184,11 @@ async function main() {
     
     async function attemptBooking(customerId: string) {
       return db.runTransaction(async (t) => {
-        const doc = await t.get(plotRef);
+        const doc = await t.get(plotRef as admin.firestore.DocumentReference);
         if (doc.data()?.status !== 'AVAILABLE') {
           throw new Error('NOT_AVAILABLE');
         }
-        t.update(plotRef, { status: 'BOOKED', customerId, updatedAt: admin.firestore.FieldValue.serverTimestamp() });
+        t.update(plotRef as admin.firestore.DocumentReference, { status: 'BOOKED', customerId, updatedAt: admin.firestore.FieldValue.serverTimestamp() });
         return true;
       });
     }
@@ -236,10 +244,6 @@ async function main() {
 
   // Phase 10 - Commission
   await runPhase('Phase 10 - Commission', async () => {
-    const { CommissionService } = require('@real-estate-erp/firebase/src/services/CommissionService');
-    const { AdminCommissionPoolRepository, AdminCommissionRecordRepository, AdminCommissionRuleRepository, AdminNetworkMemberRepository } = require('../repositories/AdminCommissionRepositories');
-    const { NetworkService } = require('@real-estate-erp/firebase/src/services/NetworkService');
-
     const networkRepo = new AdminNetworkMemberRepository();
     const networkSvc = new NetworkService(networkRepo);
     const svc = new CommissionService(
@@ -250,8 +254,8 @@ async function main() {
       networkRepo
     );
     
-    const booking = { id: testContext.bookingId, projectId: testContext.projectId, plotId: testContext.plotId };
-    const lead = { ownerId: 'SYSTEM', networkMemberId: null };
+    const booking: any = { id: testContext.bookingId, projectId: testContext.projectId, plotId: testContext.plotId };
+    const lead: any = { ownerId: 'SYSTEM', networkMemberId: null };
     
     // Create dummy network member for SYSTEM
     await db.collection('network_members').doc('SYSTEM').set({ id: 'SYSTEM', companyId: testContext.companyId, testNamespace: TEST_NS, level: 1, ancestors: [] });
@@ -313,8 +317,6 @@ async function main() {
 
   // Phase 16 - Marketing Network
   await runPhase('Phase 16 - Marketing Network', async () => {
-    const { NetworkService } = require('@real-estate-erp/firebase/src/services/NetworkService');
-    const { AdminNetworkMemberRepository } = require('../repositories/AdminCommissionRepositories');
     const network = new NetworkService(new AdminNetworkMemberRepository());
     const uManager = TEST_NS + 'MANAGER';
     const uLeader = TEST_NS + 'LEADER';

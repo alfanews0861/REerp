@@ -5,8 +5,6 @@ import { describe, it, expect, vi } from 'vitest';
 import ExecutiveDashboard from './ExecutiveDashboard';
 import { useDashboardData } from './hooks/useDashboardData';
 
-import { ThemeProvider } from '@real-estate-erp/ui';
-
 // Mock the hook
 vi.mock('./hooks/useDashboardData', () => ({
   useDashboardData: vi.fn(),

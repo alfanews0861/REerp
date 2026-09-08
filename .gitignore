@@ -43,3 +43,7 @@ Thumbs.db
 
 functions/serviceAccountKey.json
 repository-tree.txt
+*.log
+apps/marketing-mobile/android/*.txt
+apps/marketing-mobile/android/*.log
+

@@ -12,7 +12,7 @@ export const SiteVisitsWorkspace: React.FC = () => {
   const [viewMode, setViewMode] = useState<'TABLE' | 'CALENDAR' | 'TIMELINE' | 'MAP'>('TABLE');
   const [filtersOpen, setFiltersOpen] = useState(true);
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useSiteVisits();
+  const { data, isFetchingNextPage, isLoading } = useSiteVisits();
 
   const visits = data?.pages.flatMap(page => page.data) || [];
 
