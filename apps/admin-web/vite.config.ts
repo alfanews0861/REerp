@@ -25,10 +25,10 @@ export default defineConfig({
     sourcemap: true,
   },
   test: {
-    pool: 'forks',
+    pool: 'threads',
     poolOptions: {
-      forks: {
-        singleFork: true,
+      threads: {
+        singleThread: true,
       },
     },
   },

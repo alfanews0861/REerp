@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "reerp-b806b"
+  },
+  "targets": {
+    "reerp-b806b": {
+      "hosting": {
+        "admin-web": [
+          "reerp-b806b"
+        ]
+      }
+    }
+  }
+}

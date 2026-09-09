@@ -22,6 +22,7 @@ import {
   MenuItem,
   useTheme,
   Collapse,
+  Chip,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
@@ -44,19 +45,33 @@ import Receipt from '@mui/icons-material/Receipt';
 import BarChart from '@mui/icons-material/BarChart';
 import Settings from '@mui/icons-material/Settings';
 import AdminPanelSettings from '@mui/icons-material/AdminPanelSettings';
-import { Outlet, Link as RouterLink, useLocation } from 'react-router-dom';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { Outlet, Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import { useThemeMode } from '@real-estate-erp/ui';
+import { useAuthContext } from '@real-estate-erp/firebase';
 
 const drawerWidth = 260;
 const collapsedDrawerWidth = 72;
 
 export const AppShell = () => {
+  const navigate = useNavigate();
+  const { user, signOut } = useAuthContext();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const theme = useTheme();
   const { mode, setMode } = useThemeMode();
   const location = useLocation();
+
+  const handleLogout = async () => {
+    handleClose();
+    try {
+      await signOut();
+    } catch (e) {
+      console.error('Logout error:', e);
+    }
+    navigate('/login', { replace: true });
+  };
 
   // Navigation Items
   const navItems = [
@@ -238,6 +253,19 @@ export const AppShell = () => {
                 <NotificationsIcon />
               </Badge>
             </IconButton>
+            {user && (
+              <Box sx={{ display: { xs: 'none', md: 'flex' }, flexDirection: 'column', alignItems: 'flex-end', mr: 1.5 }}>
+                <Typography variant="body2" fontWeight={600} lineHeight={1.2}>
+                  {user.displayName || 'Staff User'}
+                </Typography>
+                <Chip
+                  label={(user.role || 'ADMIN').replace('_', ' ').toUpperCase()}
+                  size="small"
+                  color={user.role === 'super_admin' || user.role === 'director' ? 'error' : user.role?.includes('manager') ? 'secondary' : 'primary'}
+                  sx={{ height: 18, fontSize: '0.65rem', fontWeight: 700, mt: 0.3 }}
+                />
+              </Box>
+            )}
             <IconButton
               size="large"
               edge="end"
@@ -246,7 +274,9 @@ export const AppShell = () => {
               onClick={handleMenu}
               color="inherit"
             >
-              <Avatar sx={{ width: 32, height: 32, bgcolor: theme.palette.primary.main }}>A</Avatar>
+              <Avatar sx={{ width: 34, height: 34, bgcolor: theme.palette.primary.main, fontSize: '0.9rem', fontWeight: 600 }}>
+                {user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'A'}
+              </Avatar>
             </IconButton>
             <Menu
               anchorEl={anchorEl}
@@ -255,9 +285,29 @@ export const AppShell = () => {
               anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
               transformOrigin={{ vertical: 'top', horizontal: 'right' }}
             >
-              <MenuItem onClick={handleClose}>Profile</MenuItem>
-              <MenuItem onClick={handleClose}>My account</MenuItem>
-              <MenuItem onClick={handleClose}>Logout</MenuItem>
+              <MenuItem
+                onClick={() => {
+                  handleClose();
+                  navigate('/administration');
+                }}
+              >
+                Staff Administration
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  handleClose();
+                  navigate('/settings');
+                }}
+              >
+                System Settings
+              </MenuItem>
+              <Divider />
+              <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
+                <ListItemIcon sx={{ color: 'error.main' }}>
+                  <LogoutIcon fontSize="small" />
+                </ListItemIcon>
+                Logout
+              </MenuItem>
             </Menu>
           </Box>
         </Toolbar>

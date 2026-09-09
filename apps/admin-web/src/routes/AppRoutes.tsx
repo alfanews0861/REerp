@@ -1,8 +1,7 @@
 import { FC, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Box, Typography, Button, Paper, CircularProgress } from '@mui/material';
+import { Box, CircularProgress } from '@mui/material';
 import {
-  useThemeMode,
   PrivateRoute,
   GuestRoute,
   PublicRoute,
@@ -27,6 +26,8 @@ const TelecallerWorkspace = lazy(() => import('../pages/marketing/telecaller/Tel
 const MarketingReports = lazy(() => import('../pages/reports/MarketingReports'));
 const BookingsWorkspace = lazy(() => import('../pages/sales/BookingsWorkspace'));
 const PaymentsWorkspace = lazy(() => import('../pages/finance/PaymentsWorkspace'));
+const UserManagementWorkspace = lazy(() => import('../pages/administration/UserManagementWorkspace'));
+const LoginScreen = lazy(() => import('../pages/auth/LoginScreen'));
 
 const LoadingFallback = () => (
   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', minHeight: '50vh' }}>
@@ -34,38 +35,18 @@ const LoadingFallback = () => (
   </Box>
 );
 
-const PublicHome: FC = () => {
-  const { mode, setMode } = useThemeMode();
-  const toggleTheme = () => setMode(mode === 'light' ? 'dark' : mode === 'dark' ? 'corporate' : 'light');
-  return (
-    <Box sx={{ p: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, minHeight: '100vh', bgcolor: 'background.default' }}>
-      <Paper elevation={2} sx={{ p: 4, maxWidth: 600, width: '100%', textAlign: 'center' }}>
-        <Typography variant="h4" color="primary.main" gutterBottom fontWeight={600}>
-          Enterprise Login
-        </Typography>
-        <Typography variant="body1" color="text.secondary" paragraph>
-          Please sign in to access the Admin Shell.
-        </Typography>
-        <Button variant="contained" color="primary" onClick={toggleTheme}>
-          Toggle Theme ({mode})
-        </Button>
-      </Paper>
-    </Box>
-  );
-};
-
 export const AppRoutes: FC = () => {
   return (
     <Suspense fallback={<LoadingFallback />}>
       <Routes>
         {/* Public Routes */}
         <Route element={<PublicRoute />}>
-          <Route path="/public" element={<PublicHome />} />
+          <Route path="/public" element={<LoginScreen />} />
         </Route>
 
         {/* Guest Only Routes (e.g. Login) */}
         <Route element={<GuestRoute redirectTo="/dashboard" />}>
-          <Route path="/login" element={<PublicHome />} />
+          <Route path="/login" element={<LoginScreen />} />
         </Route>
 
         {/* Private Authenticated Routes with AppShell */}
@@ -109,8 +90,9 @@ export const AppRoutes: FC = () => {
             <Route path="/reports" element={<MarketingReports />} />
             <Route path="/reports/marketing" element={<MarketingReports />} />
             <Route path="/analytics" element={<Placeholder />} />
-            <Route path="/settings" element={<Placeholder />} />
-            <Route path="/administration" element={<Placeholder />} />
+            <Route path="/settings" element={<UserManagementWorkspace />} />
+            <Route path="/settings/users" element={<UserManagementWorkspace />} />
+            <Route path="/administration" element={<UserManagementWorkspace />} />
           </Route>
         </Route>
 
