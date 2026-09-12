@@ -18,14 +18,28 @@ export const LocationProvider = ({ children }: { children: ReactNode }) => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const requestPermission = async () => {
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      setErrorMsg('Permission to access location was denied');
-      return;
-    }
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+        return;
+      }
 
-    const currentLocation = await Location.getCurrentPositionAsync({});
-    setLocation(currentLocation);
+      const hasServices = await Location.hasServicesEnabledAsync();
+      if (!hasServices) {
+        setErrorMsg('Location services (GPS) are disabled on this device.');
+        return;
+      }
+
+      const currentLocation = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+      setLocation(currentLocation);
+      setErrorMsg(null);
+    } catch (err: any) {
+      console.warn('LocationProvider error:', err);
+      setErrorMsg(err?.message || 'Failed to get location');
+    }
   };
 
   useEffect(() => {
