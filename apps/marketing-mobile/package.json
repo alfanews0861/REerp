@@ -2,6 +2,9 @@
   "name": "@real-estate-erp/marketing-mobile",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",

@@ -1,4 +1,4 @@
-import * as functions from 'firebase-functions';
+import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import * as admin from 'firebase-admin';
 import { CommandCenterKPIs } from '@real-estate-erp/types';
 
@@ -15,14 +15,14 @@ interface BackfillParams {
  * if run as a full sweep, but since it's pagination-based, we use increment to add to existing totals
  * and use a cursor. To truly reset, the `dashboard_kpis` should be cleared before running the sweep.
  */
-export const backfillKPIs = functions.https.onCall(async (data: BackfillParams, context) => {
-  if (!context.auth?.token.admin) {
-    throw new functions.https.HttpsError('permission-denied', 'Only admins can run backfills');
+export const backfillKPIs = onCall(async (request) => {
+  if (!request.auth?.token.admin) {
+    throw new HttpsError('permission-denied', 'Only admins can run backfills');
   }
 
-  const { companyId, collectionName, batchSize = 500, lastProcessedId } = data;
+  const { companyId, collectionName, batchSize = 500, lastProcessedId } = (request.data || {}) as BackfillParams;
   if (!companyId || !collectionName) {
-    throw new functions.https.HttpsError('invalid-argument', 'Missing companyId or collectionName');
+    throw new HttpsError('invalid-argument', 'Missing companyId or collectionName');
   }
 
   const db = admin.firestore();

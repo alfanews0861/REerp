@@ -16,10 +16,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node 20.x
+      - name: Setup Node 24.x
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 24.x
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -35,6 +35,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Accept Android SDK Licenses & Setup API 36
+        run: |
+          yes | sdkmanager --licenses || true
+          sdkmanager --install "platforms;android-36" "build-tools;35.0.0" || true
+
       - name: Verify Keystore File
         working-directory: apps/marketing-mobile/android/app
         run: |
@@ -49,7 +54,7 @@ jobs:
         working-directory: apps/marketing-mobile/android
         run: chmod +x gradlew
 
-      - name: Build Android Release APK
+      - name: Build Android Release APK (API 36 + R8 Compression)
         working-directory: apps/marketing-mobile/android
         run: ./gradlew assembleRelease --stacktrace
         env:
@@ -89,5 +94,8 @@ jobs:
           fi
           echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Node:** 24.x" >> $GITHUB_STEP_SUMMARY
           echo "**Java:** 17" >> $GITHUB_STEP_SUMMARY
+          echo "**Compile/Target SDK:** API Level 36" >> $GITHUB_STEP_SUMMARY
+          echo "**R8 Compression:** Enabled" >> $GITHUB_STEP_SUMMARY
           echo "**Package:** com.realestateerp.marketingmobile" >> $GITHUB_STEP_SUMMARY
