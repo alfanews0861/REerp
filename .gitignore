@@ -51,3 +51,6 @@ apps/marketing-mobile/android/*.log
 tsc_errs.txt
 *.log
 
+
+release-build/
+
