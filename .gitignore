@@ -47,3 +47,7 @@ repository-tree.txt
 apps/marketing-mobile/android/*.txt
 apps/marketing-mobile/android/*.log
 
+
+tsc_errs.txt
+*.log
+

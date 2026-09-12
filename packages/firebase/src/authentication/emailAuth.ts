@@ -29,7 +29,8 @@ export async function signUpWithEmail(
   email: string,
   pass: string,
   displayName: string,
-  role: UserRole = 'customer'
+  role: UserRole = 'customer',
+  phoneNumber?: string
 ): Promise<UserCredential> {
   const validation = validatePassword(pass);
   if (!validation.isValid) {
@@ -42,20 +43,25 @@ export async function signUpWithEmail(
   if (credential.user) {
     await updateProfile(credential.user, { displayName });
 
-    await setDoc(
-      doc(db, 'users', credential.user.uid),
-      {
-        uid: credential.user.uid,
-        email,
-        displayName,
-        role,
-        status: 'active',
-        permissions: [],
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      },
-      { merge: true }
-    );
+    try {
+      await setDoc(
+        doc(db, 'users', credential.user.uid),
+        {
+          uid: credential.user.uid,
+          email,
+          displayName,
+          phoneNumber: phoneNumber || null,
+          role,
+          status: 'active',
+          permissions: [],
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+    } catch (e) {
+      console.warn('Could not write user profile to firestore during signup:', e);
+    }
   }
 
   return credential;

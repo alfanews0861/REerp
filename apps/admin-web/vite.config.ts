@@ -13,7 +13,6 @@ export default defineConfig({
       '@real-estate-erp/firebase': path.resolve(__dirname, '../../packages/firebase/src'),
       '@real-estate-erp/ui': path.resolve(__dirname, '../../packages/ui/src'),
       '@real-estate-erp/hooks': path.resolve(__dirname, '../../packages/hooks/src'),
-      '@mui/icons-material': '@mui/icons-material/esm',
     },
   },
   server: {
@@ -22,14 +21,10 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: true,
+    sourcemap: false,
+    chunkSizeWarningLimit: 1500,
   },
   test: {
-    pool: 'threads',
-    poolOptions: {
-      threads: {
-        singleThread: true,
-      },
-    },
+    fileParallelism: false,
   },
 });

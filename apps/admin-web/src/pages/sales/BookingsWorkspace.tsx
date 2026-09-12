@@ -22,9 +22,11 @@ import AddIcon from '@mui/icons-material/Add';
 import PaymentIcon from '@mui/icons-material/Payment';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import CloseIcon from '@mui/icons-material/Close';
+import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import { DataTable, MetricCard, SearchBox, StatusChip } from '@real-estate-erp/ui';
 import { getFirebaseInstance, inventoryBookingService, paymentService } from '@real-estate-erp/firebase';
 import { collection, query, getDocs, limit, orderBy } from 'firebase/firestore';
+import { OfficialAllotmentModal } from './components/OfficialAllotmentModal';
 
 export interface BookingItem {
   id: string;
@@ -47,12 +49,12 @@ export interface BookingItem {
   paymentPlanType?: string;
 }
 
-const SEED_BOOKINGS: BookingItem[] = [
+export const SEED_BOOKINGS: BookingItem[] = [
   {
     id: 'bkg-1',
     bookingNumber: 'BKG-2026-001',
     projectId: 'proj-1',
-    projectName: 'Sunrise Enclave',
+    projectName: 'Sunrise Enclave (Mokila)',
     plotId: 'plot-12',
     plotNumber: 'P-12',
     customerId: 'cust-1',
@@ -65,14 +67,14 @@ const SEED_BOOKINGS: BookingItem[] = [
     totalPaidAmount: 500000,
     status: 'active',
     bookingDate: '2026-09-01T10:30:00Z',
-    expiryDate: '2026-09-15T18:00:00Z',
+    expiryDate: '2026-09-25T18:00:00Z',
     paymentPlanType: 'installment',
   },
   {
     id: 'bkg-2',
     bookingNumber: 'BKG-2026-002',
     projectId: 'proj-1',
-    projectName: 'Sunrise Enclave',
+    projectName: 'Sunrise Enclave (Mokila)',
     plotId: 'plot-45',
     plotNumber: 'P-45',
     customerId: 'cust-2',
@@ -91,7 +93,7 @@ const SEED_BOOKINGS: BookingItem[] = [
     id: 'bkg-3',
     bookingNumber: 'BKG-2026-003',
     projectId: 'proj-2',
-    projectName: 'Green Valley Phase 2',
+    projectName: 'Green Valley Phase 2 (Shadnagar)',
     plotId: 'plot-78',
     plotNumber: 'P-78',
     customerId: 'cust-3',
@@ -110,21 +112,177 @@ const SEED_BOOKINGS: BookingItem[] = [
   {
     id: 'bkg-4',
     bookingNumber: 'BKG-2026-004',
-    projectId: 'proj-2',
-    projectName: 'Green Valley Phase 2',
-    plotId: 'plot-19',
-    plotNumber: 'P-19',
+    projectId: 'proj-3',
+    projectName: 'Palm County (Kollur)',
+    plotId: 'plot-pc15',
+    plotNumber: 'PC-15',
     customerId: 'cust-4',
-    customerName: 'Kalyan Rao',
-    customerPhone: '+91 98888 12345',
-    totalAmount: 2100000,
+    customerName: 'Kalyan Chakravarthy',
+    customerPhone: '+91 98480 33441',
+    totalAmount: 5600000,
+    discountAmount: 100000,
+    finalAmount: 5500000,
+    tokenAmount: 500000,
+    totalPaidAmount: 1500000,
+    status: 'active',
+    bookingDate: '2026-09-02T16:20:00Z',
+    expiryDate: '2026-09-30T18:00:00Z',
+    paymentPlanType: 'bank_loan',
+  },
+  {
+    id: 'bkg-5',
+    bookingNumber: 'BKG-2026-005',
+    projectId: 'proj-1',
+    projectName: 'Sunrise Enclave (Mokila)',
+    plotId: 'plot-06',
+    plotNumber: 'P-06',
+    customerId: 'cust-5',
+    customerName: 'Dr. Haritha Rao',
+    customerPhone: '+91 98480 44552',
+    totalAmount: 3250000,
+    discountAmount: 50000,
+    finalAmount: 3200000,
+    tokenAmount: 300000,
+    totalPaidAmount: 300000,
+    status: 'active',
+    bookingDate: '2026-09-07T12:00:00Z',
+    expiryDate: '2026-09-22T18:00:00Z',
+    paymentPlanType: 'installment',
+  },
+  {
+    id: 'bkg-6',
+    bookingNumber: 'BKG-2026-006',
+    projectId: 'proj-4',
+    projectName: 'Royal Meadows (Shankarpally)',
+    plotId: 'plot-rm22',
+    plotNumber: 'RM-22',
+    customerId: 'cust-6',
+    customerName: 'Satyanarayana Murthy',
+    customerPhone: '+91 98480 55663',
+    totalAmount: 4300000,
+    discountAmount: 100000,
+    finalAmount: 4200000,
+    tokenAmount: 4200000,
+    totalPaidAmount: 4200000,
+    status: 'completed',
+    bookingDate: '2026-08-28T15:30:00Z',
+    paymentPlanType: 'outright',
+  },
+  {
+    id: 'bkg-7',
+    bookingNumber: 'BKG-2026-007',
+    projectId: 'proj-2',
+    projectName: 'Green Valley Phase 2 (Shadnagar)',
+    plotId: 'plot-gv33',
+    plotNumber: 'GV-33',
+    customerId: 'cust-7',
+    customerName: 'Venkat Raman',
+    customerPhone: '+91 98480 66774',
+    totalAmount: 2000000,
+    discountAmount: 50000,
+    finalAmount: 1950000,
+    tokenAmount: 1950000,
+    totalPaidAmount: 1950000,
+    status: 'completed',
+    bookingDate: '2026-08-25T11:45:00Z',
+    paymentPlanType: 'outright',
+  },
+  {
+    id: 'bkg-8',
+    bookingNumber: 'BKG-2026-008',
+    projectId: 'proj-1',
+    projectName: 'Sunrise Enclave (Mokila)',
+    plotId: 'plot-88',
+    plotNumber: 'P-88',
+    customerId: 'cust-8',
+    customerName: 'Naveen Kumar V',
+    customerPhone: '+91 98480 77885',
+    totalAmount: 2600000,
     discountAmount: 0,
-    finalAmount: 2100000,
+    finalAmount: 2600000,
     tokenAmount: 100000,
     totalPaidAmount: 100000,
     status: 'cancelled',
-    bookingDate: '2026-08-15T09:45:00Z',
+    bookingDate: '2026-08-10T10:00:00Z',
     paymentPlanType: 'installment',
+  },
+  {
+    id: 'bkg-9',
+    bookingNumber: 'BKG-2026-009',
+    projectId: 'proj-3',
+    projectName: 'Palm County (Kollur)',
+    plotId: 'plot-pc40',
+    plotNumber: 'PC-40',
+    customerId: 'cust-9',
+    customerName: 'Lakshmi Prasanna',
+    customerPhone: '+91 98480 88996',
+    totalAmount: 4900000,
+    discountAmount: 100000,
+    finalAmount: 4800000,
+    tokenAmount: 500000,
+    totalPaidAmount: 1000000,
+    status: 'active',
+    bookingDate: '2026-09-04T14:00:00Z',
+    expiryDate: '2026-09-25T18:00:00Z',
+    paymentPlanType: 'installment',
+  },
+  {
+    id: 'bkg-10',
+    bookingNumber: 'BKG-2026-010',
+    projectId: 'proj-3',
+    projectName: 'Palm County (Kollur)',
+    plotId: 'plot-pc01',
+    plotNumber: 'PC-01 (Corner Villa Plot)',
+    customerId: 'cust-10',
+    customerName: 'Dr. Ashok Varma (NRI)',
+    customerPhone: '+1 469 555 0192',
+    totalAmount: 12200000,
+    discountAmount: 200000,
+    finalAmount: 12000000,
+    tokenAmount: 12000000,
+    totalPaidAmount: 12000000,
+    status: 'completed',
+    bookingDate: '2026-08-22T09:00:00Z',
+    paymentPlanType: 'outright',
+  },
+  {
+    id: 'bkg-11',
+    bookingNumber: 'BKG-2026-011',
+    projectId: 'proj-1',
+    projectName: 'Sunrise Enclave (Mokila)',
+    plotId: 'plot-15',
+    plotNumber: 'P-15',
+    customerId: 'cust-11',
+    customerName: 'Sudhakar Goud',
+    customerPhone: '+91 98480 11225',
+    totalAmount: 2800000,
+    discountAmount: 0,
+    finalAmount: 2800000,
+    tokenAmount: 100000,
+    totalPaidAmount: 100000,
+    status: 'expired',
+    bookingDate: '2026-08-01T11:00:00Z',
+    expiryDate: '2026-08-15T18:00:00Z',
+    paymentPlanType: 'installment',
+  },
+  {
+    id: 'bkg-12',
+    bookingNumber: 'BKG-2026-012',
+    projectId: 'proj-4',
+    projectName: 'Royal Meadows (Shankarpally)',
+    plotId: 'plot-rm08',
+    plotNumber: 'RM-08',
+    customerId: 'cust-12',
+    customerName: 'Anitha Chowdary',
+    customerPhone: '+91 98480 22339',
+    totalAmount: 3800000,
+    discountAmount: 50000,
+    finalAmount: 3750000,
+    tokenAmount: 300000,
+    totalPaidAmount: 300000,
+    status: 'draft',
+    bookingDate: '2026-09-10T16:00:00Z',
+    paymentPlanType: 'bank_loan',
   },
 ];
 
@@ -139,6 +297,7 @@ export const BookingsWorkspace: React.FC = () => {
   const [selectedBooking, setSelectedBooking] = useState<BookingItem | null>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+  const [allotmentModalOpen, setAllotmentModalOpen] = useState(false);
 
   // Form states for new booking
   const [newBookingData, setNewBookingData] = useState({
@@ -381,6 +540,17 @@ export const BookingsWorkspace: React.FC = () => {
               }}
             >
               <VisibilityIcon fontSize="small" />
+            </IconButton>
+            <IconButton
+              size="small"
+              color="info"
+              title="Official Allotment Letter"
+              onClick={() => {
+                setSelectedBooking(row);
+                setAllotmentModalOpen(true);
+              }}
+            >
+              <AssignmentTurnedInIcon fontSize="small" />
             </IconButton>
             {row.status === 'active' && (
               <IconButton
@@ -734,6 +904,13 @@ export const BookingsWorkspace: React.FC = () => {
           </DialogActions>
         </Dialog>
       )}
+
+      {/* Official Printable Allotment Letter Modal */}
+      <OfficialAllotmentModal
+        open={allotmentModalOpen}
+        onClose={() => setAllotmentModalOpen(false)}
+        booking={selectedBooking}
+      />
     </Box>
   );
 };

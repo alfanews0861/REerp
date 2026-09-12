@@ -9,6 +9,7 @@ vi.mock('@real-estate-erp/firebase', () => ({
   getFirebaseInstance: vi.fn(() => ({ db: {}, auth: {} })),
   signUpWithEmail: vi.fn(),
   sendPasswordResetEmail: vi.fn(),
+  SiteVisitRepository: vi.fn().mockImplementation(() => ({})),
 }));
 
 vi.mock('firebase/firestore', () => ({
@@ -45,10 +46,10 @@ describe('UserManagementWorkspace', () => {
   it('renders default staff members in the data table', () => {
     render(<UserManagementWorkspace />);
 
-    expect(screen.getByText('Rajesh Kumar (Director)')).toBeInTheDocument();
+    expect(screen.getByText('Rajesh Kumar (Managing Director)')).toBeInTheDocument();
     expect(screen.getByText('admin@reerp.com')).toBeInTheDocument();
-    expect(screen.getByText('Sunita Reddy')).toBeInTheDocument();
-    expect(screen.getByText('Anand Naidu')).toBeInTheDocument();
+    expect(screen.getByText(/Sunita Reddy/i)).toBeInTheDocument();
+    expect(screen.getByText(/Anand Naidu/i)).toBeInTheDocument();
   });
 
   it('filters staff by role tab', async () => {
@@ -59,9 +60,9 @@ describe('UserManagementWorkspace', () => {
     fireEvent.click(telecallerTab);
 
     await waitFor(() => {
-      expect(screen.getByText('Sunita Reddy')).toBeInTheDocument();
-      expect(screen.getByText('Kiran Rao')).toBeInTheDocument();
-      expect(screen.queryByText('Rajesh Kumar (Director)')).not.toBeInTheDocument();
+      expect(screen.getByText(/Sunita Reddy/i)).toBeInTheDocument();
+      expect(screen.getByText(/Kiran Rao/i)).toBeInTheDocument();
+      expect(screen.queryByText('Rajesh Kumar (Managing Director)')).not.toBeInTheDocument();
     });
   });
 
@@ -100,7 +101,7 @@ describe('UserManagementWorkspace', () => {
     fireEvent.click(blockButtons[0].closest('button')!);
 
     await waitFor(() => {
-      expect(screen.getByText(/Account status for Rajesh Kumar \(Director\) updated to SUSPENDED/i)).toBeInTheDocument();
+      expect(screen.getByText(/Account status for Satyadev Varma \(Super Admin\) updated to SUSPENDED/i)).toBeInTheDocument();
     });
   });
 });

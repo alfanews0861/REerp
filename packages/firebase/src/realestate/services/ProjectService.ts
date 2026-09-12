@@ -10,6 +10,10 @@ export class ProjectService {
     this.repository = new ProjectRepository();
   }
 
+  public async getAllProjects(): Promise<ProjectModel[]> {
+    return this.repository.findAll();
+  }
+
   public async getProject(id: string): Promise<ProjectModel | null> {
     return this.repository.findById(id);
   }
@@ -27,3 +31,6 @@ export class ProjectService {
     return this.repository.update(id, data, userId);
   }
 }
+
+export const projectService = new ProjectService();
+

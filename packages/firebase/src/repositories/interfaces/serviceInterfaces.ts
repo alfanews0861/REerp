@@ -29,4 +29,6 @@ export interface ICommissionRuleRepository {
 export interface INetworkMemberRepository {
   findById(id: string): Promise<NetworkMemberModel | null>;
   update(id: string, input: any, userId: string): Promise<NetworkMemberModel>;
+  findDescendants?(memberId: string): Promise<NetworkMemberModel[]>;
+  findAll?(constraints?: any[]): Promise<NetworkMemberModel[]>;
 }

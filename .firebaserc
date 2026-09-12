@@ -7,8 +7,12 @@
       "hosting": {
         "admin-web": [
           "reerp-b806b"
+        ],
+        "public-website": [
+          "reerp-website"
         ]
       }
     }
-  }
+  },
+  "etags": {}
 }

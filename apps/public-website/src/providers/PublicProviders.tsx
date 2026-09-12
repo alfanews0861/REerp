@@ -1,6 +1,7 @@
 import { FC, ReactNode, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary, ThemeProvider } from '@real-estate-erp/ui';
+import { LanguageProvider } from './LanguageContext';
 
 export interface PublicProvidersProps {
   children: ReactNode;
@@ -22,7 +23,9 @@ export const PublicProviders: FC<PublicProvidersProps> = ({ children }) => {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <LanguageProvider>{children}</LanguageProvider>
+        </ThemeProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );

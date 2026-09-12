@@ -57,12 +57,20 @@ export interface ProjectMedia {
   masterPlanPdf?: string;
 }
 
+export type ApprovalAuthority = 'DTCP' | 'HMDA' | 'RERA' | 'GHMC' | 'YTDA' | 'GRAM_PANCHAYAT' | 'OTHER';
+
 export interface Project {
   id: string;
   name: string;
   code: string;
   projectType: ProjectType;
   status: ProjectStatus;
+  approvalAuthority?: ApprovalAuthority;
+  approvalNumber?: string;
+  reraId?: string;
+  totalAreaAcres?: number;
+  layoutMapUrl?: string;
+  featured?: boolean;
   location: LocationDetails;
   members: ProjectMembers;
   pricing: ProjectPricing;

@@ -5,6 +5,8 @@ export interface AttendanceRecord {
   userId: string;
   userName: string;
   userRole: string;
+  staffType?: 'FIELD_STAFF' | 'OFFICE_STAFF';
+  assignedLocationName?: string;
   branchId: string;
   date: string; // YYYY-MM-DD
   punchInTime?: string; // ISO string

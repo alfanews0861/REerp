@@ -1,9 +1,36 @@
 import {
   collection,
   doc,
+  addDoc,
+  updateDoc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+  orderBy,
+  limit,
+  writeBatch,
+  setDoc,
+  deleteDoc,
   FirestoreDataConverter,
   QueryDocumentSnapshot,
 } from 'firebase/firestore';
+
+export {
+  collection,
+  doc,
+  addDoc,
+  updateDoc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+  orderBy,
+  limit,
+  writeBatch,
+  setDoc,
+  deleteDoc,
+};
 import { getFirebaseInstance } from './config';
 
 export function createTypedConverter<T extends { id?: string }>(): FirestoreDataConverter<T> {

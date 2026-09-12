@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   AppBar,
   Box,
@@ -23,12 +23,16 @@ import {
   useTheme,
   Collapse,
   Chip,
+  Button,
+  Tooltip,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import DarkMode from '@mui/icons-material/DarkMode';
 import LightMode from '@mui/icons-material/LightMode';
+import TravelExploreIcon from '@mui/icons-material/TravelExplore';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
@@ -49,9 +53,24 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { Outlet, Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import { useThemeMode } from '@real-estate-erp/ui';
 import { useAuthContext } from '@real-estate-erp/firebase';
+import { UserRole } from '@real-estate-erp/types';
 
 const drawerWidth = 260;
 const collapsedDrawerWidth = 72;
+
+interface NavChildItem {
+  text: string;
+  path: string;
+  roles?: UserRole[];
+}
+
+interface NavigationItem {
+  text: string;
+  icon: React.ReactNode;
+  path?: string;
+  roles?: UserRole[];
+  children?: NavChildItem[];
+}
 
 export const AppShell = () => {
   const navigate = useNavigate();
@@ -63,6 +82,9 @@ export const AppShell = () => {
   const { mode, setMode } = useThemeMode();
   const location = useLocation();
 
+  const currentRole: UserRole = (user?.role as UserRole) || 'customer';
+  const isSuperOrDirector = currentRole === 'super_admin' || currentRole === 'director';
+
   const handleLogout = async () => {
     handleClose();
     try {
@@ -73,54 +95,79 @@ export const AppShell = () => {
     navigate('/login', { replace: true });
   };
 
-  // Navigation Items
-  const navItems = [
+  // Role-mapped Navigation Items
+  const allNavItems: NavigationItem[] = [
     {
       text: 'Dashboard',
       icon: <Dashboard />,
+      roles: ['super_admin', 'director', 'branch_manager', 'marketing_manager', 'marketing_executive', 'sales_manager', 'sales_executive', 'telecaller', 'accountant', 'driver', 'customer'],
       children: [
         { text: 'Executive Overview', path: '/dashboard' },
-        { text: 'Command Center', path: '/dashboard/command-center' },
+        { text: 'Command Center', path: '/dashboard/command-center', roles: ['super_admin', 'director', 'branch_manager'] },
       ],
     },
     {
       text: 'CRM',
       icon: <People />,
+      roles: ['super_admin', 'director', 'branch_manager', 'sales_manager', 'sales_executive', 'telecaller', 'marketing_manager'],
       children: [
-        { text: 'Leads', path: '/crm/leads' },
-        { text: 'Site Visits', path: '/crm/site-visits' },
-        { text: 'Customer 360', path: '/crm/customers' },
+        { text: 'Leads', path: '/crm/leads', roles: ['super_admin', 'director', 'branch_manager', 'sales_manager', 'sales_executive', 'telecaller', 'marketing_manager'] },
+        { text: 'Site Visits', path: '/crm/site-visits', roles: ['super_admin', 'director', 'branch_manager', 'sales_manager', 'sales_executive'] },
+        { text: 'Customer 360', path: '/crm/customers', roles: ['super_admin', 'director', 'branch_manager', 'sales_manager', 'sales_executive', 'telecaller'] },
       ],
     },
-    { text: 'Projects', icon: <BusinessCenter />, path: '/projects' },
-    { text: 'Plots', icon: <Map />, path: '/plots' },
+    { text: 'Projects', icon: <BusinessCenter />, path: '/projects', roles: ['super_admin', 'director', 'branch_manager', 'sales_manager', 'sales_executive'] },
+    { text: 'Plots', icon: <Map />, path: '/plots', roles: ['super_admin', 'director', 'branch_manager', 'sales_manager', 'sales_executive', 'customer'] },
     {
       text: 'Marketing',
       icon: <Campaign />,
+      roles: ['super_admin', 'director', 'branch_manager', 'marketing_manager', 'marketing_executive', 'telecaller'],
       children: [
-        { text: 'Campaigns', path: '/marketing/campaigns' },
-        { text: 'Telecaller Queue', path: '/marketing/telecaller' },
-        { text: 'Marketing Network', path: '/marketing/network' },
-        { text: 'Commission Ledger', path: '/marketing/commission' },
-        { text: 'Commission Rules', path: '/marketing/commission/rules' },
+        { text: 'Campaigns', path: '/marketing/campaigns', roles: ['super_admin', 'director', 'branch_manager', 'marketing_manager', 'marketing_executive'] },
+        { text: 'Telecaller Queue', path: '/marketing/telecaller', roles: ['super_admin', 'director', 'branch_manager', 'marketing_manager', 'telecaller'] },
+        { text: 'Marketing Network', path: '/marketing/network', roles: ['super_admin', 'director', 'branch_manager', 'marketing_manager'] },
+        { text: 'Commission Ledger', path: '/marketing/commission', roles: ['super_admin', 'director', 'branch_manager', 'marketing_manager', 'accountant'] },
+        { text: 'Commission Rules', path: '/marketing/commission/rules', roles: ['super_admin', 'director', 'marketing_manager'] },
       ],
     },
-    { text: 'Bookings', icon: <EventNote />, path: '/bookings' },
-    { text: 'Payments', icon: <Payment />, path: '/payments' },
+    { text: 'Bookings', icon: <EventNote />, path: '/bookings', roles: ['super_admin', 'director', 'branch_manager', 'sales_manager', 'sales_executive', 'accountant', 'customer'] },
+    { text: 'Payments', icon: <Payment />, path: '/payments', roles: ['super_admin', 'director', 'branch_manager', 'accountant', 'customer'] },
     {
       text: 'Employees',
       icon: <BadgeIcon />,
+      roles: ['super_admin', 'director', 'branch_manager'],
       children: [
         { text: 'Attendance', path: '/employees/attendance' },
       ],
     },
-    { text: 'Vehicles', icon: <DirectionsCar />, path: '/vehicles' },
-    { text: 'Expenses', icon: <Receipt />, path: '/expenses' },
-    { text: 'Reports', icon: <BarChart />, path: '/reports' },
-    { text: 'Analytics', icon: <BarChart />, path: '/analytics' },
-    { text: 'Settings', icon: <Settings />, path: '/settings' },
-    { text: 'Administration', icon: <AdminPanelSettings />, path: '/administration' },
+    { text: 'Vehicles', icon: <DirectionsCar />, path: '/vehicles', roles: ['super_admin', 'director', 'branch_manager', 'driver'] },
+    { text: 'Expenses', icon: <Receipt />, path: '/expenses', roles: ['super_admin', 'director', 'branch_manager', 'accountant'] },
+    { text: 'Reports', icon: <BarChart />, path: '/reports', roles: ['super_admin', 'director', 'branch_manager', 'marketing_manager', 'sales_manager', 'accountant'] },
+    { text: 'Analytics', icon: <BarChart />, path: '/analytics', roles: ['super_admin', 'director', 'branch_manager', 'marketing_manager', 'sales_manager'] },
+    { text: 'Settings', icon: <Settings />, path: '/settings', roles: ['super_admin', 'director'] },
+    { text: 'Administration', icon: <AdminPanelSettings />, path: '/administration', roles: ['super_admin', 'director'] },
   ];
+
+  // Filter items based on active user role
+  const visibleNavItems = useMemo(() => {
+    return allNavItems
+      .filter((item) => {
+        if (!item.roles) return true;
+        return item.roles.includes(currentRole);
+      })
+      .map((item) => {
+        if (!item.children) return item;
+        const filteredChildren = item.children.filter((child) => {
+          if (!child.roles) return true;
+          return child.roles.includes(currentRole);
+        });
+        return {
+          ...item,
+          children: filteredChildren.length > 0 ? filteredChildren : undefined,
+        };
+      })
+      .filter((item) => !item.children || item.children.length > 0);
+  }, [currentRole]);
 
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
   const handleCollapseToggle = () => setIsCollapsed(!isCollapsed);
@@ -194,7 +241,7 @@ export const AppShell = () => {
       </Toolbar>
       <Divider />
       <List>
-        {renderNavItems(navItems)}
+        {renderNavItems(visibleNavItems)}
       </List>
     </div>
   );
@@ -245,6 +292,39 @@ export const AppShell = () => {
           </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            {/* Direct Link to Public Customer Website */}
+            <Tooltip title="Open Public Customer & Investor Website in a new tab">
+              <Button
+                component="a"
+                href="https://reerp-website.web.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                size="small"
+                variant="outlined"
+                startIcon={<TravelExploreIcon sx={{ fontSize: '1.05rem !important', color: 'primary.main' }} />}
+                endIcon={<OpenInNewIcon sx={{ fontSize: '0.75rem !important' }} />}
+                sx={{
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  fontSize: '0.8rem',
+                  borderRadius: 2,
+                  px: 1.5,
+                  py: 0.5,
+                  mr: 1.5,
+                  whiteSpace: 'nowrap',
+                  display: { xs: 'none', md: 'inline-flex' },
+                  borderColor: theme.palette.divider,
+                  color: 'text.primary',
+                  '&:hover': {
+                    borderColor: theme.palette.primary.main,
+                    bgcolor: 'action.hover',
+                  },
+                }}
+              >
+                Public Website
+              </Button>
+            </Tooltip>
+
             <IconButton color="inherit" onClick={toggleTheme}>
               {mode === 'dark' ? <LightMode /> : <DarkMode />}
             </IconButton>
@@ -286,22 +366,39 @@ export const AppShell = () => {
               transformOrigin={{ vertical: 'top', horizontal: 'right' }}
             >
               <MenuItem
-                onClick={() => {
-                  handleClose();
-                  navigate('/administration');
-                }}
+                component="a"
+                href="https://reerp-website.web.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={handleClose}
               >
-                Staff Administration
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  handleClose();
-                  navigate('/settings');
-                }}
-              >
-                System Settings
+                <ListItemIcon>
+                  <TravelExploreIcon fontSize="small" />
+                </ListItemIcon>
+                View Public Website ↗
               </MenuItem>
               <Divider />
+              {isSuperOrDirector && (
+                <MenuItem
+                  onClick={() => {
+                    handleClose();
+                    navigate('/administration');
+                  }}
+                >
+                  Staff Administration
+                </MenuItem>
+              )}
+              {isSuperOrDirector && (
+                <MenuItem
+                  onClick={() => {
+                    handleClose();
+                    navigate('/settings');
+                  }}
+                >
+                  System Settings
+                </MenuItem>
+              )}
+              {isSuperOrDirector && <Divider />}
               <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
                 <ListItemIcon sx={{ color: 'error.main' }}>
                   <LogoutIcon fontSize="small" />

@@ -22,6 +22,7 @@
     "@real-estate-erp/ui": "workspace:*",
     "@real-estate-erp/utils": "workspace:*",
     "@tanstack/react-query": "^5.51.23",
+    "firebase": "^10.12.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.0"

@@ -2,6 +2,7 @@
 import '@testing-library/jest-dom/vitest';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
 import ExecutiveDashboard from './ExecutiveDashboard';
 import { useDashboardData } from './hooks/useDashboardData';
 
@@ -10,7 +11,7 @@ vi.mock('./hooks/useDashboardData', () => ({
   useDashboardData: vi.fn(),
 }));
 
-const renderWithTheme = (ui: React.ReactElement) => render(ui);
+const renderWithTheme = (ui: React.ReactElement) => render(<MemoryRouter>{ui}</MemoryRouter>);
 
 describe('ExecutiveDashboard', () => {
   it('renders loading state initially', () => {

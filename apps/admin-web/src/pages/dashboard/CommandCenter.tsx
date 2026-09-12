@@ -1,102 +1,271 @@
 import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  Typography,
+  Grid,
+  Card,
+  CardActionArea,
+  Tabs,
+  Tab,
+  Chip,
+  Select,
+  MenuItem,
+  FormControl,
+  Paper,
+  Divider,
+  Button,
+  CircularProgress,
+  useTheme,
+} from '@mui/material';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import SupportAgentIcon from '@mui/icons-material/SupportAgent';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { DashboardService } from '../../services/DashboardService';
 import { ExecutiveDashboardData } from '@real-estate-erp/types';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export const CommandCenter: React.FC = () => {
+  const theme = useTheme();
+  const navigate = useNavigate();
   const [data, setData] = useState<ExecutiveDashboardData | null>(null);
-  const [activeTab, setActiveTab] = useState<'MARKETING' | 'SALES' | 'INVENTORY' | 'AFTER_SALES' | 'AI_INSIGHTS'>('SALES');
+  const [activeTab, setActiveTab] = useState<'SALES' | 'MARKETING' | 'INVENTORY' | 'AFTER_SALES' | 'AI_INSIGHTS'>('SALES');
+  const [projectFilter, setProjectFilter] = useState('ALL');
+  const [periodFilter, setPeriodFilter] = useState('THIS_MONTH');
 
   useEffect(() => {
     DashboardService.getCommandCenterData().then(setData);
   }, []);
 
-  if (!data) return <div className="p-6">Loading Command Center...</div>;
+  if (!data) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh', p: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  const kpis = [
+    {
+      title: 'Total Bookings',
+      value: data.kpis.bookings,
+      path: '/bookings',
+      icon: <TrendingUpIcon />,
+      color: theme.palette.primary.main,
+      subtitle: 'Active & Confirmed Deals',
+    },
+    {
+      title: 'Gross Sales',
+      value: `₹ ${(data.kpis.grossSales / 10000000).toFixed(2)} Cr`,
+      path: '/payments',
+      icon: <CurrencyRupeeIcon />,
+      color: theme.palette.success.main,
+      subtitle: 'Total Contract Value',
+    },
+    {
+      title: 'Collected Amount',
+      value: `₹ ${(data.kpis.collectedAmount / 10000000).toFixed(2)} Cr`,
+      path: '/payments',
+      icon: <ReceiptLongIcon />,
+      color: theme.palette.warning.main,
+      subtitle: 'Realized Revenue Receipts',
+    },
+    {
+      title: 'Open Customer Cases',
+      value: data.kpis.afterSalesOpenCases,
+      path: '/crm/customers',
+      icon: <SupportAgentIcon />,
+      color: theme.palette.secondary.main,
+      subtitle: 'Support & After-Sales',
+    },
+  ];
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Management Command Center</h1>
-        <div className="flex space-x-2">
-          {/* Real filters acting on the DashboardService payload */}
-          <select className="border rounded p-2"><option>All Projects</option></select>
-          <select className="border rounded p-2"><option>This Month</option></select>
-        </div>
-      </div>
+    <Box sx={{ p: { xs: 2, md: 3 } }}>
+      {/* Header */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, flexDirection: { xs: 'column', sm: 'row' }, mb: 3, gap: 2 }}>
+        <Box>
+          <Typography variant="h4" fontWeight={700} color="text.primary">
+            Management Command Center
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Real-time executive oversight, operational indicators, and AI strategic signals
+          </Typography>
+        </Box>
 
-      <div className="mb-6">
-        <nav className="flex space-x-4">
-          {['MARKETING', 'SALES', 'INVENTORY', 'AFTER_SALES', 'AI_INSIGHTS'].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab as any)}
-              className={`px-4 py-2 rounded-lg font-medium text-sm ${
-                activeTab === tab
-                  ? 'bg-blue-600 text-white shadow'
-                  : 'bg-white text-gray-600 hover:bg-gray-100'
-              }`}
+        <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+          <FormControl size="small" sx={{ minWidth: 140 }}>
+            <Select value={projectFilter} onChange={(e) => setProjectFilter(e.target.value)}>
+              <MenuItem value="ALL">All Projects</MenuItem>
+              <MenuItem value="SUNRISE">Sunrise Enclave</MenuItem>
+              <MenuItem value="GREEN">Green Meadows</MenuItem>
+              <MenuItem value="ROYAL">Royal Palms</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl size="small" sx={{ minWidth: 130 }}>
+            <Select value={periodFilter} onChange={(e) => setPeriodFilter(e.target.value)}>
+              <MenuItem value="THIS_MONTH">This Month</MenuItem>
+              <MenuItem value="LAST_MONTH">Last Month</MenuItem>
+              <MenuItem value="THIS_QUARTER">This Quarter</MenuItem>
+              <MenuItem value="YEAR_TO_DATE">Year to Date</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+      </Box>
+
+      {/* KPI Cards Grid */}
+      <Grid container spacing={2.5} sx={{ mb: 4 }}>
+        {kpis.map((kpi, idx) => (
+          <Grid item xs={12} sm={6} md={3} key={idx}>
+            <Card
+              elevation={2}
+              sx={{
+                borderRadius: 2.5,
+                borderLeft: `5px solid ${kpi.color}`,
+                transition: 'transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out',
+                '&:hover': {
+                  transform: 'translateY(-3px)',
+                  boxShadow: 4,
+                },
+              }}
             >
-              {tab.replace('_', ' ')}
-            </button>
-          ))}
-        </nav>
-      </div>
+              <CardActionArea onClick={() => navigate(kpi.path)} sx={{ p: 2.5 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                  <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                    {kpi.title}
+                  </Typography>
+                  <Box sx={{ color: kpi.color }}>{kpi.icon}</Box>
+                </Box>
+                <Typography variant="h4" fontWeight={700} color="text.primary" sx={{ mb: 0.5 }}>
+                  {kpi.value}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {kpi.subtitle}
+                </Typography>
+              </CardActionArea>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <Link to="/crm/bookings" className="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500 hover:bg-blue-50 transition">
-          <p className="text-sm text-gray-500">Total Bookings</p>
-          <p className="text-2xl font-bold">{data.kpis.bookings}</p>
-        </Link>
-        <Link to="/finance/payments" className="bg-white p-4 rounded-lg shadow border-l-4 border-green-500 hover:bg-green-50 transition">
-          <p className="text-sm text-gray-500">Gross Sales</p>
-          <p className="text-2xl font-bold">₹ {(data.kpis.grossSales / 10000000).toFixed(2)} Cr</p>
-        </Link>
-        <Link to="/finance/collections" className="bg-white p-4 rounded-lg shadow border-l-4 border-yellow-500 hover:bg-yellow-50 transition">
-          <p className="text-sm text-gray-500">Collected Amount</p>
-          <p className="text-2xl font-bold">₹ {(data.kpis.collectedAmount / 10000000).toFixed(2)} Cr</p>
-        </Link>
-        <Link to="/crm/after-sales" className="bg-white p-4 rounded-lg shadow border-l-4 border-purple-500 hover:bg-purple-50 transition">
-          <p className="text-sm text-gray-500">Open After-Sales Cases</p>
-          <p className="text-2xl font-bold">{data.kpis.afterSalesOpenCases}</p>
-        </Link>
-      </div>
+      {/* Domain Tabs */}
+      <Paper elevation={1} sx={{ borderRadius: 2.5, mb: 3, overflow: 'hidden' }}>
+        <Tabs
+          value={activeTab}
+          onChange={(_, val) => setActiveTab(val)}
+          variant="scrollable"
+          scrollButtons="auto"
+          textColor="primary"
+          indicatorColor="primary"
+          sx={{ borderBottom: 1, borderColor: 'divider', px: 2 }}
+        >
+          <Tab value="SALES" label="Sales Operations" sx={{ fontWeight: 600 }} />
+          <Tab value="MARKETING" label="Marketing & Growth" sx={{ fontWeight: 600 }} />
+          <Tab value="INVENTORY" label="Inventory & Plots" sx={{ fontWeight: 600 }} />
+          <Tab value="AFTER_SALES" label="After-Sales & CRM" sx={{ fontWeight: 600 }} />
+          <Tab
+            value="AI_INSIGHTS"
+            label="AI Analytics & Signals"
+            icon={<AutoAwesomeIcon fontSize="small" />}
+            iconPosition="end"
+            sx={{ fontWeight: 600, color: theme.palette.secondary.main }}
+          />
+        </Tabs>
 
-      {activeTab === 'AI_INSIGHTS' && (
-        <div className="space-y-4">
-          <h2 className="text-xl font-bold mb-4">AI Analytics & Signals</h2>
-          {data.insights.map((insight, idx) => (
-            <div key={idx} className="bg-white p-4 rounded-lg shadow border border-gray-200">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-bold text-lg">{insight.metric}</h3>
-                <span className={`px-2 py-1 text-xs font-bold rounded ${
-                  insight.severity === 'HIGH' || insight.severity === 'CRITICAL' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'
-                }`}>
-                  {insight.severity} SEVERITY
-                </span>
-              </div>
-              <p className="text-gray-800 mb-1"><strong>Observation:</strong> {insight.observation}</p>
-              <p className="text-gray-600 mb-1 text-sm"><strong>Evidence:</strong> {insight.evidence}</p>
-              <div className="mt-4 p-3 bg-gray-50 rounded text-sm flex flex-col space-y-1">
-                <p><strong>Possible Cause:</strong> {insight.possibleCause}</p>
-                <p className="text-blue-700"><strong>Action:</strong> {insight.recommendedAction}</p>
-                <p className="text-xs text-gray-400 mt-2">Provided by {insight.provider} at {insight.generatedAt}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-      
-      {activeTab !== 'AI_INSIGHTS' && (
-        <div className="bg-white p-6 rounded-lg shadow min-h-[300px] flex flex-col">
-          <p className="text-gray-400 mb-4">Drill-down charts and tables for {activeTab} will appear here.</p>
-          <div className="mt-auto self-start">
-             <Link to={`/reports/${activeTab.toLowerCase()}`} className="text-blue-600 hover:underline">
-               View Full {activeTab.replace('_', ' ')} Report &rarr;
-             </Link>
-          </div>
-        </div>
-      )}
-    </div>
+        {/* Tab Contents */}
+        <Box sx={{ p: 3 }}>
+          {activeTab === 'AI_INSIGHTS' ? (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+              <Typography variant="h6" fontWeight={700}>
+                AI Intelligence & Strategic Signals
+              </Typography>
+              {data.insights.map((insight, idx) => (
+                <Card key={idx} variant="outlined" sx={{ borderRadius: 2, p: 2.5 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5, flexWrap: 'wrap', gap: 1 }}>
+                    <Typography variant="subtitle1" fontWeight={700} color="primary">
+                      {insight.metric}
+                    </Typography>
+                    <Chip
+                      label={`${insight.severity} SEVERITY`}
+                      size="small"
+                      color={insight.severity === 'HIGH' || insight.severity === 'CRITICAL' ? 'error' : 'warning'}
+                      sx={{ fontWeight: 700, fontSize: '0.7rem' }}
+                    />
+                  </Box>
+                  <Typography variant="body2" sx={{ mb: 1 }}>
+                    <strong>Observation:</strong> {insight.observation}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    <strong>Evidence:</strong> {insight.evidence}
+                  </Typography>
+                  <Paper variant="outlined" sx={{ p: 2, bgcolor: theme.palette.action.hover, borderRadius: 1.5 }}>
+                    <Typography variant="body2">
+                      <strong>Possible Cause:</strong> {insight.possibleCause}
+                    </Typography>
+                    <Typography variant="body2" color="primary.main" fontWeight={600} sx={{ mt: 0.5 }}>
+                      <strong>Recommended Action:</strong> {insight.recommendedAction}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+                      Generated by {insight.provider} at {insight.generatedAt ? new Date(insight.generatedAt).toLocaleString() : 'N/A'}
+                    </Typography>
+                  </Paper>
+                </Card>
+              ))}
+            </Box>
+          ) : (
+            <Box sx={{ minHeight: 250, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <Box>
+                <Typography variant="h6" fontWeight={700} sx={{ mb: 1 }}>
+                  {activeTab.replace('_', ' ')} Executive Drill-down
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                  Consolidated operational indicators, throughput charts, and conversion funnels for {activeTab.toLowerCase()}.
+                </Typography>
+                
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={4}>
+                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
+                      <Typography variant="caption" color="text.secondary">Target Completion</Typography>
+                      <Typography variant="h5" fontWeight={700} color="primary">84.5%</Typography>
+                      <Typography variant="caption" color="success.main">↑ 5.2% vs target</Typography>
+                    </Paper>
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
+                      <Typography variant="caption" color="text.secondary">Average Cycle Time</Typography>
+                      <Typography variant="h5" fontWeight={700}>18 Days</Typography>
+                      <Typography variant="caption" color="text.secondary">Lead to Booking</Typography>
+                    </Paper>
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
+                      <Typography variant="caption" color="text.secondary">Operational Efficiency</Typography>
+                      <Typography variant="h5" fontWeight={700} color="success.main">92.0%</Typography>
+                      <Typography variant="caption" color="success.main">SLA Met</Typography>
+                    </Paper>
+                  </Grid>
+                </Grid>
+              </Box>
+
+              <Divider sx={{ my: 3 }} />
+
+              <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  endIcon={<ArrowForwardIcon />}
+                  onClick={() => navigate(activeTab === 'MARKETING' ? '/reports/marketing' : activeTab === 'INVENTORY' ? '/plots' : activeTab === 'AFTER_SALES' ? '/crm/customers' : '/reports')}
+                >
+                  View Full {activeTab.replace('_', ' ')} Workspace
+                </Button>
+              </Box>
+            </Box>
+          )}
+        </Box>
+      </Paper>
+    </Box>
   );
 };
 

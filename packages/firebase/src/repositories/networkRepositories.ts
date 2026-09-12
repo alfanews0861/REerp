@@ -10,11 +10,16 @@ import {
   networkPositionConverter,
   networkTeamConverter,
 } from '../converters/typedConverters';
+import { where } from 'firebase/firestore';
 import { INetworkMemberRepository } from './interfaces/serviceInterfaces';
 
 export class NetworkMemberRepository extends BaseRepository<NetworkMemberModel> implements INetworkMemberRepository {
   constructor() {
     super(FIRESTORE_COLLECTIONS.NETWORK_MEMBERS, 'NetworkMember', networkMemberConverter);
+  }
+
+  async findDescendants(memberId: string): Promise<NetworkMemberModel[]> {
+    return this.findAll([where('ancestors', 'array-contains', memberId)]);
   }
 }
 

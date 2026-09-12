@@ -10,7 +10,8 @@ import {
   AreaUnit,
   PlotFacing,
   PlotStatus,
-  PricingConfig
+  PricingConfig,
+  ApprovalAuthority
 } from '@real-estate-erp/types';
 
 export interface ProjectModel extends BaseFirestoreModel {
@@ -18,6 +19,12 @@ export interface ProjectModel extends BaseFirestoreModel {
   code: string;
   projectType: ProjectType;
   status: ProjectStatus;
+  approvalAuthority?: ApprovalAuthority;
+  approvalNumber?: string;
+  reraId?: string;
+  totalAreaAcres?: number;
+  layoutMapUrl?: string;
+  featured?: boolean;
   location: LocationDetails;
   members: ProjectMembers;
   pricing: ProjectPricing;

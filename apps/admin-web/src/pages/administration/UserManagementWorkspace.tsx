@@ -3,6 +3,7 @@ import {
   Box,
   Typography,
   Button,
+  Paper,
   Grid,
   Card,
   CardContent,
@@ -24,6 +25,7 @@ import {
   FormControlLabel,
   Checkbox,
   Divider,
+  LinearProgress,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -35,10 +37,12 @@ import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 import HeadsetMicIcon from '@mui/icons-material/HeadsetMic';
 import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 import GroupIcon from '@mui/icons-material/Group';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { DataTable, StatusChip, SearchBox } from '@real-estate-erp/ui';
 import { UserProfile, UserRole, UserStatus } from '@real-estate-erp/types';
 import { getFirebaseInstance, signUpWithEmail, sendPasswordResetEmail } from '@real-estate-erp/firebase';
 import { collection, doc, updateDoc, onSnapshot } from 'firebase/firestore';
+import { FirestoreSeederService } from '../../services/FirestoreSeederService';
 
 export interface ExtendedStaffUser extends UserProfile {
   department?: string;
@@ -46,12 +50,27 @@ export interface ExtendedStaffUser extends UserProfile {
   lastActive?: string;
 }
 
-const DEFAULT_STAFF_USERS: ExtendedStaffUser[] = [
+export const DEFAULT_STAFF_USERS: ExtendedStaffUser[] = [
+  {
+    id: 'usr-000',
+    uid: 'usr-000',
+    email: 'superadmin@reerp.com',
+    displayName: 'Satyadev Varma (Super Admin)',
+    role: 'super_admin',
+    status: 'active',
+    phoneNumber: '+91 98480 00001',
+    department: 'IT & System Governance',
+    reportingManager: 'Board of Directors',
+    permissions: ['*:*'],
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z',
+    lastActive: 'Just now',
+  },
   {
     id: 'usr-001',
     uid: 'usr-001',
     email: 'admin@reerp.com',
-    displayName: 'Rajesh Kumar (Director)',
+    displayName: 'Rajesh Kumar (Managing Director)',
     role: 'director',
     status: 'active',
     phoneNumber: '+91 98480 11223',
@@ -63,10 +82,55 @@ const DEFAULT_STAFF_USERS: ExtendedStaffUser[] = [
     lastActive: 'Just now',
   },
   {
+    id: 'usr-001b',
+    uid: 'usr-001b',
+    email: 'director.ops@reerp.com',
+    displayName: 'K. Raghava Rao (Executive Director)',
+    role: 'director',
+    status: 'active',
+    phoneNumber: '+91 98480 11224',
+    department: 'Operations & Strategy',
+    reportingManager: 'Rajesh Kumar',
+    permissions: ['*:*'],
+    createdAt: '2026-01-12T10:00:00Z',
+    updatedAt: '2026-03-01T16:00:00Z',
+    lastActive: '15 mins ago',
+  },
+  {
+    id: 'usr-bm1',
+    uid: 'usr-bm1',
+    email: 'bm.gachibowli@reerp.com',
+    displayName: 'Srinivas Murthy (Branch Head - West Zone)',
+    role: 'branch_manager',
+    status: 'active',
+    phoneNumber: '+91 98480 99881',
+    department: 'Gachibowli Branch Operations',
+    reportingManager: 'Rajesh Kumar',
+    permissions: ['branch:*', 'lead:*', 'plot:*', 'booking:*', 'expenses:approve'],
+    createdAt: '2026-01-14T09:00:00Z',
+    updatedAt: '2026-03-05T11:00:00Z',
+    lastActive: '10 mins ago',
+  },
+  {
+    id: 'usr-bm2',
+    uid: 'usr-bm2',
+    email: 'bm.central@reerp.com',
+    displayName: 'Kavitha Reddy (Branch Head - Jubilee Hills)',
+    role: 'branch_manager',
+    status: 'active',
+    phoneNumber: '+91 98480 99882',
+    department: 'Central Branch Operations',
+    reportingManager: 'Rajesh Kumar',
+    permissions: ['branch:*', 'lead:*', 'plot:*', 'booking:*', 'expenses:approve'],
+    createdAt: '2026-01-15T09:00:00Z',
+    updatedAt: '2026-03-05T12:00:00Z',
+    lastActive: '25 mins ago',
+  },
+  {
     id: 'usr-002',
     uid: 'usr-002',
     email: 'sales.mgr@reerp.com',
-    displayName: 'Priya Sharma (Sales Head)',
+    displayName: 'Priya Sharma (Zonal Sales Head)',
     role: 'sales_manager',
     status: 'active',
     phoneNumber: '+91 98480 22334',
@@ -78,10 +142,25 @@ const DEFAULT_STAFF_USERS: ExtendedStaffUser[] = [
     lastActive: '12 mins ago',
   },
   {
+    id: 'usr-sm2',
+    uid: 'usr-sm2',
+    email: 'praveen.teja@reerp.com',
+    displayName: 'Praveen Teja (Senior Sales Manager - Mokila)',
+    role: 'sales_manager',
+    status: 'active',
+    phoneNumber: '+91 98480 22335',
+    department: 'Venture Sales Desk',
+    reportingManager: 'Priya Sharma',
+    permissions: ['lead:*', 'plot:*', 'booking:*', 'customer:*'],
+    createdAt: '2026-01-18T10:00:00Z',
+    updatedAt: '2026-03-04T14:00:00Z',
+    lastActive: '1 hour ago',
+  },
+  {
     id: 'usr-003',
     uid: 'usr-003',
     email: 'marketing.mgr@reerp.com',
-    displayName: 'Vikram Varma (Marketing Head)',
+    displayName: 'Vikram Varma (Head of Marketing)',
     role: 'marketing_manager',
     status: 'active',
     phoneNumber: '+91 98480 33445',
@@ -93,10 +172,85 @@ const DEFAULT_STAFF_USERS: ExtendedStaffUser[] = [
     lastActive: '1 hour ago',
   },
   {
+    id: 'usr-006',
+    uid: 'usr-006',
+    email: 'anand.naidu@reerp.com',
+    displayName: 'Anand Naidu',
+    role: 'sales_executive',
+    status: 'active',
+    phoneNumber: '+91 98480 66778',
+    department: 'Field Sales & Client Visits',
+    reportingManager: 'Priya Sharma',
+    permissions: ['lead:read', 'lead:update', 'plot:read', 'booking:create', 'customer:read'],
+    createdAt: '2026-02-10T10:00:00Z',
+    updatedAt: '2026-03-04T12:30:00Z',
+    lastActive: '2 hours ago',
+  },
+  {
+    id: 'usr-se2',
+    uid: 'usr-se2',
+    email: 'vamshi.krishna@reerp.com',
+    displayName: 'Vamshi Krishna',
+    role: 'sales_executive',
+    status: 'active',
+    phoneNumber: '+91 98480 66779',
+    department: 'Field Sales & Client Visits',
+    reportingManager: 'Priya Sharma',
+    permissions: ['lead:read', 'lead:update', 'plot:read', 'booking:create', 'customer:read'],
+    createdAt: '2026-02-11T10:00:00Z',
+    updatedAt: '2026-03-05T09:30:00Z',
+    lastActive: '30 mins ago',
+  },
+  {
+    id: 'usr-se3',
+    uid: 'usr-se3',
+    email: 'sneha.latha@reerp.com',
+    displayName: 'Sneha Latha (Relationship Manager)',
+    role: 'sales_executive',
+    status: 'active',
+    phoneNumber: '+91 98480 66780',
+    department: 'HNI & Investor Sales',
+    reportingManager: 'Priya Sharma',
+    permissions: ['lead:read', 'lead:update', 'plot:read', 'booking:create', 'customer:read'],
+    createdAt: '2026-02-15T11:00:00Z',
+    updatedAt: '2026-03-05T14:15:00Z',
+    lastActive: '45 mins ago',
+  },
+  {
+    id: 'usr-007',
+    uid: 'usr-007',
+    email: 'mahesh.babu@reerp.com',
+    displayName: 'Mahesh Babu M',
+    role: 'marketing_executive',
+    status: 'active',
+    phoneNumber: '+91 98480 77889',
+    department: 'Ground Marketing & Canvassing',
+    reportingManager: 'Vikram Varma',
+    permissions: ['campaign:read', 'lead:create', 'lead:read'],
+    createdAt: '2026-02-12T14:00:00Z',
+    updatedAt: '2026-03-01T09:00:00Z',
+    lastActive: '3 hours ago',
+  },
+  {
+    id: 'usr-me2',
+    uid: 'usr-me2',
+    email: 'divya.sree@reerp.com',
+    displayName: 'Divya Sree (Events & Offline Promotions)',
+    role: 'marketing_executive',
+    status: 'active',
+    phoneNumber: '+91 98480 77890',
+    department: 'Marketing & Digital',
+    reportingManager: 'Vikram Varma',
+    permissions: ['campaign:read', 'lead:create', 'lead:read'],
+    createdAt: '2026-02-18T10:00:00Z',
+    updatedAt: '2026-03-04T16:00:00Z',
+    lastActive: '2 hours ago',
+  },
+  {
     id: 'usr-004',
     uid: 'usr-004',
     email: 'telecaller1@reerp.com',
-    displayName: 'Sunita Reddy',
+    displayName: 'Sunita Reddy (Calling Team Lead)',
     role: 'telecaller',
     status: 'active',
     phoneNumber: '+91 98480 44556',
@@ -111,7 +265,7 @@ const DEFAULT_STAFF_USERS: ExtendedStaffUser[] = [
     id: 'usr-005',
     uid: 'usr-005',
     email: 'telecaller2@reerp.com',
-    displayName: 'Kiran Rao',
+    displayName: 'Kiran Rao (Digital Lead Specialist)',
     role: 'telecaller',
     status: 'active',
     phoneNumber: '+91 98480 55667',
@@ -123,34 +277,109 @@ const DEFAULT_STAFF_USERS: ExtendedStaffUser[] = [
     lastActive: '45 mins ago',
   },
   {
-    id: 'usr-006',
-    uid: 'usr-006',
-    email: 'field.agent1@reerp.com',
-    displayName: 'Anand Naidu',
-    role: 'sales_executive',
+    id: 'usr-tc3',
+    uid: 'usr-tc3',
+    email: 'meena.kumari@reerp.com',
+    displayName: 'Meena Kumari (NRI Support Desk)',
+    role: 'telecaller',
     status: 'active',
-    phoneNumber: '+91 98480 66778',
-    department: 'Field Sales & Visits',
-    reportingManager: 'Priya Sharma',
-    permissions: ['lead:read', 'lead:update', 'plot:read', 'booking:create', 'customer:read'],
-    createdAt: '2026-02-10T10:00:00Z',
-    updatedAt: '2026-03-04T12:30:00Z',
-    lastActive: '2 hours ago',
+    phoneNumber: '+91 98480 55668',
+    department: 'Inbound Calling Center',
+    reportingManager: 'Sunita Reddy',
+    permissions: ['lead:read', 'lead:update', 'followup:create', 'customer:read'],
+    createdAt: '2026-02-08T09:00:00Z',
+    updatedAt: '2026-03-05T15:00:00Z',
+    lastActive: '10 mins ago',
   },
   {
-    id: 'usr-007',
-    uid: 'usr-007',
-    email: 'field.agent2@reerp.com',
-    displayName: 'Mahesh Babu M',
-    role: 'marketing_executive',
-    status: 'suspended',
-    phoneNumber: '+91 98480 77889',
-    department: 'Direct Marketing',
-    reportingManager: 'Vikram Varma',
-    permissions: ['campaign:read', 'lead:create', 'lead:read'],
-    createdAt: '2026-02-12T14:00:00Z',
-    updatedAt: '2026-03-01T09:00:00Z',
-    lastActive: '5 days ago',
+    id: 'usr-acc1',
+    uid: 'usr-acc1',
+    email: 'accounts.head@reerp.com',
+    displayName: 'Lakshmi Narayana (Chief Accountant)',
+    role: 'accountant',
+    status: 'active',
+    phoneNumber: '+91 98480 88991',
+    department: 'Finance & Accounts',
+    reportingManager: 'Rajesh Kumar',
+    permissions: ['payments:*', 'expenses:*', 'reports:read'],
+    createdAt: '2026-01-10T10:00:00Z',
+    updatedAt: '2026-03-05T13:00:00Z',
+    lastActive: '20 mins ago',
+  },
+  {
+    id: 'usr-acc2',
+    uid: 'usr-acc2',
+    email: 'radha.krishna@reerp.com',
+    displayName: 'Radha Krishna (Taxation & Auditing)',
+    role: 'accountant',
+    status: 'active',
+    phoneNumber: '+91 98480 88992',
+    department: 'Finance & Accounts',
+    reportingManager: 'Lakshmi Narayana',
+    permissions: ['payments:read', 'expenses:read', 'expenses:approve'],
+    createdAt: '2026-01-20T10:00:00Z',
+    updatedAt: '2026-03-04T17:00:00Z',
+    lastActive: '1 hour ago',
+  },
+  {
+    id: 'usr-drv1',
+    uid: 'usr-drv1',
+    email: 'driver.ramesh@reerp.com',
+    displayName: 'Ramesh Goud (Innova Crysta - TS 09 UB 1001)',
+    role: 'driver',
+    status: 'active',
+    phoneNumber: '+91 98490 11223',
+    department: 'Fleet & Logistics',
+    reportingManager: 'Srinivas Murthy',
+    permissions: ['vehicle:read', 'trip:create'],
+    createdAt: '2026-01-15T08:00:00Z',
+    updatedAt: '2026-03-05T09:00:00Z',
+    lastActive: '10 mins ago',
+  },
+  {
+    id: 'usr-drv2',
+    uid: 'usr-drv2',
+    email: 'driver.suresh@reerp.com',
+    displayName: 'Suresh Kumar (Tempo Traveller - TS 08 EX 4050)',
+    role: 'driver',
+    status: 'active',
+    phoneNumber: '+91 94412 33445',
+    department: 'Fleet & Logistics',
+    reportingManager: 'Srinivas Murthy',
+    permissions: ['vehicle:read', 'trip:create'],
+    createdAt: '2026-01-16T08:00:00Z',
+    updatedAt: '2026-03-05T10:30:00Z',
+    lastActive: 'On Field Duty',
+  },
+  {
+    id: 'usr-drv3',
+    uid: 'usr-drv3',
+    email: 'driver.venu@reerp.com',
+    displayName: 'Venu Madhav (Ertiga - TS 07 HK 2020)',
+    role: 'driver',
+    status: 'active',
+    phoneNumber: '+91 91234 56780',
+    department: 'Fleet & Logistics',
+    reportingManager: 'Srinivas Murthy',
+    permissions: ['vehicle:read', 'trip:create'],
+    createdAt: '2026-01-20T08:00:00Z',
+    updatedAt: '2026-03-04T18:00:00Z',
+    lastActive: 'Yesterday',
+  },
+  {
+    id: 'usr-drv4',
+    uid: 'usr-drv4',
+    email: 'driver.prakash@reerp.com',
+    displayName: 'Prakash Rao (Scorpio-N - TS 09 Z 8899)',
+    role: 'driver',
+    status: 'active',
+    phoneNumber: '+91 99887 76655',
+    department: 'Fleet & Logistics',
+    reportingManager: 'Srinivas Murthy',
+    permissions: ['vehicle:read', 'trip:create'],
+    createdAt: '2026-02-01T08:00:00Z',
+    updatedAt: '2026-03-05T11:00:00Z',
+    lastActive: 'On Field Duty',
   },
 ];
 
@@ -161,7 +390,10 @@ export const UserManagementWorkspace: React.FC = () => {
   const [selectedRoleCategory, setSelectedRoleCategory] = useState<RoleCategory>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [bannerNotice, setBannerNotice] = useState<string | null>(null);
+  const [bannerNotice, setBannerNotice] = useState<{
+    text: string;
+    severity: 'success' | 'error' | 'warning' | 'info';
+  } | null>(null);
 
   // Modals state
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -182,6 +414,41 @@ export const UserManagementWorkspace: React.FC = () => {
   const [editRole, setEditRole] = useState<UserRole>('telecaller');
   const [editPermissions, setEditPermissions] = useState<string[]>([]);
   const [editLoading, setEditLoading] = useState(false);
+
+  // Firestore Database Seeding state
+  const [seedingLoading, setSeedingLoading] = useState(false);
+  const [seedingProgress, setSeedingProgress] = useState<{ message: string; current: number; total: number } | null>(null);
+
+  const handleSeedDatabase = async () => {
+    setSeedingLoading(true);
+    setSeedingProgress({ message: 'Initializing Firestore database seeding...', current: 0, total: 100 });
+
+    try {
+      const result = await FirestoreSeederService.seedAll((prog) => {
+        setSeedingProgress(prog);
+      });
+
+      if (result.success) {
+        setBannerNotice({
+          text: `✅ Successfully populated ${result.totalDocuments} enterprise records directly into Firebase Firestore across 14 collections!`,
+          severity: 'success',
+        });
+      } else {
+        setBannerNotice({
+          text: `Notice: ${result.error || 'Seeding encountered an issue'}`,
+          severity: 'error',
+        });
+      }
+    } catch (err: any) {
+      setBannerNotice({
+        text: `Seeding error: ${err?.message || 'Failed to connect to Firestore'}`,
+        severity: 'error',
+      });
+    } finally {
+      setSeedingLoading(false);
+      setSeedingProgress(null);
+    }
+  };
 
   // Subscribe to live users from Firestore
   useEffect(() => {
@@ -289,7 +556,10 @@ export const UserManagementWorkspace: React.FC = () => {
 
     try {
       await signUpWithEmail(newEmail.trim(), newPassword, newDisplayName.trim(), newRole);
-      setBannerNotice(`Staff profile created successfully for ${newDisplayName} (${newRole}).`);
+      setBannerNotice({
+        text: `Staff profile created successfully for ${newDisplayName} (${newRole}).`,
+        severity: 'success',
+      });
       setCreateDialogOpen(false);
     } catch (err: unknown) {
       // In case Firebase throws or offline demo
@@ -311,7 +581,10 @@ export const UserManagementWorkspace: React.FC = () => {
         lastActive: 'Just registered',
       };
       setUsers((prev) => [newStaff, ...prev]);
-      setBannerNotice(`Staff member ${newDisplayName} registered with role ${newRole} (saved). Notice: ${errorMsg}`);
+      setBannerNotice({
+        text: `Staff member ${newDisplayName} registered with role ${newRole} (saved locally). Notice: ${errorMsg}`,
+        severity: 'warning',
+      });
       setCreateDialogOpen(false);
     } finally {
       setCreateLoading(false);
@@ -346,7 +619,10 @@ export const UserManagementWorkspace: React.FC = () => {
         u.uid === selectedUser.uid ? { ...u, role: editRole, permissions: editPermissions } : u
       )
     );
-    setBannerNotice(`Updated ${selectedUser.displayName}'s role to ${editRole}.`);
+    setBannerNotice({
+      text: `Updated ${selectedUser.displayName}'s role to ${editRole}.`,
+      severity: 'success',
+    });
     setEditLoading(false);
     setEditRoleDialogOpen(false);
   };
@@ -367,16 +643,25 @@ export const UserManagementWorkspace: React.FC = () => {
     setUsers((prev) =>
       prev.map((u) => (u.uid === user.uid ? { ...u, status: nextStatus } : u))
     );
-    setBannerNotice(`Account status for ${user.displayName} updated to ${nextStatus.toUpperCase()}.`);
+    setBannerNotice({
+      text: `Account status for ${user.displayName} updated to ${nextStatus.toUpperCase()}.`,
+      severity: 'info',
+    });
   };
 
   const handleSendReset = async (email: string) => {
     try {
       await sendPasswordResetEmail(email);
-      setBannerNotice(`Password reset link successfully dispatched to ${email}.`);
+      setBannerNotice({
+        text: `Password reset link successfully dispatched to ${email}.`,
+        severity: 'success',
+      });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Reset link dispatch error';
-      setBannerNotice(`Notice for ${email}: ${msg}`);
+      setBannerNotice({
+        text: `Notice for ${email}: ${msg}`,
+        severity: 'error',
+      });
     }
   };
 
@@ -502,20 +787,49 @@ export const UserManagementWorkspace: React.FC = () => {
             Manage employee access, configure RBAC roles (Admin, Manager, Telecaller, Field Agent) & security.
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<AddIcon />}
-          onClick={handleOpenCreate}
-          sx={{ fontWeight: 600, textTransform: 'none', px: 2.5 }}
-        >
-          Add Staff Member
-        </Button>
+        <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+          <Button
+            variant="outlined"
+            color="secondary"
+            startIcon={<CloudUploadIcon />}
+            onClick={handleSeedDatabase}
+            disabled={seedingLoading}
+            sx={{ fontWeight: 700, textTransform: 'none', px: 2, borderWidth: 2 }}
+          >
+            {seedingLoading ? 'Seeding Firestore...' : '⚡ Push All Demo Data to Database'}
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<AddIcon />}
+            onClick={handleOpenCreate}
+            sx={{ fontWeight: 600, textTransform: 'none', px: 2.5 }}
+          >
+            Add Staff Member
+          </Button>
+        </Box>
       </Box>
 
+      {seedingLoading && seedingProgress && (
+        <Paper elevation={2} sx={{ p: 2.5, mb: 3, borderRadius: 2, bgcolor: 'background.paper', border: '1px solid', borderColor: 'secondary.main' }}>
+          <Typography variant="subtitle2" fontWeight={700} color="secondary.main" gutterBottom>
+            {seedingProgress.message}
+          </Typography>
+          <LinearProgress
+            variant="determinate"
+            value={seedingProgress.total > 0 ? (seedingProgress.current / seedingProgress.total) * 100 : 0}
+            color="secondary"
+            sx={{ height: 8, borderRadius: 4, my: 1 }}
+          />
+          <Typography variant="caption" color="text.secondary">
+            Writing {seedingProgress.current} of {seedingProgress.total} documents into Firebase Firestore collections...
+          </Typography>
+        </Paper>
+      )}
+
       {bannerNotice && (
-        <Alert severity="success" sx={{ mb: 3 }} onClose={() => setBannerNotice(null)}>
-          {bannerNotice}
+        <Alert severity={bannerNotice.severity} sx={{ mb: 3 }} onClose={() => setBannerNotice(null)}>
+          {bannerNotice.text}
         </Alert>
       )}
 

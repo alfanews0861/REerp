@@ -85,7 +85,21 @@ export class NetworkService {
       updatedAt: new Date().toISOString()
     }, userId);
 
-    // TODO: Update all descendants' ancestor arrays (Cascade update)
-    // This requires a batch update of all members where `ancestors` array contains `memberId`
+    // Cascade update: update all descendants' ancestor arrays
+    if (this.memberRepo.findDescendants) {
+      const descendants = await this.memberRepo.findDescendants(memberId);
+      for (const descendant of descendants) {
+        const memberIdx = descendant.ancestors.indexOf(memberId);
+        if (memberIdx !== -1) {
+          const subsequentAncestors = descendant.ancestors.slice(memberIdx + 1);
+          const updatedAncestors = [...newAncestors, memberId, ...subsequentAncestors];
+          await this.memberRepo.update(descendant.id, {
+            ancestors: updatedAncestors,
+            updatedBy: userId,
+            updatedAt: new Date().toISOString()
+          }, userId);
+        }
+      }
+    }
   }
 }

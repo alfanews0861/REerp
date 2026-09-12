@@ -1,0 +1,554 @@
+﻿<!DOCTYPE html>
+<html lang="te">
+<head>
+  <meta charset="UTF-8">
+  <title>Real Estate ERP - పబ్లిక్ వెబ్‌సైట్ ఫీచర్ల వివరాలు</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+    @page {
+      size: A4;
+      margin: 11mm 13mm;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Noto Sans Telugu', 'Nirmala UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #0f172a;
+      background-color: #ffffff;
+      line-height: 1.45;
+      font-size: 11.2px;
+    }
+
+    .page {
+      page-break-after: always;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .page:last-child {
+      page-break-after: avoid;
+    }
+
+    /* Header */
+    .header {
+      border-bottom: 2.5px solid #059669;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .brand-title {
+      font-size: 21px;
+      font-weight: 800;
+      color: #065f46;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-subtitle {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #059669;
+      margin-top: 1px;
+    }
+
+    .doc-meta {
+      text-align: right;
+      font-size: 9.5px;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
+    .badge-pill {
+      display: inline-block;
+      background-color: #ecfdf5;
+      color: #047857;
+      font-size: 9.5px;
+      font-weight: 600;
+      padding: 1.5px 7px;
+      border-radius: 9999px;
+      border: 1px solid #a7f3d0;
+      margin-top: 3px;
+    }
+
+    /* Overview Box */
+    .overview-box {
+      background: #f8fafc;
+      border-left: 4px solid #059669;
+      border-top: 1px solid #e2e8f0;
+      border-right: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 8px 12px;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 10px;
+      font-size: 11.2px;
+      color: #334155;
+    }
+
+    /* Feature Grid */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin-bottom: 10px;
+    }
+
+    .feature-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 7px;
+      padding: 8px 11px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 4px;
+      margin-bottom: 5px;
+    }
+
+    .card-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .tag-badge {
+      font-size: 8.5px;
+      font-weight: 700;
+      padding: 1.5px 5px;
+      border-radius: 4px;
+      background: #ecfdf5;
+      color: #047857;
+      border: 0.5px solid #a7f3d0;
+    }
+
+    ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+
+    ul li {
+      position: relative;
+      padding-left: 12px;
+      margin-bottom: 2.5px;
+      color: #334155;
+      font-size: 10.8px;
+      line-height: 1.4;
+    }
+
+    ul li::before {
+      content: "•";
+      position: absolute;
+      left: 2px;
+      color: #059669;
+      font-weight: bold;
+      font-size: 12px;
+    }
+
+    /* Section Heading */
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-bottom: 1.5px solid #e2e8f0;
+      padding-bottom: 4px;
+      margin-bottom: 7px;
+      margin-top: 4px;
+    }
+
+    /* Tables */
+    .table-container {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10px;
+      margin-bottom: 10px;
+    }
+
+    .table-container th, .table-container td {
+      border: 1px solid #cbd5e1;
+      padding: 5px 7px;
+      text-align: left;
+    }
+
+    .table-container th {
+      background-color: #f1f5f9;
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    .table-container tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    .badge-live {
+      color: #059669;
+      font-weight: 700;
+    }
+
+    .badge-feature {
+      color: #2563eb;
+      font-weight: 700;
+    }
+
+    /* Process Flow */
+    .flow-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-bottom: 10px;
+    }
+
+    .flow-title {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #065f46;
+      margin-bottom: 5px;
+    }
+
+    .flow-steps {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .flow-step {
+      flex: 1;
+      background: #ffffff;
+      border: 1px solid #a7f3d0;
+      border-radius: 6px;
+      padding: 5px 6px;
+      text-align: center;
+      font-size: 9px;
+    }
+
+    .flow-step strong {
+      display: block;
+      color: #065f46;
+      font-size: 9.5px;
+      margin-bottom: 2px;
+    }
+
+    .flow-arrow {
+      color: #94a3b8;
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: auto;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 5px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 9px;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PAGE 1 -->
+  <div class="page">
+    <div class="header">
+      <div>
+        <div class="brand-title">Enterprise Real Estate ERP</div>
+        <div class="brand-subtitle">పబ్లిక్ వెబ్‌సైట్ పోర్టల్ - సమగ్ర ఫీచర్ల వివరణ (Public Website Specification)</div>
+        <span class="badge-pill">App Directory: apps/public-website (React 19 + Vite + MUI + Gemini AI)</span>
+      </div>
+      <div class="doc-meta">
+        <strong>డాక్యుమెంట్:</strong> Public Portal Feature Guide<br>
+        <strong>ప్లాట్‌ఫారమ్:</strong> Web Portal (Mobile & Desktop Responsive)<br>
+        <strong>తేదీ:</strong> సెప్టెంబర్ 2026 &bull; వెర్షన్: 1.0
+      </div>
+    </div>
+
+    <div class="overview-box">
+      <strong>సిస్టమ్ పరిచయం (Public Portal Overview):</strong><br>
+      <strong>Public Website (`apps/public-website`)</strong> అనేది కస్టమర్లు ప్రాపర్టీలను అన్వేషించడానికి, ప్లాట్లను ఎంపిక చేసుకోవడానికి మరియు లీడ్స్ సంపాదించడానికి రూపొందించిన హై-పెర్ఫార్మెన్స్ పోర్టల్. రియల్-టైమ్ ఇన్వెంటరీ, ఇంటరాక్టివ్ మాస్టర్ లేఅవుట్ మ్యాప్, ఆన్‌లైన్ టోకెన్ బుకింగ్, ఉచిత సైట్ విజిట్ బుకింగ్ మరియు <strong>Google Gemini AI Assistant</strong> వంటి విప్లవాత్మక ఫీచర్లతో ఇది రూపొందించబడింది.
+    </div>
+
+    <div class="feature-grid">
+      <!-- 1. Home Page & ROI Calculator -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">1. హోమ్ పోర్టల్ & ల్యాండ్ ROI క్యాలిక్యులేటర్</span>
+          <span class="tag-badge">కస్టమర్ పోర్టల్</span>
+        </div>
+        <ul>
+          <li><strong>Hero Property Showcase:</strong> HMDA / DTCP అప్రూవ్డ్ గేటెడ్ వెంచర్ల హై-రిజల్యూషన్ బ్యానర్లు.</li>
+          <li><strong>Interactive Search Bar:</strong> ప్రాజెక్ట్ లొకేషన్ మరియు ఫేసింగ్ (ఈస్ట్/వెస్ట్/నార్త్/సౌత్) ఫిల్టర్లు.</li>
+          <li><strong>Smart ROI Calculator:</strong> పెట్టుబడి మొత్తం & కాలవ్యవధి స్లైడర్ల ఆధారంగా 18% CAGR తో ఫ్యూచర్ ల్యాండ్ వ్యాల్యూ అంచనా.</li>
+          <li><strong>Trust Highlights:</strong> 100% క్లియర్ టైటిల్, స్పాట్ రిజిస్ట్రేషన్ మరియు బ్యాంక్ లోన్ సదుపాయం.</li>
+        </ul>
+      </div>
+
+      <!-- 2. Master Layout Map -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">2. ఇంటరాక్టివ్ మాస్టర్ లేఅవుట్ మ్యాప్</span>
+          <span class="tag-badge">ఇంటరాక్టివ్ SVG మ్యాప్</span>
+        </div>
+        <ul>
+          <li><strong>Digital Venture Layout:</strong> వెంచర్ పూర్తి మాస్టర్ లేఅవుట్‌ను డిజిటల్ మ్యాప్ రూపంలో వీక్షించవచ్చు.</li>
+          <li><strong>Color Coded Status:</strong> ప్లాట్ల లైవ్ స్థితి (ఆకుపచ్చ: Available, పసుపు: Hold, ఎరుపు: Booked).</li>
+          <li><strong>Interactive Zoom & Pan:</strong> జూమ్-ఇన్, జూమ్-అవుట్ మరియు రీసెట్ వ్యూ కంట్రోల్స్.</li>
+          <li><strong>Plot Click Details:</strong> ప్లాట్‌పై క్లిక్ చేయగానే గజాలు, కొలతలు, ఫేసింగ్ మరియు మొత్తం ధర డిస్‌ప్లే.</li>
+        </ul>
+      </div>
+
+      <!-- 3. Real-time Plot Explorer -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">3. రియల్-టైమ్ ప్లాట్ ఎక్స్‌ప్లోరర్</span>
+          <span class="tag-badge">లైవ్ ఇన్వెంటరీ</span>
+        </div>
+        <ul>
+          <li><strong>Dual View Switcher:</strong> కార్డ్ గ్రిడ్ వ్యూ (Grid View) మరియు మ్యాప్ వ్యూ (Map View) మధ్య సులువుగా మారవచ్చు.</li>
+          <li><strong>Advanced Filters:</strong> సైజ్ (<180, 180-260, >260 గజాలు), ఫేసింగ్ మరియు కార్నర్ ప్లాట్ల ఫిల్టర్లు.</li>
+          <li><strong>Transparent Pricing:</strong> బేస్ రేట్, ఫేసింగ్ ప్రీమియం, కార్నర్ ఛార్జీలతో కూడిన స్పష్టమైన కొటేషన్.</li>
+          <li><strong>Direct Action Triggers:</strong> ప్రతి ప్లాట్ నుండి నేరుగా టోకెన్ హోల్డ్ లేదా సైట్ విజిట్ బుక్ చేసే వెసులుబాటు.</li>
+        </ul>
+      </div>
+
+      <!-- 4. Online Token Booking -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">4. ఆన్‌లైన్ టోకెన్ బుకింగ్ & ప్లాట్ హోల్డ్</span>
+          <span class="tag-badge">ఇన్‌స్టంట్ రిజర్వేషన్</span>
+        </div>
+        <ul>
+          <li><strong>Instant Plot Hold:</strong> నచ్చిన ప్లాట్‌ను వెబ్‌సైట్ నుండే నేరుగా హోల్డ్‌లో పెట్టుకునే సదుపాయం.</li>
+          <li><strong>48-Hour Protection:</strong> బుక్ చేసిన ప్లాట్ 48 గంటల పాటు ఇతరులకు బుకింగ్ కాకుండా ఆటో-లాకింగ్.</li>
+          <li><strong>Booking ID Generation:</strong> కస్టమర్‌కు వెంటనే యునిక్ రిఫరెన్స్ నంబర్ మరియు రసీదు అందజేత.</li>
+          <li><strong>Live Inventory Update:</strong> ప్లాట్ హోల్డ్ చేయగానే వెబ్‌సైట్ మరియు అడ్మిన్ పోర్టల్‌లో క్షణాల్లో స్టేటస్ అప్‌డేట్.</li>
+        </ul>
+      </div>
+
+      <!-- 5. Free Site Visit Booking -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">5. ఉచిత AC క్యాబ్ సైట్ విజిట్ బుకింగ్</span>
+          <span class="tag-badge">డోర్‌స్టెప్ సర్వీస్</span>
+        </div>
+        <ul>
+          <li><strong>Complimentary AC Cab:</strong> కస్టమర్ ఇంటి వద్ద నుండే ఉచిత ఏసీ క్యాబ్ పికప్ & డ్రాప్ రిక్వెస్ట్.</li>
+          <li><strong>Preferred Scheduling:</strong> నచ్చిన తేదీ, సమయం మరియు పికప్ లొకేషన్ ఎంపిక.</li>
+          <li><strong>Instant Dispatch:</strong> రిక్వెస్ట్ చేసిన వెంటనే సేల్స్ టీమ్ మరియు మొబైల్ యాప్ డ్రైవర్లకు ఆటోమేటిక్ అలర్ట్.</li>
+          <li><strong>WhatsApp & SMS Updates:</strong> కస్టమర్‌కు విజిట్ కన్ఫర్మేషన్ మరియు డ్రైవర్ వివరాల మెసేజ్.</li>
+        </ul>
+      </div>
+
+      <!-- 6. Gemini AI Assistant -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">6. జెమిని AI రియల్ ఎస్టేట్ అడ్వైజర్</span>
+          <span class="tag-badge">Google Gemini AI</span>
+        </div>
+        <ul>
+          <li><strong>24/7 AI Smart Bot:</strong> రియల్ ఎస్టేట్ ప్రశ్నలకు తక్షణమే సమాధానాలు ఇచ్చే జెమిని AI చాట్‌బాట్.</li>
+          <li><strong>Multilingual Dialogue:</strong> తెలుగు, హిందీ మరియు ఇంగ్లీష్ భాషల్లో ప్రశ్నలకు స్పష్టమైన వివరణలు.</li>
+          <li><strong>Regulatory Guidance:</strong> HMDA vs DTCP నిబంధనలు, హైదరాబాద్ గ్రోత్ కారిడార్ల (Mokila, Kollur) వివరాలు.</li>
+          <li><strong>In-Chat Booking:</strong> కస్టమర్ బడ్జెట్‌కు తగిన ప్లాట్లను సిఫార్సు చేసి, చాట్ లోపలే విజిట్ షెడ్యూల్ చేసే సామర్థ్యం.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span>Enterprise Real Estate Marketing ERP &bull; Public Portal Documentation</span>
+      <span>Page 1 of 2</span>
+    </div>
+  </div>
+
+  <!-- PAGE 2 -->
+  <div class="page">
+    <div class="header">
+      <div>
+        <div class="brand-title">Enterprise Real Estate ERP</div>
+        <div class="brand-subtitle">వెంచర్ షోకేస్, బహుభాషా సదుపాయం & CRM ఇంటిగ్రేషన్ (Showcase & CRM)</div>
+      </div>
+      <div class="doc-meta">
+        <strong>డాక్యుమెంట్:</strong> Public Portal Feature Guide - Page 2<br>
+        <strong>ప్లాట్‌ఫారమ్:</strong> Web Portal (Vite + React 19)
+      </div>
+    </div>
+
+    <div class="feature-grid">
+      <!-- 7. Venture Detail Showcase -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">7. వెంచర్ సమగ్ర వివరాల పేజీ (Venture Showcase)</span>
+          <span class="tag-badge">ప్రాజెక్ట్ ప్రొఫైల్</span>
+        </div>
+        <ul>
+          <li><strong>Comprehensive Highlights:</strong> ప్రాజెక్ట్ విస్తీర్ణం, ఫేజ్‌లు, మొత్తం ప్లాట్ల సంఖ్య మరియు అందుబాటులో ఉన్న ప్లాట్లు.</li>
+          <li><strong>Premium Amenities:</strong> క్లబ్‌హౌస్, 40 & 33 అడుగుల బీటీ రోడ్లు, అండర్‌గ్రౌండ్ డ్రైనేజ్, 24/7 సెక్యూరిటీ.</li>
+          <li><strong>Location Geolocation:</strong> ఔటర్ రింగ్ రోడ్ (ORR), ఐటీ కారిడార్లు, విద్యాసంస్థలకు ఉండే ప్రయాణ సమయాల మ్యాట్రిక్స్.</li>
+          <li><strong>Approval Docs:</strong> RERA అనుమతి పత్రాలు మరియు బ్రోచర్‌లను నేరుగా డౌన్‌లోడ్ చేసుకునే సదుపాయం.</li>
+        </ul>
+      </div>
+
+      <!-- 8. Multilingual & Responsive UI -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">8. బహుభాషా సదుపాయం & రెస్పాన్సివ్ డిజైన్</span>
+          <span class="tag-badge">తెలుగు & ఇంగ్లీష్</span>
+        </div>
+        <ul>
+          <li><strong>Language Switcher:</strong> ఒకే క్లిక్‌తో తెలుగు (తెలుగు) మరియు ఇంగ్లీష్ భాషల మధ్య కంటెంట్ మార్చుకునే వెసులుబాటు.</li>
+          <li><strong>Mobile First Design:</strong> స్మార్ట్‌ఫోన్లు, టాబ్లెట్లు మరియు డెస్క్‌టాప్‌లలో వేగవంతమైన బ్రౌజింగ్ అనుభవం.</li>
+          <li><strong>1-Tap Connect:</strong> కస్టమర్ కేర్ డైరెక్ట్ కాల్ బటన్ మరియు 💬 వాట్సాప్ చాట్ ఫ్లోటింగ్ బటన్లు.</li>
+        </ul>
+      </div>
+
+      <!-- 9. Seamless CRM Ingestion -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">9. ఆటోమేటిక్ లీడ్స్ క్యాప్చర్ & CRM సింక్</span>
+          <span class="tag-badge">ఆటోమేషన్</span>
+        </div>
+        <ul>
+          <li><strong>Zero Lead Leakage:</strong> వెబ్‌సైట్ ద్వారా వచ్చే ప్రతి ఎంక్వైరీ క్షణాల్లో అడ్మిన్ CRM లీడ్స్ పూల్‌లో నమోదవుతుంది.</li>
+          <li><strong>UTM Source Attribution:</strong> Meta Ads, Google Ads లేదా ఆర్గానిక్ సెర్చ్ ద్వారా ఏ ప్రకటన నుండి లీడ్ వచ్చిందో ట్రాకింగ్.</li>
+          <li><strong>Lead Scoring:</strong> కస్టమర్ పరిశీలించిన ప్లాట్లు మరియు బడ్జెట్ ఆధారంగా ఆటోమేటిక్ లీడ్ క్వాలిఫికేషన్.</li>
+        </ul>
+      </div>
+
+      <!-- 10. Contact & Branch Locator -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">10. సంప్రదింపులు & బ్రాంచ్ లొకేషన్లు</span>
+          <span class="tag-badge">కస్టమర్ సపోర్ట్</span>
+        </div>
+        <ul>
+          <li><strong>Branch Directory:</strong> హైదరాబాద్‌లోని ప్రధాన బ్రాంచ్ ఆఫీసులు మరియు సైట్ ఆఫీసుల చిరునామాలు, ఫోన్ నంబర్లు.</li>
+          <li><strong>Interactive Contact Form:</strong> ప్రశ్నలు, సందేహాలు నివృత్తి చేసుకునే ఆన్‌లైన్ ఎంక్వైరీ ఫారమ్.</li>
+          <li><strong>Google Maps Navigation:</strong> సైట్ ఆఫీసులకు నేరుగా నావిగేట్ చేసుకునేందుకు గూగుల్ మ్యాప్స్ లింకులు.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Process Flow: Customer Journey -->
+    <div class="flow-box">
+      <div class="flow-title">🔄 వెబ్‌సైట్ కస్టమర్ జర్నీ & బ్యాకెండ్ సింక్రొనైజేషన్ (Customer Experience Flow)</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <strong>1. ప్లాట్ల పరిశీలన</strong>
+          లేఅవుట్ మ్యాప్ & ROI క్యాలిక్యులేటర్
+        </div>
+        <div class="flow-arrow">➔</div>
+        <div class="flow-step">
+          <strong>2. AI సలహా & ఎంపిక</strong>
+          జెమిని AI సహాయంతో బడ్జెట్ ప్లాట్
+        </div>
+        <div class="flow-arrow">➔</div>
+        <div class="flow-step">
+          <strong>3. టోకెన్ / సైట్ విజిట్</strong>
+          48-గంటల హోల్డ్ లేదా ఏసీ క్యాబ్ బుకింగ్
+        </div>
+        <div class="flow-arrow">➔</div>
+        <div class="flow-step">
+          <strong>4. CRM లీడ్ కేటాయింపు</strong>
+          టెలికాలర్ & సేల్స్ ఎగ్జిక్యూటివ్‌కు అలర్ట్
+        </div>
+        <div class="flow-arrow">➔</div>
+        <div class="flow-step">
+          <strong>5. ఫీల్డ్ ఎగ్జిక్యూషన్</strong>
+          మొబైల్ యాప్‌లో డ్రైవర్ పికప్ & విజిట్
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature Matrix Table -->
+    <div class="section-title">
+      <span>📑 పబ్లిక్ వెబ్‌సైట్ ఫీచర్ల సారాంశ పట్టిక (Public Portal Feature Matrix)</span>
+    </div>
+
+    <table class="table-container">
+      <thead>
+        <tr>
+          <th>ఫీచర్ మాడ్యూల్</th>
+          <th>ప్రధాన ప్రయోజనం</th>
+          <th>కస్టమర్ చర్య (Customer Action)</th>
+          <th>లైవ్ డేటా సపోర్ట్</th>
+          <th>బ్యాకెండ్ ఇంటిగ్రేషన్</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>హోమ్ పోర్టల్ & ROI</strong></td>
+          <td>వెంచర్ల అన్వేషణ & ల్యాండ్ అప్రిసియేషన్ లెక్కింపు</td>
+          <td>స్లైడర్లతో ఫ్యూచర్ రిటర్న్స్ లెక్కించడం</td>
+          <td><span class="badge-live">రియల్-టైమ్</span></td>
+          <td>ప్రాజెక్ట్ డేటాబేస్ లింక్</td>
+        </tr>
+        <tr>
+          <td><strong>మాస్టర్ లేఅవుట్ మ్యాప్</strong></td>
+          <td>వెంచర్ పూర్తి లేఅవుట్‌ను డిజిటల్‌గా చూడటం</td>
+          <td>ప్లాట్లపై క్లిక్ చేసి కొలతలు, ధర చూడటం</td>
+          <td><span class="badge-live">లైవ్ ప్లాట్ స్టేటస్</span></td>
+          <td>ఇన్వెంటరీ మేనేజ్‌మెంట్</td>
+        </tr>
+        <tr>
+          <td><strong>ప్లాట్ ఎక్స్‌ప్లోరర్</strong></td>
+          <td>ఫేసింగ్, సైజ్ మరియు బడ్జెట్ వారీగా ఫిల్టరింగ్</td>
+          <td>ఈస్ట్/నార్త్/కార్నర్ ప్లాట్లను సెలెక్ట్ చేయడం</td>
+          <td><span class="badge-live">క్షణం క్షణం అప్‌డేట్</span></td>
+          <td>ప్లాట్ ప్రైసింగ్ ఇంజిన్</td>
+        </tr>
+        <tr>
+          <td><strong>టోకెన్ బుకింగ్</strong></td>
+          <td>నచ్చిన ప్లాట్‌ను ఆన్‌లైన్‌లో 48 గంటలు హోల్డ్ చేయడం</td>
+          <td>టోకెన్ అడ్వాన్స్ వివరాలు సబ్మిట్ చేయడం</td>
+          <td><span class="badge-live">ఆటో-లాకింగ్ సపోర్ట్</span></td>
+          <td>సేల్స్ బుకింగ్స్ క్యూ</td>
+        </tr>
+        <tr>
+          <td><strong>ఉచిత సైట్ విజిట్</strong></td>
+          <td>ఇంటి వద్ద నుండే ఏసీ క్యాబ్ పికప్‌తో సైట్ చూడటం</td>
+          <td>తేదీ, సమయం, లొకేషన్ ఎంపిక చేయడం</td>
+          <td><span class="badge-live">తక్షణ అలర్ట్</span></td>
+          <td>మొబైల్ యాప్ డ్రైవర్స్ లాగ్</td>
+        </tr>
+        <tr>
+          <td><strong>జెమిని AI అడ్వైజర్</strong></td>
+          <td>24/7 ప్లాట్ గైడెన్స్ మరియు సందేహాల నివృత్తి</td>
+          <td>తెలుగు/ఇంగ్లీష్‌లో ప్రశ్నలు అడగడం</td>
+          <td><span class="badge-feature">Google Gemini AI</span></td>
+          <td>ఇంటెలిజెంట్ రికమండేషన్స్</td>
+        </tr>
+        <tr>
+          <td><strong>బహుభాషా సదుపాయం</strong></td>
+          <td>తెలుగు మరియు ఇంగ్లీష్ భాషల్లో బ్రౌజింగ్</td>
+          <td>లాంగ్వేజ్ స్విచ్చర్ ద్వారా మార్చడం</td>
+          <td><span class="badge-feature">ద్విభాషా సపోర్ట్</span></td>
+          <td>i18n లాంగ్వేజ్ ఇంజిన్</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="footer">
+      <span>Enterprise Real Estate Marketing ERP &bull; Public Portal Documentation</span>
+      <span>Page 2 of 2</span>
+    </div>
+  </div>
+
+</body>
+</html>

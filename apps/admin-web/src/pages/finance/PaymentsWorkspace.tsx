@@ -13,17 +13,15 @@ import {
   MenuItem,
   Stack,
   IconButton,
-  Divider,
   Chip,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
-import PrintIcon from '@mui/icons-material/Print';
-import CloseIcon from '@mui/icons-material/Close';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { DataTable, MetricCard, SearchBox, StatusChip } from '@real-estate-erp/ui';
 import { getFirebaseInstance, paymentService } from '@real-estate-erp/firebase';
 import { collection, query, getDocs, limit, orderBy } from 'firebase/firestore';
+import { OfficialReceiptModal } from './components/OfficialReceiptModal';
 
 export interface PaymentRecord {
   id: string;
@@ -44,7 +42,7 @@ export interface PaymentRecord {
   remarks?: string;
 }
 
-const SEED_PAYMENTS: PaymentRecord[] = [
+export const SEED_PAYMENTS: PaymentRecord[] = [
   {
     id: 'pay-1',
     paymentNumber: 'PAY-1001',
@@ -55,13 +53,13 @@ const SEED_PAYMENTS: PaymentRecord[] = [
     customerName: 'Rajesh Sharma',
     customerPhone: '+91 98480 22338',
     plotNumber: 'P-12',
-    projectName: 'Sunrise Enclave',
+    projectName: 'Sunrise Enclave (Mokila)',
     amount: 200000,
     paymentDate: '2026-09-01T10:35:00Z',
     paymentMethod: 'UPI',
     transactionRef: 'UPI/9848022338/928371',
     status: 'verified',
-    remarks: 'Booking token payment',
+    remarks: 'Initial token booking amount',
   },
   {
     id: 'pay-2',
@@ -73,13 +71,13 @@ const SEED_PAYMENTS: PaymentRecord[] = [
     customerName: 'Rajesh Sharma',
     customerPhone: '+91 98480 22338',
     plotNumber: 'P-12',
-    projectName: 'Sunrise Enclave',
+    projectName: 'Sunrise Enclave (Mokila)',
     amount: 300000,
     paymentDate: '2026-09-04T16:20:00Z',
     paymentMethod: 'BANK_TRANSFER',
     transactionRef: 'NEFT-HDFC-0019284',
     status: 'verified',
-    remarks: 'First installment payment',
+    remarks: 'First installment payment cleared',
   },
   {
     id: 'pay-3',
@@ -91,13 +89,13 @@ const SEED_PAYMENTS: PaymentRecord[] = [
     customerName: 'Suresh Verma',
     customerPhone: '+91 94401 55667',
     plotNumber: 'P-45',
-    projectName: 'Sunrise Enclave',
+    projectName: 'Sunrise Enclave (Mokila)',
     amount: 1800000,
     paymentDate: '2026-08-20T14:30:00Z',
     paymentMethod: 'BANK_TRANSFER',
     transactionRef: 'RTGS-SBIN-994821',
     status: 'verified',
-    remarks: 'Full outright settlement',
+    remarks: 'Full outright settlement prior to registration',
   },
   {
     id: 'pay-4',
@@ -109,13 +107,175 @@ const SEED_PAYMENTS: PaymentRecord[] = [
     customerName: 'Anita Reddy',
     customerPhone: '+91 91234 56789',
     plotNumber: 'P-78',
-    projectName: 'Green Valley Phase 2',
+    projectName: 'Green Valley Phase 2 (Shadnagar)',
     amount: 300000,
     paymentDate: '2026-09-05T11:15:00Z',
     paymentMethod: 'CHEQUE',
     transactionRef: 'CHQ-882910-ICICI',
+    status: 'verified',
+    remarks: 'Token cheque cleared successfully',
+  },
+  {
+    id: 'pay-5',
+    paymentNumber: 'PAY-1005',
+    receiptNumber: 'REC-2026-085',
+    bookingId: 'bkg-4',
+    bookingNumber: 'BKG-2026-004',
+    customerId: 'cust-4',
+    customerName: 'Kalyan Chakravarthy',
+    customerPhone: '+91 98480 33441',
+    plotNumber: 'PC-15',
+    projectName: 'Palm County (Kollur)',
+    amount: 500000,
+    paymentDate: '2026-09-02T16:45:00Z',
+    paymentMethod: 'BANK_TRANSFER',
+    transactionRef: 'NEFT-AXIS-9102834',
+    status: 'verified',
+    remarks: 'Booking advance token',
+  },
+  {
+    id: 'pay-6',
+    paymentNumber: 'PAY-1006',
+    receiptNumber: 'REC-2026-086',
+    bookingId: 'bkg-4',
+    bookingNumber: 'BKG-2026-004',
+    customerId: 'cust-4',
+    customerName: 'Kalyan Chakravarthy',
+    customerPhone: '+91 98480 33441',
+    plotNumber: 'PC-15',
+    projectName: 'Palm County (Kollur)',
+    amount: 1000000,
+    paymentDate: '2026-09-08T12:30:00Z',
+    paymentMethod: 'BANK_TRANSFER',
+    transactionRef: 'RTGS-AXIS-0099182',
+    status: 'verified',
+    remarks: 'Agreement down-payment tranche',
+  },
+  {
+    id: 'pay-7',
+    paymentNumber: 'PAY-1007',
+    receiptNumber: 'REC-2026-087',
+    bookingId: 'bkg-5',
+    bookingNumber: 'BKG-2026-005',
+    customerId: 'cust-5',
+    customerName: 'Dr. Haritha Rao',
+    customerPhone: '+91 98480 44552',
+    plotNumber: 'P-06',
+    projectName: 'Sunrise Enclave (Mokila)',
+    amount: 300000,
+    paymentDate: '2026-09-07T12:15:00Z',
+    paymentMethod: 'UPI',
+    transactionRef: 'UPI/ICICI/882719284',
+    status: 'verified',
+    remarks: 'Token hold advance payment',
+  },
+  {
+    id: 'pay-8',
+    paymentNumber: 'PAY-1008',
+    receiptNumber: 'REC-2026-088',
+    bookingId: 'bkg-6',
+    bookingNumber: 'BKG-2026-006',
+    customerId: 'cust-6',
+    customerName: 'Satyanarayana Murthy',
+    customerPhone: '+91 98480 55663',
+    plotNumber: 'RM-22',
+    projectName: 'Royal Meadows (Shankarpally)',
+    amount: 4200000,
+    paymentDate: '2026-08-28T15:45:00Z',
+    paymentMethod: 'BANK_TRANSFER',
+    transactionRef: 'RTGS-KOTAK-778819',
+    status: 'verified',
+    remarks: 'Full settlement for registered sale deed',
+  },
+  {
+    id: 'pay-9',
+    paymentNumber: 'PAY-1009',
+    receiptNumber: 'REC-2026-089',
+    bookingId: 'bkg-7',
+    bookingNumber: 'BKG-2026-007',
+    customerId: 'cust-7',
+    customerName: 'Venkat Raman',
+    customerPhone: '+91 98480 66774',
+    plotNumber: 'GV-33',
+    projectName: 'Green Valley Phase 2 (Shadnagar)',
+    amount: 1950000,
+    paymentDate: '2026-08-25T12:00:00Z',
+    paymentMethod: 'BANK_TRANSFER',
+    transactionRef: 'RTGS-SBIN-889921',
+    status: 'verified',
+    remarks: 'Outright payment for Shadnagar venture',
+  },
+  {
+    id: 'pay-10',
+    paymentNumber: 'PAY-1010',
+    receiptNumber: 'REC-2026-090',
+    bookingId: 'bkg-9',
+    bookingNumber: 'BKG-2026-009',
+    customerId: 'cust-9',
+    customerName: 'Lakshmi Prasanna',
+    customerPhone: '+91 98480 88996',
+    plotNumber: 'PC-40',
+    projectName: 'Palm County (Kollur)',
+    amount: 500000,
+    paymentDate: '2026-09-04T14:30:00Z',
+    paymentMethod: 'UPI',
+    transactionRef: 'UPI/HDFC/992817264',
+    status: 'verified',
+    remarks: 'Booking token payment',
+  },
+  {
+    id: 'pay-11',
+    paymentNumber: 'PAY-1011',
+    receiptNumber: 'REC-2026-091',
+    bookingId: 'bkg-9',
+    bookingNumber: 'BKG-2026-009',
+    customerId: 'cust-9',
+    customerName: 'Lakshmi Prasanna',
+    customerPhone: '+91 98480 88996',
+    plotNumber: 'PC-40',
+    projectName: 'Palm County (Kollur)',
+    amount: 500000,
+    paymentDate: '2026-09-10T11:00:00Z',
+    paymentMethod: 'CHEQUE',
+    transactionRef: 'CHQ-991823-SBI',
     status: 'pending',
-    remarks: 'Token cheque submitted, clearing pending',
+    remarks: 'Installment cheque submitted, awaiting clearance',
+  },
+  {
+    id: 'pay-12',
+    paymentNumber: 'PAY-1012',
+    receiptNumber: 'REC-2026-092',
+    bookingId: 'bkg-10',
+    bookingNumber: 'BKG-2026-010',
+    customerId: 'cust-10',
+    customerName: 'Dr. Ashok Varma (NRI)',
+    customerPhone: '+1 469 555 0192',
+    plotNumber: 'PC-01 (Corner Villa Plot)',
+    projectName: 'Palm County (Kollur)',
+    amount: 12000000,
+    paymentDate: '2026-08-22T09:30:00Z',
+    paymentMethod: 'BANK_TRANSFER',
+    transactionRef: 'SWIFT-WIRE-CHASE-009182',
+    status: 'verified',
+    remarks: 'NRI USD Foreign Inward Remittance full settlement',
+  },
+  {
+    id: 'pay-13',
+    paymentNumber: 'PAY-1013',
+    receiptNumber: 'REC-2026-093',
+    bookingId: 'bkg-12',
+    bookingNumber: 'BKG-2026-012',
+    customerId: 'cust-12',
+    customerName: 'Anitha Chowdary',
+    customerPhone: '+91 98480 22339',
+    plotNumber: 'RM-08',
+    projectName: 'Royal Meadows (Shankarpally)',
+    amount: 300000,
+    paymentDate: '2026-09-10T16:15:00Z',
+    paymentMethod: 'UPI',
+    transactionRef: 'UPI/ICICI/554819201',
+    status: 'verified',
+    remarks: 'Token advance for plot reservation',
   },
 ];
 
@@ -497,114 +657,11 @@ export const PaymentsWorkspace: React.FC = () => {
       </Dialog>
 
       {/* Official Printable Receipt Modal */}
-      {selectedReceipt && (
-        <Dialog open={receiptDialogOpen} onClose={() => setReceiptDialogOpen(false)} maxWidth="sm" fullWidth>
-          <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="h6" fontWeight={700} color="primary.main">
-              Official Payment Receipt
-            </Typography>
-            <IconButton onClick={() => setReceiptDialogOpen(false)} size="small">
-              <CloseIcon />
-            </IconButton>
-          </DialogTitle>
-          <DialogContent dividers>
-            <Box sx={{ p: 2, border: '2px solid #e2e8f0', borderRadius: 2, bgcolor: '#fafafa' }}>
-              {/* Receipt Header */}
-              <Box sx={{ textAlign: 'center', mb: 2 }}>
-                <Typography variant="h5" fontWeight={800} color="primary.main" letterSpacing={1}>
-                  REAL ESTATE ENTERPRISE ERP
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Registered Corporate Office: Financial District, Hyderabad | Tel: +91 40 1234 5678
-                </Typography>
-                <Divider sx={{ my: 1.5 }} />
-                <Typography variant="subtitle1" fontWeight={700} sx={{ textDecoration: 'underline' }}>
-                  RECEIPT OF PAYMENT
-                </Typography>
-              </Box>
-
-              {/* Receipt Meta */}
-              <Grid container spacing={1} sx={{ mb: 2 }}>
-                <Grid item xs={6}>
-                  <Typography variant="body2" color="text.secondary">Receipt No:</Typography>
-                  <Typography variant="body1" fontWeight={700}>{selectedReceipt.receiptNumber}</Typography>
-                </Grid>
-                <Grid item xs={6} sx={{ textAlign: 'right' }}>
-                  <Typography variant="body2" color="text.secondary">Date:</Typography>
-                  <Typography variant="body1" fontWeight={600}>
-                    {new Date(selectedReceipt.paymentDate).toLocaleDateString()}
-                  </Typography>
-                </Grid>
-              </Grid>
-
-              {/* Customer & Plot Info */}
-              <Stack spacing={1} sx={{ mb: 2 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="body2" color="text.secondary">Received From:</Typography>
-                  <Typography variant="body2" fontWeight={600}>{selectedReceipt.customerName}</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="body2" color="text.secondary">Contact Phone:</Typography>
-                  <Typography variant="body2">{selectedReceipt.customerPhone}</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="body2" color="text.secondary">Plot & Project:</Typography>
-                  <Typography variant="body2" fontWeight={600}>
-                    Plot {selectedReceipt.plotNumber}, {selectedReceipt.projectName}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="body2" color="text.secondary">Booking Reference:</Typography>
-                  <Typography variant="body2">{selectedReceipt.bookingNumber}</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="body2" color="text.secondary">Payment Mode:</Typography>
-                  <Typography variant="body2" fontWeight={500}>
-                    {selectedReceipt.paymentMethod} {selectedReceipt.transactionRef ? `(${selectedReceipt.transactionRef})` : ''}
-                  </Typography>
-                </Box>
-              </Stack>
-
-              <Divider sx={{ my: 1.5 }} />
-
-              {/* Amount Highlight */}
-              <Box sx={{ bgcolor: '#e0e7ff', p: 1.5, borderRadius: 1, textAlign: 'center', mb: 2 }}>
-                <Typography variant="body2" color="primary.dark" fontWeight={600}>
-                  AMOUNT RECEIVED
-                </Typography>
-                <Typography variant="h4" color="primary.main" fontWeight={800}>
-                  ₹{selectedReceipt.amount.toLocaleString('en-IN')}
-                </Typography>
-                {selectedReceipt.remarks && (
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                    Remarks: {selectedReceipt.remarks}
-                  </Typography>
-                )}
-              </Box>
-
-              {/* Footer Signatures */}
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mt: 3, pt: 2 }}>
-                <Box>
-                  <Typography variant="caption" color="text.secondary">System Generated Document</Typography>
-                  <Typography variant="caption" display="block" color="text.secondary">Verified electronically</Typography>
-                </Box>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Box sx={{ height: 30, borderBottom: '1px solid #94a3b8', width: 140, mb: 0.5 }} />
-                  <Typography variant="caption" fontWeight={600}>Authorized Signatory</Typography>
-                </Box>
-              </Box>
-            </Box>
-          </DialogContent>
-          <DialogActions sx={{ p: 2 }}>
-            <Button startIcon={<PrintIcon />} variant="outlined" onClick={() => window.print()}>
-              Print Receipt
-            </Button>
-            <Button variant="contained" onClick={() => setReceiptDialogOpen(false)}>
-              Close
-            </Button>
-          </DialogActions>
-        </Dialog>
-      )}
+      <OfficialReceiptModal
+        open={receiptDialogOpen}
+        onClose={() => setReceiptDialogOpen(false)}
+        receipt={selectedReceipt}
+      />
     </Box>
   );
 };

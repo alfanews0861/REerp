@@ -20,12 +20,30 @@ export interface Vehicle {
   updatedAt: string;
 }
 
+export interface Driver {
+  id: string;
+  name: string;
+  phone: string;
+  licenseNumber: string;
+  licenseExpiry?: string;
+  status: 'AVAILABLE' | 'ON_TRIP' | 'ON_LEAVE' | 'INACTIVE';
+  assignedVehicleId?: string;
+  assignedVehicleName?: string;
+  totalTripsCount?: number;
+  rating?: number;
+  branchId?: string;
+}
+
 export interface OdometerLog {
   id: string;
+  tripNumber?: string;
   vehicleId: string;
+  vehicleName?: string;
   driverId: string;
   driverName: string;
   tripType: 'SITE_VISIT' | 'MARKETING' | 'OFFICE_COMMUTE' | 'PERSONAL';
+  siteVisitProjectName?: string;
+  customerName?: string;
   startOdometerKm: number;
   endOdometerKm?: number;
   totalDistanceKm?: number;

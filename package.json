@@ -12,6 +12,7 @@
     "type-check": "turbo run type-check --concurrency=2",
     "typecheck": "turbo run type-check --concurrency=2",
     "clean": "turbo run clean",
+    "seed:db": "node scripts/seed-firestore.mjs",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\""
   },

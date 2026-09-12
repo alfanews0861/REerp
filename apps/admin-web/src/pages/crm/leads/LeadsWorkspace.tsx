@@ -7,6 +7,9 @@ import MapIcon from '@mui/icons-material/Map';
 import FilterListIcon from '@mui/icons-material/FilterList';
 
 import { useLeads } from '@real-estate-erp/hooks';
+import { getFirebaseInstance } from '@real-estate-erp/firebase';
+import { doc, writeBatch } from 'firebase/firestore';
+import { Lead } from '@real-estate-erp/types';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 import { setViewMode, LeadViewMode } from '../../../store/leadsSlice';
@@ -29,6 +32,24 @@ export const LeadsWorkspace: React.FC = () => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useLeads(activeFilters);
 
   const leads = data?.pages.flatMap(page => page.data) || [];
+  const selectedLeadObjects = leads.filter((l) => selectedLeads.includes(l.id));
+
+  const handleBatchUpdate = async (leadIds: string[], updates: Partial<Lead>) => {
+    try {
+      const { db } = getFirebaseInstance();
+      if (db && leadIds.length > 0) {
+        const batch = writeBatch(db);
+        for (const id of leadIds) {
+          const docRef = doc(db, 'leads', id);
+          batch.update(docRef, { ...updates, updatedAt: new Date().toISOString() });
+        }
+        await batch.commit();
+      }
+      setSelectedLeads([]);
+    } catch (err) {
+      console.error('Failed to batch update leads:', err);
+    }
+  };
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const bottom = e.currentTarget.scrollHeight - e.currentTarget.scrollTop <= e.currentTarget.clientHeight + 100;
@@ -74,7 +95,11 @@ export const LeadsWorkspace: React.FC = () => {
             {isFetchingNextPage && <Typography variant="body2" color="text.secondary">Loading more...</Typography>}
           </Box>
           <Box>
-            <BulkActionsMenu selectedCount={selectedLeads.length} onAction={(action) => console.log('Action:', action)} />
+            <BulkActionsMenu
+              selectedCount={selectedLeads.length}
+              selectedLeads={selectedLeadObjects}
+              onBatchUpdate={handleBatchUpdate}
+            />
           </Box>
         </Box>
 

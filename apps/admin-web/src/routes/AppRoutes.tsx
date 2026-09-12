@@ -5,16 +5,17 @@ import {
   PrivateRoute,
   GuestRoute,
   PublicRoute,
+  RoleRoute,
 } from '@real-estate-erp/ui';
 import { AppShell } from '../layouts/AppShell';
 
 // Lazy loading for all modules
-const Placeholder = lazy(() => import('../pages/PlaceholderPage'));
 const ExecutiveDashboard = lazy(() => import('../pages/dashboard/ExecutiveDashboard'));
 const CommandCenter = lazy(() => import('../pages/dashboard/CommandCenter'));
 const LeadsWorkspace = lazy(() => import('../pages/crm/leads/LeadsWorkspace'));
 const SiteVisitsWorkspace = lazy(() => import('../pages/crm/site-visits/SiteVisitsWorkspace'));
 const Customer360View = lazy(() => import('../pages/crm/Customer360View'));
+const ProjectsWorkspace = lazy(() => import('../pages/projects/ProjectsWorkspace'));
 const PlotInventory = lazy(() => import('../pages/plots/PlotInventory'));
 const PlotDetails = lazy(() => import('../pages/plots/PlotDetails'));
 const CampaignList = lazy(() => import('../pages/marketing/campaigns/CampaignList'));
@@ -24,9 +25,13 @@ const CommissionLedgerPage = lazy(() => import('../pages/marketing/commission/Co
 const CommissionRulesPage = lazy(() => import('../pages/marketing/commission/CommissionRulesPage'));
 const TelecallerWorkspace = lazy(() => import('../pages/marketing/telecaller/TelecallerWorkspace'));
 const MarketingReports = lazy(() => import('../pages/reports/MarketingReports'));
+const AnalyticsWorkspace = lazy(() => import('../pages/analytics/AnalyticsWorkspace'));
 const BookingsWorkspace = lazy(() => import('../pages/sales/BookingsWorkspace'));
 const PaymentsWorkspace = lazy(() => import('../pages/finance/PaymentsWorkspace'));
+const ExpensesWorkspace = lazy(() => import('../pages/expenses/ExpensesWorkspace'));
+const VehiclesWorkspace = lazy(() => import('../pages/vehicles/VehiclesWorkspace'));
 const UserManagementWorkspace = lazy(() => import('../pages/administration/UserManagementWorkspace'));
+const AttendanceWorkspace = lazy(() => import('../pages/employees/AttendanceWorkspace'));
 const LoginScreen = lazy(() => import('../pages/auth/LoginScreen'));
 
 const LoadingFallback = () => (
@@ -54,7 +59,11 @@ export const AppRoutes: FC = () => {
           <Route element={<AppShell />}>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<ExecutiveDashboard />} />
-            <Route path="/dashboard/command-center" element={<CommandCenter />} />
+            
+            {/* Leadership / Command Center */}
+            <Route element={<RoleRoute allowedRoles={['super_admin', 'director', 'branch_manager']} unauthorizedTo="/dashboard" />}>
+              <Route path="/dashboard/command-center" element={<CommandCenter />} />
+            </Route>
             
             {/* CRM */}
             <Route path="/crm/leads" element={<LeadsWorkspace />} />
@@ -63,7 +72,7 @@ export const AppRoutes: FC = () => {
             <Route path="/crm/customers/:id" element={<Customer360View />} />
             
             {/* Projects & Plots */}
-            <Route path="/projects" element={<Placeholder />} />
+            <Route path="/projects" element={<ProjectsWorkspace />} />
             <Route path="/plots" element={<PlotInventory />} />
             <Route path="/plots/:id" element={<PlotDetails />} />
             
@@ -72,27 +81,47 @@ export const AppRoutes: FC = () => {
             <Route path="/marketing/campaigns/details" element={<CampaignDetail />} />
             <Route path="/marketing/campaigns/:id" element={<CampaignDetail />} />
             <Route path="/marketing/site-visits" element={<SiteVisitsWorkspace />} />
-            <Route path="/marketing/network" element={<NetworkWorkspace />} />
-            <Route path="/marketing/commission" element={<CommissionLedgerPage />} />
-            <Route path="/marketing/commission/rules" element={<CommissionRulesPage />} />
             <Route path="/marketing/telecaller" element={<TelecallerWorkspace />} />
             
-            {/* Sales & Finance */}
+            {/* Marketing Network & Commissions */}
+            <Route element={<RoleRoute allowedRoles={['super_admin', 'director', 'branch_manager', 'marketing_manager', 'accountant']} unauthorizedTo="/dashboard" />}>
+              <Route path="/marketing/network" element={<NetworkWorkspace />} />
+              <Route path="/marketing/commission" element={<CommissionLedgerPage />} />
+              <Route path="/marketing/commission/rules" element={<CommissionRulesPage />} />
+            </Route>
+            
+            {/* Sales & Bookings */}
             <Route path="/bookings" element={<BookingsWorkspace />} />
-            <Route path="/payments" element={<PaymentsWorkspace />} />
-            <Route path="/expenses" element={<Placeholder />} />
+
+            {/* Finance & Expenses */}
+            <Route element={<RoleRoute allowedRoles={['super_admin', 'director', 'branch_manager', 'accountant']} unauthorizedTo="/dashboard" />}>
+              <Route path="/payments" element={<PaymentsWorkspace />} />
+              <Route path="/expenses" element={<ExpensesWorkspace />} />
+            </Route>
             
-            {/* HR & Ops */}
-            <Route path="/employees/attendance" element={<Placeholder />} />
-            <Route path="/vehicles" element={<Placeholder />} />
+            {/* HR / Operations */}
+            <Route element={<RoleRoute allowedRoles={['super_admin', 'director', 'branch_manager']} unauthorizedTo="/dashboard" />}>
+              <Route path="/employees/attendance" element={<AttendanceWorkspace />} />
+            </Route>
+
+            {/* Vehicles / Fleet */}
+            <Route element={<RoleRoute allowedRoles={['super_admin', 'director', 'branch_manager', 'driver']} unauthorizedTo="/dashboard" />}>
+              <Route path="/vehicles" element={<VehiclesWorkspace />} />
+            </Route>
             
-            {/* Reports & Settings */}
-            <Route path="/reports" element={<MarketingReports />} />
-            <Route path="/reports/marketing" element={<MarketingReports />} />
-            <Route path="/analytics" element={<Placeholder />} />
-            <Route path="/settings" element={<UserManagementWorkspace />} />
-            <Route path="/settings/users" element={<UserManagementWorkspace />} />
-            <Route path="/administration" element={<UserManagementWorkspace />} />
+            {/* Reports & Analytics */}
+            <Route element={<RoleRoute allowedRoles={['super_admin', 'director', 'branch_manager', 'marketing_manager', 'sales_manager', 'accountant']} unauthorizedTo="/dashboard" />}>
+              <Route path="/reports" element={<MarketingReports />} />
+              <Route path="/reports/marketing" element={<MarketingReports />} />
+              <Route path="/analytics" element={<AnalyticsWorkspace />} />
+            </Route>
+
+            {/* System Administration & Settings (Strict: Super Admin & Director Only) */}
+            <Route element={<RoleRoute allowedRoles={['super_admin', 'director']} unauthorizedTo="/dashboard" />}>
+              <Route path="/settings" element={<UserManagementWorkspace />} />
+              <Route path="/settings/users" element={<UserManagementWorkspace />} />
+              <Route path="/administration" element={<UserManagementWorkspace />} />
+            </Route>
           </Route>
         </Route>
 

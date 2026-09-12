@@ -1,0 +1,502 @@
+﻿<!DOCTYPE html>
+<html lang="te">
+<head>
+  <meta charset="UTF-8">
+  <title>Real Estate ERP - వెబ్ యాప్ అడ్మినిస్ట్రేషన్ ఫీచర్లు</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+    @page {
+      size: A4;
+      margin: 11mm 13mm;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Noto Sans Telugu', 'Nirmala UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #0f172a;
+      background-color: #ffffff;
+      line-height: 1.45;
+      font-size: 11.2px;
+    }
+
+    .page {
+      page-break-after: always;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .page:last-child {
+      page-break-after: avoid;
+    }
+
+    /* Header */
+    .header {
+      border-bottom: 2.5px solid #1e3a8a;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .brand-title {
+      font-size: 21px;
+      font-weight: 800;
+      color: #1e3a8a;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-subtitle {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #2563eb;
+      margin-top: 1px;
+    }
+
+    .doc-meta {
+      text-align: right;
+      font-size: 9.5px;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
+    .badge-pill {
+      display: inline-block;
+      background-color: #eff6ff;
+      color: #1d4ed8;
+      font-size: 9.5px;
+      font-weight: 600;
+      padding: 1.5px 7px;
+      border-radius: 9999px;
+      border: 1px solid #bfdbfe;
+      margin-top: 3px;
+    }
+
+    /* Overview Box */
+    .overview-box {
+      background: #f8fafc;
+      border-left: 4px solid #1e3a8a;
+      border-top: 1px solid #e2e8f0;
+      border-right: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 8px 12px;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 10px;
+      font-size: 11.2px;
+      color: #334155;
+    }
+
+    /* Feature Grid */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin-bottom: 10px;
+    }
+
+    .feature-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 7px;
+      padding: 8px 11px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 4px;
+      margin-bottom: 5px;
+    }
+
+    .card-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .role-tag {
+      font-size: 8.5px;
+      font-weight: 700;
+      padding: 1.5px 5px;
+      border-radius: 4px;
+      background: #eff6ff;
+      color: #1e40af;
+      border: 0.5px solid #bfdbfe;
+    }
+
+    ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+
+    ul li {
+      position: relative;
+      padding-left: 12px;
+      margin-bottom: 2.5px;
+      color: #334155;
+      font-size: 10.8px;
+      line-height: 1.4;
+    }
+
+    ul li::before {
+      content: "•";
+      position: absolute;
+      left: 2px;
+      color: #1e3a8a;
+      font-weight: bold;
+      font-size: 12px;
+    }
+
+    /* Section Heading */
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-bottom: 1.5px solid #e2e8f0;
+      padding-bottom: 4px;
+      margin-bottom: 7px;
+      margin-top: 4px;
+    }
+
+    /* Tables */
+    .table-container {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10px;
+      margin-bottom: 10px;
+    }
+
+    .table-container th, .table-container td {
+      border: 1px solid #cbd5e1;
+      padding: 5px 7px;
+      text-align: left;
+    }
+
+    .table-container th {
+      background-color: #f1f5f9;
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    .table-container tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    .badge-full {
+      color: #16a34a;
+      font-weight: 700;
+    }
+
+    .badge-scope {
+      color: #2563eb;
+      font-weight: 700;
+    }
+
+    .badge-none {
+      color: #94a3b8;
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: auto;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 5px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 9px;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PAGE 1 -->
+  <div class="page">
+    <div class="header">
+      <div>
+        <div class="brand-title">Enterprise Real Estate ERP</div>
+        <div class="brand-subtitle">వెబ్ యాప్ అడ్మినిస్ట్రేషన్ - సమగ్ర ఫీచర్ల వివరణ (Admin Web Specification)</div>
+        <span class="badge-pill">App Directory: apps/admin-web (React 19 + Material UI + Redux + Firestore)</span>
+      </div>
+      <div class="doc-meta">
+        <strong>డాక్యుమెంట్:</strong> Admin Web Platform Guide<br>
+        <strong>ప్లాట్‌ఫారమ్:</strong> Web Enterprise Portal (Desktop & Tablet)<br>
+        <strong>తేదీ:</strong> సెప్టెంబర్ 2026 &bull; వెర్షన్: 1.0
+      </div>
+    </div>
+
+    <div class="overview-box">
+      <strong>సిస్టమ్ పరిచయం (System Architecture):</strong><br>
+      <strong>Admin Web Portal (`apps/admin-web`)</strong> అనేది మొత్తం రియల్ ఎస్టేట్ సంస్థకు ప్రధాన ఆపరేటింగ్ కేంద్రం. ఎగ్జిక్యూటివ్ మేనేజ్‌మెంట్, లీడ్ CRM, వెంచర్ ప్లాట్ల ఇన్వెంటరీ, సేల్స్ బుకింగ్స్, ఏజెంట్ కమీషన్లు, ఫైనాన్స్ అకౌంటింగ్ మరియు సిబ్బంది అడ్మినిస్ట్రేషన్‌లను ఒకే గొడుగు కిందకు తెచ్చే అత్యాధునిక ఎంటర్‌ప్రైజ్ ప్లాట్‌ఫారమ్.
+    </div>
+
+    <div class="feature-grid">
+      <!-- 1. Executive Dashboard & Command Center -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">1. ఎగ్జిక్యూటివ్ డ్యాష్‌బోర్డ్ & కమాండ్ సెంటర్</span>
+          <span class="role-tag">Super Admin & Director</span>
+        </div>
+        <ul>
+          <li><strong>Executive KPIs:</strong> మొత్తం రెవెన్యూ, కలెక్షన్స్, సేల్స్ వెలాసిటీ మరియు లైవ్ బుకింగ్ గ్రాఫ్‌లు.</li>
+          <li><strong>Command Center:</strong> కంపెనీ వ్యాప్తంగా జరుగుతున్న ఆపరేషన్లు, పెండింగ్ అప్రూవల్స్ పరిశీలన.</li>
+          <li><strong>Real-time Analytics:</strong> లీడ్ కన్వర్షన్ రేట్లు, వెంచర్-వైజ్ సేల్స్ ట్రెండ్స్ మరియు ఫండ్ ఫ్లో.</li>
+        </ul>
+      </div>
+
+      <!-- 2. CRM & Leads Workspace -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">2. లీడ్స్ వర్క్‌స్పేస్ & Customer 360</span>
+          <span class="role-tag">మార్కెటింగ్ & సేల్స్ హెడ్స్</span>
+        </div>
+        <ul>
+          <li><strong>Omnichannel Capture:</strong> వెబ్‌సైట్, Meta Ads, Google Ads, మరియు వాక్-ఇన్స్ నుండి లీడ్స్ కేటాయింపు.</li>
+          <li><strong>Pipeline Kanban:</strong> NEW ➔ CONTACTED ➔ VISIT_SCHEDULED ➔ NEGOTIATION ➔ WON.</li>
+          <li><strong>Customer 360° View:</strong> కస్టమర్ పూర్తి చరిత్ర, కాల్ లాగ్స్, సైట్ విజిట్స్, పేమెంట్ రికార్డులు.</li>
+          <li><strong>Telecaller Queue:</strong> టెలికాలర్లకు రోజువారీ కాల్ లిస్ట్‌లు, డిస్పోజిషన్ నోట్స్ మరియు రీ-షెడ్యూలింగ్.</li>
+        </ul>
+      </div>
+
+      <!-- 3. Projects & Plot Inventory -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">3. ప్రాజెక్ట్‌లు & ప్లాట్ ఇన్వెంటరీ</span>
+          <span class="role-tag">ఆపరేషన్స్ & మేనేజ్‌మెంట్</span>
+        </div>
+        <ul>
+          <li><strong>Project Setup:</strong> ఫేజ్‌లు, లేఅవుట్ మ్యాప్‌లు, RERA అనుమతులు, లొకేషన్ బౌండరీలు.</li>
+          <li><strong>Visual Plot Grid:</strong> ప్లాట్ల లైవ్ స్టేటస్ (AVAILABLE, HOLD, BOOKED, REGISTERED, BLOCKED).</li>
+          <li><strong>Dynamic Pricing Engine:</strong> బేస్ ప్రైస్/గజం, కార్నర్ ప్రీమియం, ఈస్ట్/నార్త్ ఫేసింగ్ ఛార్జీలు, PLC ఛార్జీలు.</li>
+          <li><strong>Hold Lock Management:</strong> నిర్దిష్ట గడువుతో ప్లాట్ హోల్డ్ లాకింగ్ మరియు ఆటోమేటిక్ ఎక్స్‌పైరీ.</li>
+        </ul>
+      </div>
+
+      <!-- 4. Marketing Campaigns & Telecaller -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">4. క్యాంపెయిన్లు & అడ్ అనలిటిక్స్</span>
+          <span class="role-tag">మార్కెటింగ్ మేనేజర్లు</span>
+        </div>
+        <ul>
+          <li><strong>Campaign Tracking:</strong> డిజిటల్ అడ్వర్టైజ్‌మెంట్ బడ్జెట్, ఖర్చులు మరియు లీడ్ అట్రిబ్యూషన్.</li>
+          <li><strong>Cost Metrics:</strong> కాస్ట్-పర్-లీడ్ (CPL) మరియు కాస్ట్-పర్-అక్విజిషన్ (CPA) ఆటోమేటిక్ లెక్కింపు.</li>
+          <li><strong>Campaign ROI:</strong> ఏ అడ్వర్టైజ్మెంట్ నుండి ఎన్ని ప్లాట్ల అమ్మకాలు జరిగాయో తెలిపే ROI ఇంజిన్.</li>
+        </ul>
+      </div>
+
+      <!-- 5. Sales Pipeline & Bookings -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">5. సేల్స్ పైప్‌లైన్ & ప్లాట్ బుకింగ్స్</span>
+          <span class="role-tag">సేల్స్ మేనేజర్లు</span>
+        </div>
+        <ul>
+          <li><strong>Booking Lifecycle:</strong> అడ్వాన్స్ టోకెన్ కలెక్షన్, డాక్యుమెంట్ వెరిఫికేషన్ మరియు బుకింగ్ కన్ఫర్మేషన్.</li>
+          <li><strong>Discount Authorizations:</strong> బ్రాంచ్ మేనేజర్/డైరెక్టర్ అనుమతితో డిస్కౌంట్ వర్క్‌ఫ్లో.</li>
+          <li><strong>Customer Agreements:</strong> సేల్ అగ్రిమెంట్లు, అలాట్‌మెంట్ లెటర్స్ మరియు ఆటోమేటిక్ పిడిఎఫ్ జనరేషన్.</li>
+        </ul>
+      </div>
+
+      <!-- 6. Agent Network & MLM Tree -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">6. ఏజెంట్ నెట్‌వర్క్ & హైరార్కీ ట్రీ</span>
+          <span class="role-tag">మేనేజ్‌మెంట్ & అడ్మిన్</span>
+        </div>
+        <ul>
+          <li><strong>Multi-tier Hierarchy:</strong> Director ➔ General Manager ➔ Sales Manager ➔ Field Associates ట్రీ.</li>
+          <li><strong>Agent Onboarding:</strong> ఏజెంట్ రిజిస్ట్రేషన్, కేవైసీ డాక్యుమెంట్లు మరియు బ్రాంచ్ లింకింగ్.</li>
+          <li><strong>Performance Matrix:</strong> ఏజెంట్ వారి టీమ్ చేసిన మొత్తం సేల్స్ వాల్యూమ్ మరియు ఆక్టివ్ లీడ్స్ ట్రాకింగ్.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span>Enterprise Real Estate Marketing ERP &bull; Admin Portal Documentation</span>
+      <span>Page 1 of 2</span>
+    </div>
+  </div>
+
+  <!-- PAGE 2 -->
+  <div class="page">
+    <div class="header">
+      <div>
+        <div class="brand-title">Enterprise Real Estate ERP</div>
+        <div class="brand-subtitle">ఫైనాన్స్, ఆపరేషన్స్, అడ్మినిస్ట్రేషన్ & సెక్యూరిటీ (Operations & Security)</div>
+      </div>
+      <div class="doc-meta">
+        <strong>డాక్యుమెంట్:</strong> Admin Web Platform Guide - Page 2<br>
+        <strong>ప్లాట్‌ఫారమ్:</strong> Web Enterprise Portal
+      </div>
+    </div>
+
+    <div class="feature-grid">
+      <!-- 7. Finance & Payments -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">7. ఫైనాన్స్, ఇన్‌వాయిసింగ్ & కలెక్షన్స్</span>
+          <span class="role-tag">అకౌంటెంట్ & ఫైనాన్స్</span>
+        </div>
+        <ul>
+          <li><strong>Installment Schedule:</strong> డౌన్ పేమెంట్, EMI షెడ్యూల్స్ మరియు లేట్ పేమెంట్ పెనాల్టీలు.</li>
+          <li><strong>Payment Verification:</strong> ఆన్‌లైన్, NEFT/RTGS, చెక్కుల రీకాన్సిలియేషన్ మరియు రసీదులు.</li>
+          <li><strong>Automated PDF Invoices:</strong> అధికారిక జీఎస్టీ ఇన్వాయిస్లు మరియు స్టాంప్ రసీదులు.</li>
+        </ul>
+      </div>
+
+      <!-- 8. Commission Rules & Ledger -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">8. కమీషన్ల రూల్ ఇంజిన్ & లెడ్జర్</span>
+          <span class="role-tag">ఫైనాన్స్ & మేనేజ్‌మెంట్</span>
+        </div>
+        <ul>
+          <li><strong>Configurable Rules:</strong> ర్యాంక్/హోదా ప్రకారం కమీషన్ శాతాలు (%), మైల్‌స్టోన్ బోనస్‌లు.</li>
+          <li><strong>Commission Ledger:</strong> బుకింగ్ వారీగా కమీషన్ లెక్కలు, TDS డిడక్షన్స్ మరియు ఆడిట్ లాగ్స్.</li>
+          <li><strong>Payout Approvals:</strong> అకౌంటెంట్ వెరిఫికేషన్ మరియు డైరెక్టర్ అప్రూవల్ తర్వాతే పేఅవుట్ రిలీజ్.</li>
+        </ul>
+      </div>
+
+      <!-- 9. Field Expenses Audit -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">9. ఫీల్డ్ ఖర్చుల ఆడిట్ & అప్రూవల్స్</span>
+          <span class="role-tag">అకౌంటెంట్ & బ్రాంచ్ హెడ్స్</span>
+        </div>
+        <ul>
+          <li><strong>Multi-Level Approvals:</strong> మొబైల్ యాప్ ద్వారా వచ్చిన ఖర్చులను బ్రాంచ్ హెడ్ & అకౌంటెంట్ పరిశీలన.</li>
+          <li><strong>Fuel & Travel Audit:</strong> ట్రిప్ ఓడోమీటర్ రీడింగ్ ఆధారంగా డీజిల్ ఖర్చుల క్రాస్ వెరిఫికేషన్.</li>
+          <li><strong>Expense Reimbursing:</strong> ఆమోదించబడిన ఖర్చుల రీయింబర్స్‌మెంట్ రికార్డులు.</li>
+        </ul>
+      </div>
+
+      <!-- 10. Fleet & Vehicle Logistics -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">10. వెహికల్ ఫ్లీట్ & లాజిస్టిక్స్</span>
+          <span class="role-tag">ఆపరేషన్స్ & డ్రైవర్స్ డెస్క్</span>
+        </div>
+        <ul>
+          <li><strong>Fleet Management:</strong> ఇన్నోవా, టెంపో ట్రావెలర్ వాహనాల లభ్యత (Available, In-Transit, Maintenance).</li>
+          <li><strong>Driver Trip Logs:</strong> బయలుదేరిన సమయం, కస్టమర్ పికప్, చేరుకున్న సైట్ మరియు ప్రయాణ దూరం (KM).</li>
+          <li><strong>Maintenance Tracking:</strong> వెహికల్ సర్వీసింగ్, ఇన్సూరెన్స్ మరియు ఫిట్‌నెస్ సర్టిఫికెట్ అలర్ట్‌లు.</li>
+        </ul>
+      </div>
+
+      <!-- 11. HR Attendance & Geo-Audit -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">11. సిబ్బంది హాజరు & జియో-ఆడిట్</span>
+          <span class="role-tag">HR & బ్రాంచ్ మేనేజర్</span>
+        </div>
+        <ul>
+          <li><strong>GPS Geofence Log:</strong> సైట్ వెంచర్ 2.5 KM లోపలే పంచ్-ఇన్ చేశారా లేదా అనే జియో-ఆడిట్.</li>
+          <li><strong>Selfie Verification View:</strong> సిబ్బంది సబ్మిట్ చేసిన లైవ్ సెల్ఫీ ఫోటోలను వెరిఫై చేసే బోర్డు.</li>
+          <li><strong>Working Hours & Muster:</strong> నెలవారీ హాజరు పట్టిక మరియు పని గంటల ఆధారంగా పేరోల్ లింకింగ్.</li>
+        </ul>
+      </div>
+
+      <!-- 12. User Administration & RBAC -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">12. యూజర్ అడ్మినిస్ట్రేషన్ & RBAC సెక్యూరిటీ</span>
+          <span class="role-tag">Super Admin & Director</span>
+        </div>
+        <ul>
+          <li><strong>10 Enterprise Roles:</strong> సూపర్ అడ్మిన్ నుండి డ్రైవర్ వరకు స్పష్టమైన యాక్సెస్ నియమాలు.</li>
+          <li><strong>Granular Permissions:</strong> డేటా డిలీట్, ఎడిట్, డిస్కౌంట్ వంటి సున్నితమైన అధికారాల కంట్రోల్.</li>
+          <li><strong>Security Auditing:</strong> పాస్‌వర్డ్ రీసెట్‌లు, యూజర్ బ్లాక్/యాక్టివేట్ మరియు సిస్టమ్ యాక్సెస్ లాగ్స్.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- RBAC Security Matrix Table -->
+    <div class="section-title">
+      <span>🔐 రోల్-బేస్డ్ యాక్సెస్ కంట్రోల్ మాట్రిక్స్ (RBAC Security & Permission Matrix)</span>
+    </div>
+
+    <table class="table-container">
+      <thead>
+        <tr>
+          <th>యూజర్ రోల్ (Role)</th>
+          <th>డ్యాష్‌బోర్డ్ & లీడ్స్</th>
+          <th>ప్లాట్స్ & వెంచర్లు</th>
+          <th>బుకింగ్స్ & సేల్స్</th>
+          <th>ఫైనాన్స్ & పేమెంట్స్</th>
+          <th>యూజర్ అడ్మినిస్ట్రేషన్</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Super Admin</strong></td>
+          <td><span class="badge-full">పూర్తి యాక్సెస్</span></td>
+          <td><span class="badge-full">పూర్తి యాక్సెస్</span></td>
+          <td><span class="badge-full">పూర్తి యాక్సెస్</span></td>
+          <td><span class="badge-full">పూర్తి యాక్సెస్</span></td>
+          <td><span class="badge-full">పూర్తి నియంత్రణ</span></td>
+        </tr>
+        <tr>
+          <td><strong>Director</strong></td>
+          <td><span class="badge-full">కమాండ్ సెంటర్</span></td>
+          <td><span class="badge-full">పూర్తి యాక్సెస్</span></td>
+          <td><span class="badge-full">అప్రూవల్ అధికారం</span></td>
+          <td><span class="badge-full">రిపోర్ట్స్ & ఆడిట్స్</span></td>
+          <td><span class="badge-full">యూజర్ల నిర్వహణ</span></td>
+        </tr>
+        <tr>
+          <td><strong>Branch Manager</strong></td>
+          <td><span class="badge-scope">బ్రాంచ్ లీడ్స్</span></td>
+          <td><span class="badge-scope">బ్రాంచ్ ఇన్వెంటరీ</span></td>
+          <td><span class="badge-scope">బ్రాంచ్ బుకింగ్స్</span></td>
+          <td><span class="badge-scope">ఖర్చుల అప్రూవల్</span></td>
+          <td><span class="badge-none">యాక్సెస్ లేదు</span></td>
+        </tr>
+        <tr>
+          <td><strong>Marketing Manager</strong></td>
+          <td><span class="badge-full">క్యాంపెయిన్లు & లీడ్స్</span></td>
+          <td><span class="badge-scope">చూసే అనుమతి</span></td>
+          <td><span class="badge-none">యాక్సెస్ లేదు</span></td>
+          <td><span class="badge-none">యాక్సెస్ లేదు</span></td>
+          <td><span class="badge-none">యాక్సెస్ లేదు</span></td>
+        </tr>
+        <tr>
+          <td><strong>Sales Executive / Manager</strong></td>
+          <td><span class="badge-scope">కేటాయించిన లీడ్స్</span></td>
+          <td><span class="badge-scope">ప్లాట్ల లభ్యత & హోల్డ్</span></td>
+          <td><span class="badge-scope">బుకింగ్ క్రియేషన్</span></td>
+          <td><span class="badge-none">యాక్సెస్ లేదు</span></td>
+          <td><span class="badge-none">యాక్సెస్ లేదు</span></td>
+        </tr>
+        <tr>
+          <td><strong>Accountant</strong></td>
+          <td><span class="badge-none">యాక్సెస్ లేదు</span></td>
+          <td><span class="badge-scope">చూసే అనుమతి</span></td>
+          <td><span class="badge-scope">బుకింగ్ రికార్డులు</span></td>
+          <td><span class="badge-full">పూర్తి నిర్వహణ</span></td>
+          <td><span class="badge-none">యాక్సెస్ లేదు</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="footer">
+      <span>Enterprise Real Estate Marketing ERP &bull; Internal System Documentation</span>
+      <span>Page 2 of 2</span>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,527 @@
+﻿<!DOCTYPE html>
+<html lang="te">
+<head>
+  <meta charset="UTF-8">
+  <title>Real Estate ERP - Mobile App Features</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+    @page {
+      size: A4;
+      margin: 12mm 14mm;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Noto Sans Telugu', 'Nirmala UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #0f172a;
+      background-color: #ffffff;
+      line-height: 1.5;
+      font-size: 11.5px;
+    }
+
+    .page {
+      page-break-after: always;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .page:last-child {
+      page-break-after: avoid;
+    }
+
+    /* Header */
+    .header {
+      border-bottom: 2.5px solid #2563eb;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .brand-title {
+      font-size: 21px;
+      font-weight: 800;
+      color: #1e3a8a;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-subtitle {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #2563eb;
+      margin-top: 1px;
+    }
+
+    .doc-meta {
+      text-align: right;
+      font-size: 10px;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
+    .badge-pill {
+      display: inline-block;
+      background-color: #eff6ff;
+      color: #1d4ed8;
+      font-size: 9.5px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 9999px;
+      border: 1px solid #bfdbfe;
+      margin-top: 3px;
+    }
+
+    /* Overview Box */
+    .overview-box {
+      background: #f8fafc;
+      border-left: 4px solid #2563eb;
+      border-top: 1px solid #e2e8f0;
+      border-right: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 10px 14px;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 14px;
+      font-size: 11.5px;
+      color: #334155;
+    }
+
+    /* Feature Grid */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .feature-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 9px 12px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 5px;
+      margin-bottom: 6px;
+    }
+
+    .card-title {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .role-tag {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 1.5px 6px;
+      border-radius: 4px;
+      background: #f1f5f9;
+      color: #475569;
+      border: 0.5px solid #cbd5e1;
+    }
+
+    ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+
+    ul li {
+      position: relative;
+      padding-left: 13px;
+      margin-bottom: 3px;
+      color: #334155;
+      font-size: 11px;
+      line-height: 1.42;
+    }
+
+    ul li::before {
+      content: "•";
+      position: absolute;
+      left: 2px;
+      color: #2563eb;
+      font-weight: bold;
+      font-size: 12px;
+    }
+
+    /* Section Heading */
+    .section-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-bottom: 1.5px solid #e2e8f0;
+      padding-bottom: 5px;
+      margin-bottom: 8px;
+      margin-top: 6px;
+    }
+
+    /* Tables */
+    .table-container {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10.5px;
+      margin-bottom: 14px;
+    }
+
+    .table-container th, .table-container td {
+      border: 1px solid #cbd5e1;
+      padding: 6px 8px;
+      text-align: left;
+    }
+
+    .table-container th {
+      background-color: #f1f5f9;
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    .table-container tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    .badge-success {
+      color: #16a34a;
+      font-weight: 700;
+    }
+
+    .badge-primary {
+      color: #2563eb;
+      font-weight: 700;
+    }
+
+    /* Architecture Box */
+    .arch-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+    }
+
+    .arch-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-bottom: 6px;
+    }
+
+    .sync-steps {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      gap: 6px;
+    }
+
+    .sync-step {
+      flex: 1;
+      background: #ffffff;
+      border: 1px solid #bfdbfe;
+      border-radius: 6px;
+      padding: 6px 8px;
+      text-align: center;
+      font-size: 9.5px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+
+    .sync-step strong {
+      display: block;
+      color: #1e40af;
+      font-size: 10px;
+      margin-bottom: 2px;
+    }
+
+    .step-arrow {
+      color: #94a3b8;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: auto;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 6px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 9.5px;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PAGE 1 -->
+  <div class="page">
+    <div class="header">
+      <div>
+        <div class="brand-title">Enterprise Real Estate ERP</div>
+        <div class="brand-subtitle">మార్కెటింగ్ మొబైల్ యాప్ - సమగ్ర ఫీచర్ల వివరణ (Feature Specification)</div>
+        <span class="badge-pill">App Directory: apps/marketing-mobile (React Native Expo + TypeScript)</span>
+      </div>
+      <div class="doc-meta">
+        <strong>డాక్యుమెంట్:</strong> Mobile App Feature Guide<br>
+        <strong>ప్లాట్‌ఫారమ్:</strong> Android & iOS (Expo Native)<br>
+        <strong>తేదీ:</strong> సెప్టెంబర్ 2026 &bull; వెర్షన్: 1.0
+      </div>
+    </div>
+
+    <div class="overview-box">
+      <strong>సిస్టమ్ పరిచయం (System Overview):</strong><br>
+      ఈ మొబైల్ అప్లికేషన్ రియల్ ఎస్టేట్ ఫీల్డ్ సేల్స్ ఎగ్జిక్యూటివ్‌లు, మార్కెటింగ్ ఏజెంట్లు, సైట్ మేనేజర్లు మరియు వెహికల్ డ్రైవర్ల రోజువారీ క్షేత్రస్థాయి విధులను వేగవంతం చేయడానికి రూపొందించబడింది. సిగ్నల్ మరియు ఇంటర్నెట్ లేని మారుమూల సైట్ వెంచర్లలో కూడా నిరంతరాయంగా పనిచేసేలా <strong>Offline-First Architecture</strong> మరియు <strong>GPS Geo-Fencing</strong> ఆధారంగా దీనిని నిర్మించారు.
+    </div>
+
+    <div class="feature-grid">
+      <!-- 1. Home Dashboard -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">1. హోమ్ డ్యాష్‌బోర్డ్ (Home Dashboard)</span>
+          <span class="role-tag">అన్ని ఫీల్డ్ రోల్స్</span>
+        </div>
+        <ul>
+          <li><strong>Today's Tasks:</strong> రోజువారీ చేయాల్సిన క్లయింట్ కాల్స్ మరియు ముఖ్యమైన ఫాలో-అప్‌లు.</li>
+          <li><strong>Real-time Metrics:</strong> ఈరోజు వచ్చిన కొత్త లీడ్స్ సంఖ్య, షెడ్యూల్ అయిన సైట్ విజిట్స్ సారాంశం.</li>
+          <li><strong>Commission & Network Level:</strong> యూజర్ నెట్‌వర్క్ లెవెల్ (ఉదా: Sales Manager) మరియు పెండింగ్‌లో ఉన్న కమీషన్ల మొత్తం ప్రదర్శన.</li>
+        </ul>
+      </div>
+
+      <!-- 2. Leads CRM -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">2. లీడ్స్ & CRM వర్క్‌స్పేస్ (Leads CRM)</span>
+          <span class="role-tag">సేల్స్ & మార్కెటింగ్</span>
+        </div>
+        <ul>
+          <li><strong>Leads Filter:</strong> "My Leads" (నా లీడ్స్) మరియు "Team Leads" (మొత్తం టీమ్ లీడ్స్) విభజన.</li>
+          <li><strong>Full Lead Dossier:</strong> పేరు, మొబైల్, ఆసక్తి స్థాయి (HIGH/MED), లీడ్ సోర్స్ (Meta Ads, Walk-in).</li>
+          <li><strong>1-Tap Communication:</strong> సింగిల్ ట్యాప్‌తో డైరెక్ట్ 📞 Call, 💬 WhatsApp చాట్ మరియు ✉️ SMS.</li>
+          <li><strong>Offline Notes:</strong> కస్టమర్ మాట్లాడిన వివరాలను ఆఫ్‌లైన్‌లో కూడా నోట్స్ రూపంలో సేవ్ చేయవచ్చు.</li>
+        </ul>
+      </div>
+
+      <!-- 3. Site Visits -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">3. సైట్ విజిట్స్ & లైవ్ ట్రాకింగ్ (Site Visits)</span>
+          <span class="role-tag">ఫీల్డ్ ఎగ్జిక్యూటివ్స్</span>
+        </div>
+        <ul>
+          <li><strong>Scheduled Visits:</strong> కస్టమర్ ప్రాపర్టీ విజిట్ సమయం మరియు వెంచర్ వివరాల జాబితా.</li>
+          <li><strong>GPS Check-In:</strong> సైట్ వద్దకు చేరుకోగానే లైవ్ GPS కోఆర్డినేట్స్ ద్వారా చెక్-ఇన్.</li>
+          <li><strong>Mark Arrival:</strong> కస్టమర్ సైట్‌కు చేరుకున్నారని ఆటోమేటిక్ లొకేషన్ వెరిఫికేషన్.</li>
+          <li><strong>Photo & Audio Proofs:</strong> కెమెరా ద్వారా ప్రాపర్టీ ఫోటో తీసి అప్‌లోడ్ చేయడం మరియు వాయిస్ నోట్ (Audio Note) రికార్డ్ చేసి సేవ్ చేయడం.</li>
+        </ul>
+      </div>
+
+      <!-- 4. Geo-Attendance -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">4. జియో-ఫెన్సింగ్ అటెండెన్స్ (Geo-Attendance)</span>
+          <span class="role-tag">ఫీల్డ్ సిబ్బంది</span>
+        </div>
+        <ul>
+          <li><strong>Auto Geofence Boundary:</strong> నిర్దేశిత సైట్ ఆఫీస్ పరిధిలో (ఉదా: Mokila సైట్ 2.5 KM రేడియస్) ఉంటేనే హాజరు నమోదు అనుమతిస్తుంది.</li>
+          <li><strong>Front Camera Selfie Proof:</strong> ఫేక్ హాజరును అరికట్టడానికి ఫ్రంట్ కెమెరాతో లైవ్ సెల్ఫీ తప్పనిసరి.</li>
+          <li><strong>Shift & Duty:</strong> Punch-In, Punch-Out సమయాలు, పని గంటలు మరియు డైలీ వర్క్ సారాంశం.</li>
+        </ul>
+      </div>
+
+      <!-- 5. Fleet & Trips -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">5. డ్రైవర్ & వెహికల్ ట్రిప్ లాగ్ (Fleet & Trips)</span>
+          <span class="role-tag">డ్రైవర్స్ & సైట్ హెడ్స్</span>
+        </div>
+        <ul>
+          <li><strong>Assigned Fleet:</strong> ఇన్నోవా, టెంపో ట్రావెలర్, స్కార్పియో వంటి వాహనాల ఎంపిక.</li>
+          <li><strong>Trip Start & End:</strong> ప్రారంభ ఓడోమీటర్ (KM), కస్టమర్ పికప్ పాయింట్, ఎండ్ ఓడోమీటర్ నమోదు.</li>
+          <li><strong>Distance Calculation:</strong> మొత్తం ప్రయాణించిన దూరం (Total KM) ఆటోమేటిక్‌గా లెక్కింపు.</li>
+          <li><strong>Fuel Refill Log:</strong> ట్రిప్ సమయంలో పోయించిన డీజిల్ ఖర్చు (Amount) మరియు లీటర్ల రికార్డింగ్.</li>
+        </ul>
+      </div>
+
+      <!-- 6. Expense Logging -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">6. ఫీల్డ్ ఖర్చుల నమోదు (Expense Logging)</span>
+          <span class="role-tag">అన్ని ఫీల్డ్ రోల్స్</span>
+        </div>
+        <ul>
+          <li><strong>Category Logging:</strong> ఫ్యూయల్, భోజనం, రవాణా (Travel, Food, Fuel) ఖర్చుల నమోదు.</li>
+          <li><strong>Account Approval:</strong> సబ్మిట్ చేసిన ఖర్చులు ఆటోమేటిక్‌గా అకౌంట్స్ వెరిఫికేషన్‌కు వెళ్తాయి.</li>
+          <li><strong>Receipt Sync:</strong> బిల్ అమౌంట్ వివరాలు ఆఫ్‌లైన్ క్యూలో స్టోర్ అయి తర్వాత సింక్ అవుతాయి.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span>Enterprise Real Estate Marketing ERP &bull; Internal Documentation</span>
+      <span>Page 1 of 2</span>
+    </div>
+  </div>
+
+  <!-- PAGE 2 -->
+  <div class="page">
+    <div class="header">
+      <div>
+        <div class="brand-title">Enterprise Real Estate ERP</div>
+        <div class="brand-subtitle">నెట్‌వర్క్, కమీషన్లు & ఆర్కిటెక్చర్ స్పెసిఫికేషన్స్ (Architecture & Ledger)</div>
+      </div>
+      <div class="doc-meta">
+        <strong>డాక్యుమెంట్:</strong> Mobile Feature Guide - Page 2<br>
+        <strong>ప్లాట్‌ఫారమ్:</strong> Android & iOS (Expo Native)
+      </div>
+    </div>
+
+    <!-- Features 7 and 8 -->
+    <div class="feature-grid">
+      <!-- 7. Commissions & Network -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">7. నెట్‌వర్క్ & కమీషన్ల ట్రాకింగ్ (Commissions)</span>
+          <span class="role-tag">ఏజెంట్లు & మేనేజర్లు</span>
+        </div>
+        <ul>
+          <li><strong>Team Hierarchy:</strong> సేల్స్ మేనేజర్ కింద ఉన్న సబ్-ఏజెంట్లు, వారి యాక్టివ్ లీడ్స్ సంఖ్య మరియు చేసిన సేల్స్ వాల్యూమ్ వివరాలు.</li>
+          <li><strong>Commission Ledger:</strong> బుకింగ్ ఐడీలతో లింక్ అయిన కమీషన్లు, Total Paid కమీషన్లు vs Pending కమీషన్ల స్పష్టమైన విభజన.</li>
+        </ul>
+      </div>
+
+      <!-- 8. Offline Architecture -->
+      <div class="feature-card">
+        <div class="card-header">
+          <span class="card-title">8. ఆఫ్‌లైన్-ఫస్ట్ ఆర్కిటెక్చర్ (Offline Sync)</span>
+          <span class="role-tag">సిస్టమ్ ఆర్కిటెక్చర్</span>
+        </div>
+        <ul>
+          <li><strong>Zero Signal Support:</strong> సిగ్నల్ లేకున్నా అటెండెన్స్, విజిట్స్, ట్రిప్స్, ఖర్చులు లోకల్ స్టోరేజ్‌లో సేవ్ అవుతాయి.</li>
+          <li><strong>Background Fetch:</strong> నెట్‌వర్క్ రాగానే ఎక్స్‌పో బ్యాక్‌గ్రౌండ్ టాస్క్ ద్వారా ఆటోమేటిక్‌గా ఫైర్‌బేస్‌కు అప్‌లోడ్.</li>
+          <li><strong>Deduplication Guard:</strong> డేటా డూప్లికేట్ కాకుండా భద్రతా ఐడెంపోటెన్సీ చెక్.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Offline Workflow Visual Box -->
+    <div class="arch-box">
+      <div class="arch-title">⚡ ఆఫ్‌లైన్ డేటా సింక్రొనైజేషన్ ఫ్లో (Offline-First Sync Pipeline)</div>
+      <p style="font-size: 11px; color: #475569;">ఫీల్డ్ ఏజెంట్ చర్యలు తీసుకున్నప్పుడు నెట్‌వర్క్ స్థితితో సంబంధం లేకుండా డేటా ఎలా ప్రాసెస్ అవుతుందో క్రింది ఫ్లో వివరిస్తుంది:</p>
+      <div class="sync-steps">
+        <div class="sync-step">
+          <strong>1. Field Action</strong>
+          అటెండెన్స్ / ట్రిప్ / ఖర్చు నమోదు
+        </div>
+        <div class="step-arrow">➔</div>
+        <div class="sync-step">
+          <strong>2. Local Queue</strong>
+          AsyncStorage లో ఎన్‌క్రిప్ట్ & స్టోరేజ్
+        </div>
+        <div class="step-arrow">➔</div>
+        <div class="sync-step">
+          <strong>3. NetInfo Detector</strong>
+          ఇంటర్నెట్ కనెక్టివిటీ డిటెక్షన్
+        </div>
+        <div class="step-arrow">➔</div>
+        <div class="sync-step">
+          <strong>4. Background Fetch</strong>
+          15-నిమిషాల షెడ్యూలర్ ఆటో-ట్రిగ్గర్
+        </div>
+        <div class="step-arrow">➔</div>
+        <div class="sync-step">
+          <strong>5. Cloud Sync</strong>
+          Firebase Firestore లో అప్‌డేట్
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature Matrix Table -->
+    <div class="section-title">
+      <span>📑 మొబైల్ ఫీచర్ల సారాంశ పట్టిక (Role-Based Feature Matrix)</span>
+    </div>
+
+    <table class="table-container">
+      <thead>
+        <tr>
+          <th>ఫీచర్ మాడ్యూల్</th>
+          <th>ప్రధాన లక్ష్యం</th>
+          <th>ఉపయోగించే యూజర్లు</th>
+          <th>ఆఫ్‌లైన్ వర్కింగ్</th>
+          <th>డేటా వెరిఫికేషన్ & ప్రూఫ్</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>హోమ్ డ్యాష్‌బోర్డ్</strong></td>
+          <td>రోజువారీ పనులు & ప్రగతి పరిశీలన</td>
+          <td>అన్ని యూజర్ రోల్స్</td>
+          <td><span class="badge-primary">Local Cache సపోర్ట్</span></td>
+          <td>రియల్ టైమ్ డేటా సింక్</td>
+        </tr>
+        <tr>
+          <td><strong>లీడ్స్ & CRM</strong></td>
+          <td>కస్టమర్ కాల్స్, వాట్సాప్ & ఫాలో-అప్‌లు</td>
+          <td>సేల్స్ & మార్కెటింగ్ ఎగ్జిక్యూటివ్స్</td>
+          <td><span class="badge-success">పూర్తిగా లభ్యం</span></td>
+          <td>స్టేటస్, ఇంట్రెస్ట్ లెవెల్స్ & హిస్టరీ</td>
+        </tr>
+        <tr>
+          <td><strong>సైట్ విజిట్స్</strong></td>
+          <td>సైట్ టూర్ ట్రాకింగ్ & ప్రూఫ్ కలెక్షన్</td>
+          <td>ఫీల్డ్ ఏజెంట్లు & సూపర్‌వైజర్లు</td>
+          <td><span class="badge-success">పూర్తిగా లభ్యం</span></td>
+          <td>GPS కోఆర్డినేట్స్ + లైవ్ ఫోటో + వాయిస్ నోట్</td>
+        </tr>
+        <tr>
+          <td><strong>జియో-అటెండెన్స్</strong></td>
+          <td>సిబ్బంది హాజరు & సైట్ లొకేషన్</td>
+          <td>మొత్తం ఫీల్డ్ స్టాఫ్</td>
+          <td><span class="badge-success">పూర్తిగా లభ్యం</span></td>
+          <td>GPS జియో-ఫెన్స్ (2.5 KM) + సెల్ఫీ వెరిఫికేషన్</td>
+        </tr>
+        <tr>
+          <td><strong>వెహికల్ & ట్రిప్స్</strong></td>
+          <td>కస్టమర్ పికప్/డ్రాప్ & ఫ్యూయల్ లాగ్</td>
+          <td>డ్రైవర్స్ & ఫ్లీట్ మేనేజర్లు</td>
+          <td><span class="badge-success">పూర్తిగా లభ్యం</span></td>
+          <td>స్టార్ట్/ఎండ్ ఓడోమీటర్ రీడింగ్ (KM)</td>
+        </tr>
+        <tr>
+          <td><strong>ఫీల్డ్ ఖర్చులు</strong></td>
+          <td>రోజువారీ ప్రయాణ/ఆహార ఖర్చుల రికార్డింగ్</td>
+          <td>ఫీల్డ్ ఉద్యోగులు</td>
+          <td><span class="badge-success">పూర్తిగా లభ్యం</span></td>
+          <td>అకౌంటెంట్ ఆడిట్ & అప్రూవల్ వర్క్‌ఫ్లో</td>
+        </tr>
+        <tr>
+          <td><strong>కమీషన్ల లెడ్జర్</strong></td>
+          <td>సొంత కమీషన్లు & టీమ్ పెర్ఫార్మెన్స్</td>
+          <td>ఏజెంట్లు & సేల్స్ మేనేజర్లు</td>
+          <td><span class="badge-primary">సింక్ అయినప్పుడు</span></td>
+          <td>బుకింగ్ ఐడీ & పేమెంట్ గేట్‌వే వెరిఫైడ్</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="footer">
+      <span>Enterprise Real Estate Marketing ERP &bull; Internal Documentation</span>
+      <span>Page 2 of 2</span>
+    </div>
+  </div>
+
+</body>
+</html>

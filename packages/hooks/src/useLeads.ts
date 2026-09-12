@@ -1,28 +1,63 @@
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Lead, LeadStatus, LeadSource } from '@real-estate-erp/types';
 
+const REALISTIC_NAMES = [
+  'Srikanth Reddy', 'Venkat Raman', 'Lakshmi Prasanna', 'Dr. Haritha Rao',
+  'Satyanarayana Murthy', 'Kalyan Chakravarthy', 'Sudhakar Goud', 'Anitha Chowdary',
+  'Naveen Kumar V', 'Rajesh Varma', 'Madhava Rao K', 'Swathi Naidu',
+  'Vijay Bhaskar Reddy', 'Chandra Shekar', 'Pooja Agarwal', 'Ravi Teja Sharma',
+  'Dr. Ashok Varma', 'Kiranmayi Devi', 'Suresh Chandra', 'Bhaskar Raju',
+  'Prasad Babu', 'Geetha Rani', 'Deepak Verma', 'Srinivas Goud',
+  'Padmavathi K', 'Karthik Raja', 'Sunil Narayana', 'Shravan Reddy'
+];
+
+const CITIES = ['Hyderabad', 'Hyderabad', 'Hyderabad', 'Bangalore', 'Vijayawada', 'Visakhapatnam', 'NRI (Dallas, USA)', 'NRI (Dubai, UAE)'];
+const VENTURE_PREFERENCES = ['Sunrise Enclave (Mokila)', 'Green Valley Phase 2 (Shadnagar)', 'Palm County (Kollur)', 'Royal Meadows (Shankarpally)'];
+
 // Mock data generator for leads
 const generateMockLeads = (page: number, limit: number): Lead[] => {
   const leads: Lead[] = [];
-  const statuses: LeadStatus[] = ['NEW', 'CONTACTED', 'QUALIFIED', 'SITE_VISIT_SCHEDULED', 'SITE_VISIT_COMPLETED', 'NEGOTIATING', 'BOOKED', 'CLOSED_LOST', 'INVALID_UNREACHABLE'];
-  const sources: LeadSource[] = ['PUBLIC_WEBSITE', 'FACEBOOK_ADS', 'INSTAGRAM_ADS', 'GOOGLE_SEARCH', '99ACRES', 'MAGICBRICKS', 'HOUSING_COM', 'WALK_IN', 'REFERRAL', 'NEWSPAPER_AD', 'COLD_CALLING'];
+  const statuses: LeadStatus[] = ['NEW', 'CONTACTED', 'QUALIFIED', 'SITE_VISIT_SCHEDULED', 'SITE_VISIT_COMPLETED', 'NEGOTIATING', 'BOOKED', 'CLOSED_LOST'];
+  const sources: LeadSource[] = ['PUBLIC_WEBSITE', 'FACEBOOK_ADS', 'INSTAGRAM_ADS', 'GOOGLE_SEARCH', '99ACRES', 'MAGICBRICKS', 'WALK_IN', 'REFERRAL', 'NEWSPAPER_AD'];
 
   for (let i = 0; i < limit; i++) {
-    const id = `lead-${page * limit + i}`;
+    const leadIndex = page * limit + i;
+    const name = REALISTIC_NAMES[leadIndex % REALISTIC_NAMES.length];
+    const id = `lead-${leadIndex + 101}`;
+    const cleanName = name.toLowerCase().replace(/[^a-z]/g, '');
+    const venture = VENTURE_PREFERENCES[leadIndex % VENTURE_PREFERENCES.length];
+    const status = statuses[leadIndex % statuses.length];
+    const minBudget = 2500000 + (leadIndex % 8) * 1500000;
+    const maxBudget = minBudget + 2000000 + (leadIndex % 5) * 1000000;
+    const intentScore = 60 + (leadIndex * 7) % 40;
+
     leads.push({
       id,
-      fullName: `Lead ${page * limit + i}`,
-      phone: `+919876543${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
-      email: `lead${page * limit + i}@example.com`,
-      city: ['Mumbai', 'Delhi', 'Bangalore', 'Pune', 'Hyderabad'][Math.floor(Math.random() * 5)],
-      source: sources[Math.floor(Math.random() * sources.length)],
-      status: statuses[Math.floor(Math.random() * statuses.length)],
-      budgetMin: 5000000 + Math.floor(Math.random() * 10000000),
-      budgetMax: 15000000 + Math.floor(Math.random() * 20000000),
-      aiIntentScore: Math.floor(Math.random() * 100),
-      aiRecommendation: 'High intent, follow up immediately.',
-      followUps: [],
-      createdAt: new Date(Date.now() - Math.random() * 10000000000).toISOString(),
+      fullName: name,
+      phone: `+91 98480 ${Math.floor(10000 + ((leadIndex * 137) % 90000))}`,
+      email: `${cleanName}${leadIndex}@gmail.com`,
+      city: CITIES[leadIndex % CITIES.length],
+      source: sources[leadIndex % sources.length],
+      status,
+      budgetMin: minBudget,
+      budgetMax: maxBudget,
+      aiIntentScore: intentScore,
+      aiRecommendation: intentScore > 80 
+        ? `High purchase intent for ${venture}. Interested in 200-267 Sq Yds East facing plot.`
+        : `Interested in long-term appreciation in ${venture}. Follow up for weekend site visit.`,
+      followUps: [
+        {
+          id: `fup-${leadIndex}-1`,
+          type: 'CALL',
+          notes: `Schedule callback regarding corner plot availability in ${venture}.`,
+          disposition: 'INTERESTED',
+          nextFollowUpDate: new Date(Date.now() + 86400000).toISOString(),
+          createdByUserId: 'usr-15',
+          createdByUserName: 'Sunita Reddy',
+          createdAt: new Date().toISOString(),
+        }
+      ],
+      createdAt: new Date(Date.now() - (leadIndex * 3600000 * 8)).toISOString(),
       updatedAt: new Date().toISOString(),
     });
   }
