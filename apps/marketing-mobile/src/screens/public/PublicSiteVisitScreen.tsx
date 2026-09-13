@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,8 +8,14 @@ import {
   TouchableOpacity,
   Alert,
   Linking,
+  RefreshControl,
 } from 'react-native';
-import { PUBLIC_VENTURES } from '../../data/publicVenturesData';
+import { PUBLIC_VENTURES, PublicVenture } from '../../data/publicVenturesData';
+import {
+  fetchLiveVentures,
+  createLiveSiteVisitRequest,
+  MobileSiteVisitResult,
+} from '../../services/publicDataService';
 import {
   Car,
   Calendar,
@@ -30,6 +36,7 @@ interface PublicSiteVisitScreenProps {
 export const PublicSiteVisitScreen: React.FC<PublicSiteVisitScreenProps> = ({
   initialVentureId,
 }) => {
+  const [ventures, setVentures] = useState<PublicVenture[]>(PUBLIC_VENTURES);
   const [selectedVentureId, setSelectedVentureId] = useState<string>(
     initialVentureId || PUBLIC_VENTURES[0].id
   );
@@ -40,19 +47,50 @@ export const PublicSiteVisitScreen: React.FC<PublicSiteVisitScreenProps> = ({
   const [passengerCount, setPassengerCount] = useState(2);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
+  const [visitResult, setVisitResult] = useState<MobileSiteVisitResult | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const selectedVenture = PUBLIC_VENTURES.find((v) => v.id === selectedVentureId);
+  const loadVentures = async () => {
+    try {
+      const data = await fetchLiveVentures();
+      setVentures(data);
+      if (!selectedVentureId && data.length > 0) {
+        setSelectedVentureId(data[0].id);
+      }
+    } catch (err) {
+      console.warn('Live ventures load notice:', err);
+    }
+  };
 
-  const handleBookVisit = () => {
+  useEffect(() => {
+    loadVentures();
+  }, []);
+
+  const selectedVenture = ventures.find((v) => v.id === selectedVentureId) || ventures[0];
+
+  const handleBookVisit = async () => {
     if (!fullName.trim() || !phone.trim() || !pickupAddress.trim()) {
-      Alert.alert('Incomplete Form', 'Please fill in your name, contact phone, and pickup address.');
+      Alert.alert('Incomplete Form', 'Please fill in your full name, contact phone, and pickup address.');
       return;
     }
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      const result = await createLiveSiteVisitRequest({
+        ventureId: selectedVenture.id,
+        ventureName: selectedVenture.name,
+        customerName: fullName.trim(),
+        customerPhone: phone.trim(),
+        pickupAddress: pickupAddress.trim(),
+        timeSlot: selectedTimeSlot,
+        passengerCount,
+      });
+      setVisitResult(result);
       setBookingConfirmed(true);
-    }, 1200);
+    } catch (err: any) {
+      Alert.alert('Booking Error', err?.message || 'Failed to submit site visit booking.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -74,7 +112,7 @@ export const PublicSiteVisitScreen: React.FC<PublicSiteVisitScreenProps> = ({
           {/* Select Venture */}
           <Text style={styles.label}>Select Venture to Visit</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.ventureScroll}>
-            {PUBLIC_VENTURES.map((v) => (
+            {ventures.map((v) => (
               <TouchableOpacity
                 key={v.id}
                 style={[

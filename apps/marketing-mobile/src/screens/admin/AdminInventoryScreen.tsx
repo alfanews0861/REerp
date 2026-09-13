@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,8 +7,14 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
+  RefreshControl,
 } from 'react-native';
-import { PUBLIC_PLOTS, PUBLIC_VENTURES, PublicPlot } from '../../data/publicVenturesData';
+import { PUBLIC_PLOTS, PUBLIC_VENTURES, PublicPlot, PublicVenture } from '../../data/publicVenturesData';
+import {
+  fetchLivePlots,
+  fetchLiveVentures,
+  updateLivePlotStatus,
+} from '../../services/publicDataService';
 import {
   Layers,
   Search,
@@ -21,9 +27,34 @@ import {
 
 export const AdminInventoryScreen: React.FC = () => {
   const [plots, setPlots] = useState<PublicPlot[]>(PUBLIC_PLOTS);
+  const [ventures, setVentures] = useState<PublicVenture[]>(PUBLIC_VENTURES);
   const [selectedVenture, setSelectedVenture] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
+  const [refreshing, setRefreshing] = useState(false);
+
+  const loadData = async () => {
+    try {
+      const [livePlots, liveVentures] = await Promise.all([
+        fetchLivePlots(selectedVenture),
+        fetchLiveVentures(),
+      ]);
+      setPlots(livePlots);
+      setVentures(liveVentures);
+    } catch (err) {
+      console.warn('Live inventory fetch error:', err);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, [selectedVenture]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadData();
+    setRefreshing(false);
+  };
 
   const filteredPlots = plots.filter((plot) => {
     if (selectedVenture !== 'ALL' && plot.projectId !== selectedVenture) return false;
@@ -39,17 +70,21 @@ export const AdminInventoryScreen: React.FC = () => {
     return true;
   });
 
-  const handleTogglePlotStatus = (plotId: string, currentStatus: PublicPlot['status']) => {
+  const handleTogglePlotStatus = async (plotId: string, currentStatus: PublicPlot['status']) => {
     let nextStatus: PublicPlot['status'] = 'AVAILABLE';
     if (currentStatus === 'AVAILABLE') nextStatus = 'FAST_SELLING';
     else if (currentStatus === 'FAST_SELLING') nextStatus = 'BOOKED';
     else if (currentStatus === 'BOOKED') nextStatus = 'REGISTERED';
     else nextStatus = 'AVAILABLE';
 
+    // Optimistic UI update
     setPlots((prev) =>
       prev.map((p) => (p.id === plotId ? { ...p, status: nextStatus } : p))
     );
-    Alert.alert('Plot Status Updated', `Plot #${plotId} is now marked as ${nextStatus}`);
+
+    // Save to Firestore
+    await updateLivePlotStatus(plotId, nextStatus);
+    Alert.alert('Plot Status Updated', `Plot #${plotId} is now marked as ${nextStatus} in Firestore.`);
   };
 
   const getStatusColor = (status: PublicPlot['status']) => {
@@ -66,7 +101,18 @@ export const AdminInventoryScreen: React.FC = () => {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={['#1E40AF']}
+          tintColor="#1E40AF"
+        />
+      }
+    >
       {/* Top Admin Stat Card */}
       <View style={styles.headerCard}>
         <View style={styles.headerBadge}>
@@ -136,7 +182,7 @@ export const AdminInventoryScreen: React.FC = () => {
           </Text>
         </TouchableOpacity>
 
-        {PUBLIC_VENTURES.map((v) => (
+        {ventures.map((v) => (
           <TouchableOpacity
             key={v.id}
             style={[styles.filterChip, selectedVenture === v.id && styles.filterChipActive]}

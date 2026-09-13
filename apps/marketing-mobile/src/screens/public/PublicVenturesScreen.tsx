@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,8 +8,10 @@ import {
   TouchableOpacity,
   TextInput,
   Modal,
+  RefreshControl,
 } from 'react-native';
 import { PUBLIC_VENTURES, PublicVenture } from '../../data/publicVenturesData';
+import { fetchLiveVentures } from '../../services/publicDataService';
 import {
   Search,
   MapPin,
@@ -35,11 +37,32 @@ export const PublicVenturesScreen: React.FC<PublicVenturesScreenProps> = ({
   onBookSiteVisit,
   onOpenAdminLogin,
 }) => {
+  const [ventures, setVentures] = useState<PublicVenture[]>(PUBLIC_VENTURES);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedAuthority, setSelectedAuthority] = useState<'ALL' | 'HMDA' | 'DTCP'>('ALL');
   const [selectedVenture, setSelectedVenture] = useState<PublicVenture | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const filteredVentures = PUBLIC_VENTURES.filter((v) => {
+  const loadVentures = async () => {
+    try {
+      const data = await fetchLiveVentures();
+      setVentures(data);
+    } catch (err) {
+      console.warn('Live ventures fetch error:', err);
+    }
+  };
+
+  useEffect(() => {
+    loadVentures();
+  }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadVentures();
+    setRefreshing(false);
+  };
+
+  const filteredVentures = ventures.filter((v) => {
     if (selectedAuthority !== 'ALL' && v.approvalAuthority !== selectedAuthority) {
       return false;
     }
@@ -56,7 +79,18 @@ export const PublicVenturesScreen: React.FC<PublicVenturesScreenProps> = ({
   });
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={['#1E40AF']}
+          tintColor="#1E40AF"
+        />
+      }
+    >
       {/* Hero Banner with Telugu/English text */}
       <View style={styles.heroCard}>
         <View style={styles.heroBadgeRow}>

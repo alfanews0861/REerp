@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,8 +8,14 @@ import {
   Modal,
   TextInput,
   Alert,
+  RefreshControl,
 } from 'react-native';
-import { PUBLIC_PLOTS, PUBLIC_VENTURES, PublicPlot } from '../../data/publicVenturesData';
+import { PUBLIC_PLOTS, PUBLIC_VENTURES, PublicPlot, PublicVenture } from '../../data/publicVenturesData';
+import {
+  fetchLivePlots,
+  fetchLiveVentures,
+  createLivePlotHold,
+} from '../../services/publicDataService';
 import {
   Layers,
   Compass,
@@ -31,11 +37,14 @@ export const PublicPlotsExplorerScreen: React.FC<PublicPlotsExplorerScreenProps>
   initialVentureId,
   onBookSiteVisit,
 }) => {
+  const [plots, setPlots] = useState<PublicPlot[]>(PUBLIC_PLOTS);
+  const [ventures, setVentures] = useState<PublicVenture[]>(PUBLIC_VENTURES);
   const [selectedProjectId, setSelectedProjectId] = useState<string>(initialVentureId || 'ALL');
   const [selectedFacing, setSelectedFacing] = useState<'ALL' | 'EAST' | 'WEST' | 'NORTH' | 'SOUTH'>('ALL');
   const [selectedStatus, setSelectedStatus] = useState<'ALL' | 'AVAILABLE' | 'FAST_SELLING'>('ALL');
   const [selectedPlot, setSelectedPlot] = useState<PublicPlot | null>(PUBLIC_PLOTS[0]);
   const [tokenModalOpen, setTokenModalOpen] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Token hold form state
   const [buyerName, setBuyerName] = useState('');
@@ -44,24 +53,69 @@ export const PublicPlotsExplorerScreen: React.FC<PublicPlotsExplorerScreenProps>
   const [isProcessingToken, setIsProcessingToken] = useState(false);
   const [tokenSuccessReceipt, setTokenSuccessReceipt] = useState<string | null>(null);
 
-  const filteredPlots = PUBLIC_PLOTS.filter((plot) => {
+  const loadData = async () => {
+    try {
+      const [livePlots, liveVentures] = await Promise.all([
+        fetchLivePlots(selectedProjectId),
+        fetchLiveVentures(),
+      ]);
+      setPlots(livePlots);
+      setVentures(liveVentures);
+      if (livePlots.length > 0 && (!selectedPlot || !livePlots.find((p) => p.id === selectedPlot.id))) {
+        setSelectedPlot(livePlots[0]);
+      }
+    } catch (err) {
+      console.warn('Live plots load notice:', err);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, [selectedProjectId]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadData();
+    setRefreshing(false);
+  };
+
+  const filteredPlots = plots.filter((plot) => {
     if (selectedProjectId !== 'ALL' && plot.projectId !== selectedProjectId) return false;
     if (selectedFacing !== 'ALL' && plot.facing !== selectedFacing) return false;
     if (selectedStatus !== 'ALL' && plot.status !== selectedStatus) return false;
     return true;
   });
 
-  const handleConfirmTokenHold = () => {
+  const handleConfirmTokenHold = async () => {
     if (!buyerName.trim() || !buyerPhone.trim()) {
-      Alert.alert('Missing Details', 'Please enter your name and contact phone number.');
+      Alert.alert('Missing Details', 'Please enter your full name and contact mobile number.');
       return;
     }
+    if (!selectedPlot) return;
+
     setIsProcessingToken(true);
-    setTimeout(() => {
+    try {
+      const result = await createLivePlotHold({
+        plotId: selectedPlot.id,
+        plotNumber: selectedPlot.plotNumber,
+        projectId: selectedPlot.projectId,
+        projectName: selectedPlot.projectName,
+        customerName: buyerName.trim(),
+        customerPhone: buyerPhone.trim(),
+        tokenAmount,
+      });
+
+      // Update local state to reflect BOOKED status immediately
+      setPlots((prev) =>
+        prev.map((p) => (p.id === selectedPlot.id ? { ...p, status: 'BOOKED' } : p))
+      );
+      setSelectedPlot((prev) => (prev ? { ...prev, status: 'BOOKED' } : null));
+      setTokenSuccessReceipt(result.receiptNumber);
+    } catch (err: any) {
+      Alert.alert('Hold Processing Notice', err?.message || 'Could not complete online hold.');
+    } finally {
       setIsProcessingToken(false);
-      const receipt = `HOLD-${Math.floor(100000 + Math.random() * 900000)}`;
-      setTokenSuccessReceipt(receipt);
-    }, 1200);
+    }
   };
 
   const getStatusColor = (status: PublicPlot['status']) => {
@@ -77,7 +131,18 @@ export const PublicPlotsExplorerScreen: React.FC<PublicPlotsExplorerScreenProps>
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={['#1E40AF']}
+          tintColor="#1E40AF"
+        />
+      }
+    >
       {/* Header Info Banner */}
       <View style={styles.bannerCard}>
         <View style={styles.bannerRow}>
@@ -92,7 +157,9 @@ export const PublicPlotsExplorerScreen: React.FC<PublicPlotsExplorerScreenProps>
         <View style={styles.legendRow}>
           <View style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: '#059669' }]} />
-            <Text style={styles.legendText}>Available ({PUBLIC_PLOTS.filter((p) => p.status === 'AVAILABLE').length})</Text>
+            <Text style={styles.legendText}>
+              Available ({plots.filter((p) => p.status === 'AVAILABLE').length})
+            </Text>
           </View>
           <View style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: '#D97706' }]} />
@@ -117,11 +184,11 @@ export const PublicPlotsExplorerScreen: React.FC<PublicPlotsExplorerScreenProps>
               selectedProjectId === 'ALL' && styles.projectChipTextActive,
             ]}
           >
-            All Ventures ({PUBLIC_PLOTS.length})
+            All Ventures ({plots.length})
           </Text>
         </TouchableOpacity>
 
-        {PUBLIC_VENTURES.map((v) => (
+        {ventures.map((v) => (
           <TouchableOpacity
             key={v.id}
             style={[styles.projectChip, selectedProjectId === v.id && styles.projectChipActive]}

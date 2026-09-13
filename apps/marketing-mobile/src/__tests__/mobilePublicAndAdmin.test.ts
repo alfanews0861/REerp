@@ -1,11 +1,19 @@
 import { describe, it, expect } from 'vitest';
 import { PUBLIC_VENTURES, PUBLIC_PLOTS, PublicPlot } from '../data/publicVenturesData';
 import { queryMobileRealEstateAssistant } from '../services/mobileAiService';
+import {
+  fetchLiveVentures,
+  fetchLivePlots,
+  createLivePlotHold,
+  createLiveSiteVisitRequest,
+  updateLivePlotStatus,
+} from '../services/publicDataService';
 
-describe('Marketing Mobile - Public Website Data & Modules', () => {
-  it('loads all public ventures with valid statutory approvals and RERA IDs', () => {
-    expect(PUBLIC_VENTURES.length).toBeGreaterThanOrEqual(4);
-    PUBLIC_VENTURES.forEach((venture) => {
+describe('Marketing Mobile - Public Website Live Data Services', () => {
+  it('loads live ventures seamlessly with valid approval authorities and RERA IDs', async () => {
+    const ventures = await fetchLiveVentures();
+    expect(ventures.length).toBeGreaterThanOrEqual(4);
+    ventures.forEach((venture) => {
       expect(venture.id).toBeDefined();
       expect(venture.name).toBeTruthy();
       expect(['HMDA', 'DTCP', 'RERA']).toContain(venture.approvalAuthority);
@@ -15,20 +23,57 @@ describe('Marketing Mobile - Public Website Data & Modules', () => {
     });
   });
 
-  it('correctly filters public plots by facing and budget', () => {
-    const eastFacing = PUBLIC_PLOTS.filter((p) => p.facing === 'EAST');
+  it('correctly filters live public plots by facing and budget', async () => {
+    const allPlots = await fetchLivePlots();
+    const eastFacing = allPlots.filter((p) => p.facing === 'EAST');
     expect(eastFacing.length).toBeGreaterThan(0);
     eastFacing.forEach((p) => expect(p.facing).toBe('EAST'));
 
-    const under50Lakhs = PUBLIC_PLOTS.filter((p) => p.totalPrice <= 5000000);
+    const under50Lakhs = allPlots.filter((p) => p.totalPrice <= 5000000);
     expect(under50Lakhs.length).toBeGreaterThan(0);
     under50Lakhs.forEach((p) => expect(p.totalPrice).toBeLessThanOrEqual(5000000));
   });
 
-  it('calculates 48-hour token hold and pricing breakdown correctly', () => {
-    const testPlot = PUBLIC_PLOTS[0];
-    const calculatedTotal = testPlot.areaSqYds * testPlot.pricePerSqYd;
-    expect(testPlot.totalPrice).toBe(calculatedTotal);
+  it('filters live plots by specific venture project ID', async () => {
+    const projPlots = await fetchLivePlots('proj-1');
+    expect(projPlots.length).toBeGreaterThan(0);
+    projPlots.forEach((p) => {
+      expect(p.projectId).toBe('proj-1');
+    });
+  });
+
+  it('creates live plot hold transaction record with verified receipt and price freeze', async () => {
+    const result = await createLivePlotHold({
+      plotId: 'plot-101',
+      plotNumber: 'P-01',
+      projectId: 'proj-1',
+      projectName: 'Sunrise Enclave - Mokila',
+      customerName: 'Kishore Kumar',
+      customerPhone: '+91 9848011223',
+      tokenAmount: 25000,
+    });
+
+    expect(result.receiptNumber).toMatch(/^HOLD-\d{6}$/);
+    expect(result.status).toBe('RESERVED_HOLD');
+    expect(result.tokenAmount).toBe(25000);
+    expect(result.customerName).toBe('Kishore Kumar');
+  });
+
+  it('creates live site visit request with assigned fleet driver and vehicle details', async () => {
+    const result = await createLiveSiteVisitRequest({
+      ventureId: 'proj-1',
+      ventureName: 'Sunrise Enclave - Mokila',
+      customerName: 'Anil Reddy',
+      customerPhone: '+91 9988776655',
+      pickupAddress: 'Hitec City, Hyderabad',
+      timeSlot: '10:00 AM (Morning)',
+      passengerCount: 3,
+    });
+
+    expect(result.visitId).toBeDefined();
+    expect(result.driverName).toBeTruthy();
+    expect(result.vehiclePlate).toBeTruthy();
+    expect(result.status).toBe('SCHEDULED');
   });
 });
 
@@ -75,5 +120,9 @@ describe('Marketing Mobile - Admin Plot Inventory Cycling', () => {
     expect(cycleStatus('FAST_SELLING')).toBe('BOOKED');
     expect(cycleStatus('BOOKED')).toBe('REGISTERED');
     expect(cycleStatus('REGISTERED')).toBe('AVAILABLE');
+  });
+
+  it('executes updateLivePlotStatus safely', async () => {
+    await expect(updateLivePlotStatus('plot-101', 'BOOKED')).resolves.not.toThrow();
   });
 });
