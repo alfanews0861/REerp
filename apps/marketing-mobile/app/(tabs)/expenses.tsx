@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, StyleSheet, ScrollView } from 'react-native';
+import { Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Input } from '../../src/components/Input';
 import { Button } from '../../src/components/Button';
 import { useMutation } from '@tanstack/react-query';
@@ -28,7 +28,7 @@ export default function ExpensesScreen() {
       setType('');
       setAmount('');
       setDescription('');
-      alert('Expense recorded. Will sync when online.');
+      Alert.alert('Success', 'Expense recorded. Will sync when online.');
     }
   });
 

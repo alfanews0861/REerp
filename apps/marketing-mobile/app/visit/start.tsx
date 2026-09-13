@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Button } from '../../src/components/Button';
 import { Card } from '../../src/components/Card';
@@ -12,7 +12,7 @@ export default function StartVisitScreen() {
 
   const handleStart = () => {
     // Logic to start the visit in the backend/cache
-    alert('Visit Started!');
+    Alert.alert('Success', 'Visit Started!');
     router.replace({ pathname: '/visit/complete', params: { visitId } });
   };
 

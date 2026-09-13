@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Button } from '../../src/components/Button';
 import { Card } from '../../src/components/Card';
@@ -48,7 +48,7 @@ export default function CompleteVisitScreen() {
 
   const handleComplete = () => {
     // Logic to complete the visit in backend/cache
-    alert('Visit Completed & Synced!');
+    Alert.alert('Success', 'Visit Completed & Synced!');
     router.replace('/visits');
   };
 

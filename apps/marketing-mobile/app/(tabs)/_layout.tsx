@@ -3,7 +3,7 @@ import { Home, Users, MapPin, ReceiptText, CalendarCheck, Car } from 'lucide-rea
 
 export default function TabLayout() {
   return (
-    <Tabs screenOptions={{ tabBarActiveTintColor: '#2563eb' }}>
+    <Tabs screenOptions={{ tabBarActiveTintColor: '#2563eb' }} initialRouteName="index">
       <Tabs.Screen
         name="index"
         options={{

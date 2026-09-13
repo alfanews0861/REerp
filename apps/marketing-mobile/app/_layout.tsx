@@ -107,7 +107,7 @@ export default function RootLayout() {
     <SafeRootErrorBoundary>
       <QueryProvider>
         <LocationProvider>
-          <Stack screenOptions={{ headerShown: false }}>
+          <Stack screenOptions={{ headerShown: false }} initialRouteName="(tabs)">
             <Stack.Screen name="index" options={{ headerShown: false }} />
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="lead/[id]" options={{ title: 'Lead Details', headerShown: true }} />
