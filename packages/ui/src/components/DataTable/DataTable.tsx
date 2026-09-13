@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useMemo } from 'react';
 import {
   Table,
   TableBody,
@@ -15,12 +15,14 @@ import {
 import { useVirtualizer } from '@tanstack/react-virtual';
 
 export interface Column<T> {
-  id: keyof T;
+  id: keyof T | string;
   label: string;
   minWidth?: number;
   width?: number;
   align?: 'right' | 'left' | 'center';
   format?: (value: any, row?: T) => React.ReactNode;
+  render?: (row: T, value?: any) => React.ReactNode;
+  sortable?: boolean;
 }
 
 export interface DataTableProps<T> {
@@ -31,27 +33,33 @@ export interface DataTableProps<T> {
   totalRows?: number;
   onPageChange?: (event: unknown, newPage: number) => void;
   onRowsPerPageChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  orderBy?: keyof T;
+  rowsPerPageOptions?: number[];
+  orderBy?: keyof T | string;
   order?: 'asc' | 'desc';
-  onSort?: (property: keyof T) => void;
+  onSort?: (property: keyof T | string) => void;
   selected?: string[];
   onSelectAllClick?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onSelectClick?: (id: string) => void;
-  keyField: keyof T;
+  keyField: keyof T | string;
   hiddenColumns?: string[];
   virtualScroll?: boolean;
   rowHeight?: number;
   resizableColumns?: boolean;
+  maxHeight?: number | string;
+  pagination?: boolean;
+  emptyMessage?: string;
+  loading?: boolean;
 }
 
 export function DataTable<T extends Record<string, any>>({
   columns,
   data,
-  page = 0,
-  rowsPerPage = 10,
-  totalRows = 0,
+  page,
+  rowsPerPage = 20,
+  totalRows,
   onPageChange,
   onRowsPerPageChange,
+  rowsPerPageOptions = [10, 20, 50, 100],
   orderBy,
   order = 'asc',
   onSort,
@@ -63,9 +71,50 @@ export function DataTable<T extends Record<string, any>>({
   virtualScroll = false,
   rowHeight = 53,
   resizableColumns = false,
+  maxHeight,
+  pagination = true,
+  emptyMessage = 'No data available',
 }: DataTableProps<T>) {
+  // Internal pagination state for uncontrolled mode
+  const [internalPage, setInternalPage] = useState(0);
+  const [internalRowsPerPage, setInternalRowsPerPage] = useState(rowsPerPage || 20);
+
+  const isControlled = onPageChange !== undefined;
+  const activePage = isControlled ? (page ?? 0) : internalPage;
+  const activeRowsPerPage = isControlled ? (rowsPerPage ?? 20) : internalRowsPerPage;
+  const totalCount = totalRows !== undefined ? totalRows : data.length;
+
+  const handlePageChange = (event: unknown, newPage: number) => {
+    if (isControlled && onPageChange) {
+      onPageChange(event, newPage);
+    } else {
+      setInternalPage(newPage);
+    }
+  };
+
+  const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newRowsPerPage = parseInt(event.target.value, 10);
+    if (isControlled && onRowsPerPageChange) {
+      onRowsPerPageChange(event);
+    } else {
+      setInternalRowsPerPage(newRowsPerPage);
+      setInternalPage(0);
+    }
+  };
+
+  // If uncontrolled and not virtualized, slice data according to pagination
+  const displayedData = useMemo(() => {
+    if (virtualScroll || isControlled) {
+      return data;
+    }
+    if (!pagination) {
+      return data;
+    }
+    const start = activePage * activeRowsPerPage;
+    return data.slice(start, start + activeRowsPerPage);
+  }, [data, virtualScroll, isControlled, pagination, activePage, activeRowsPerPage]);
   
-  const createSortHandler = (property: keyof T) => () => {
+  const createSortHandler = (property: keyof T | string) => () => {
     if (onSort) onSort(property);
   };
 
@@ -77,7 +126,7 @@ export function DataTable<T extends Record<string, any>>({
   const tableContainerRef = useRef<HTMLDivElement>(null);
   
   const rowVirtualizer = useVirtualizer({
-    count: data.length,
+    count: displayedData.length,
     getScrollElement: () => tableContainerRef.current,
     estimateSize: () => rowHeight,
     overscan: 5,
@@ -109,17 +158,50 @@ export function DataTable<T extends Record<string, any>>({
   }, [columnWidths, resizableColumns]);
 
   return (
-    <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-      <TableContainer ref={tableContainerRef} sx={{ maxHeight: virtualScroll ? 'calc(100vh - 300px)' : 440 }}>
-        <Table stickyHeader aria-label="sticky table" size={virtualScroll ? "small" : "medium"}>
+    <Paper sx={{ width: '100%', overflow: 'hidden', boxShadow: 'none' }}>
+      <TableContainer
+        ref={tableContainerRef}
+        sx={{
+          maxHeight: virtualScroll ? 'calc(100vh - 300px)' : (maxHeight || undefined),
+          overflowX: 'auto',
+          overflowY: maxHeight ? 'auto' : 'visible',
+        }}
+      >
+        <Table
+          stickyHeader={Boolean(maxHeight || virtualScroll)}
+          aria-label="data table"
+          size="small"
+          sx={{
+            '& .MuiTableCell-root': {
+              py: 1,
+              px: 1.5,
+              fontSize: '0.8125rem',
+            },
+            '& .MuiTableCell-head': {
+              py: 1.2,
+              px: 1.5,
+              fontWeight: 700,
+              fontSize: '0.72rem',
+              textTransform: 'uppercase',
+              letterSpacing: '0.03em',
+              bgcolor: '#f8fafc',
+              color: '#475569',
+              borderBottom: '1px solid #e2e8f0',
+            },
+            '& .MuiTableRow-root:hover': {
+              bgcolor: 'rgba(241, 245, 249, 0.6) !important',
+            },
+          }}
+        >
           <TableHead>
             <TableRow>
               {onSelectAllClick && (
-                <TableCell padding="checkbox" sx={{ width: 50, zIndex: 3 }}>
+                <TableCell padding="checkbox" sx={{ width: 44, zIndex: 3 }}>
                   <Checkbox
+                    size="small"
                     color="primary"
-                    indeterminate={selected.length > 0 && selected.length < data.length}
-                    checked={data.length > 0 && selected.length === data.length}
+                    indeterminate={selected.length > 0 && selected.length < displayedData.length}
+                    checked={displayedData.length > 0 && selected.length === displayedData.length}
                     onChange={onSelectAllClick}
                   />
                 </TableCell>
@@ -177,8 +259,8 @@ export function DataTable<T extends Record<string, any>>({
               </TableRow>
             )}
             
-            {(virtualScroll ? virtualRows : data.map((_, i) => ({ index: i }))).map((vRow) => {
-              const row = data[vRow.index];
+            {(virtualScroll ? virtualRows : displayedData.map((_, i) => ({ index: i }))).map((vRow) => {
+              const row = displayedData[vRow.index];
               if (!row) return null;
               
               const isItemSelected = isSelected(row[keyField as string]);
@@ -195,6 +277,7 @@ export function DataTable<T extends Record<string, any>>({
                   {onSelectClick && (
                     <TableCell padding="checkbox">
                       <Checkbox
+                        size="small"
                         color="primary"
                         checked={isItemSelected}
                         onChange={() => onSelectClick(row[keyField as string])}
@@ -202,10 +285,17 @@ export function DataTable<T extends Record<string, any>>({
                     </TableCell>
                   )}
                   {visibleColumns.map((column) => {
-                    const value = row[column.id];
+                    const col = column as any;
+                    const value = row[col.id];
+                    let cellContent = value;
+                    if (typeof col.render === 'function') {
+                      cellContent = col.render(row, value);
+                    } else if (typeof col.format === 'function') {
+                      cellContent = col.format(value, row);
+                    }
                     return (
-                      <TableCell key={column.id as string} align={column.align}>
-                        {column.format ? column.format(value, row) : value}
+                      <TableCell key={col.id as string} align={column.align}>
+                        {cellContent}
                       </TableCell>
                     );
                   })}
@@ -219,25 +309,37 @@ export function DataTable<T extends Record<string, any>>({
               </TableRow>
             )}
             
-            {!virtualScroll && data.length === 0 && (
+            {!virtualScroll && displayedData.length === 0 && (
                <TableRow>
-                 <TableCell colSpan={visibleColumns.length + (onSelectAllClick ? 1 : 0)} align="center" sx={{ py: 3 }}>
-                    No data available
+                 <TableCell colSpan={visibleColumns.length + (onSelectAllClick ? 1 : 0)} align="center" sx={{ py: 3, color: 'text.secondary', fontWeight: 500 }}>
+                    {emptyMessage}
                  </TableCell>
                </TableRow>
             )}
           </TableBody>
         </Table>
       </TableContainer>
-      {onPageChange && onRowsPerPageChange && (
+      {pagination && (
         <TablePagination
-          rowsPerPageOptions={[10, 25, 100]}
+          rowsPerPageOptions={rowsPerPageOptions}
           component="div"
-          count={totalRows}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={onPageChange}
-          onRowsPerPageChange={onRowsPerPageChange}
+          count={totalCount}
+          rowsPerPage={activeRowsPerPage}
+          page={activePage}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleRowsPerPageChange}
+          sx={{
+            borderTop: '1px solid #e2e8f0',
+            '.MuiTablePagination-toolbar': {
+              minHeight: 44,
+              px: 1.5,
+              fontSize: '0.8rem',
+            },
+            '.MuiTablePagination-selectLabel, .MuiTablePagination-displayedRows': {
+              fontSize: '0.8rem',
+              mb: 0,
+            },
+          }}
         />
       )}
     </Paper>

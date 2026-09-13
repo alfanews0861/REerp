@@ -11,6 +11,13 @@ declare module '@mui/material/styles' {
       sold: string;
       cancelled: string;
     };
+    gradients?: {
+      primary: string;
+      gold: string;
+      emerald: string;
+      dark: string;
+      card: string;
+    };
   }
   interface PaletteOptions {
     status?: {
@@ -22,5 +29,13 @@ declare module '@mui/material/styles' {
       sold: string;
       cancelled: string;
     };
+    gradients?: {
+      primary?: string;
+      gold?: string;
+      emerald?: string;
+      dark?: string;
+      card?: string;
+    };
   }
 }
+

@@ -3,7 +3,6 @@ import {
   Box,
   Typography,
   Button,
-  Paper,
   Grid,
   Card,
   CardContent,
@@ -25,7 +24,6 @@ import {
   FormControlLabel,
   Checkbox,
   Divider,
-  LinearProgress,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -37,12 +35,10 @@ import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 import HeadsetMicIcon from '@mui/icons-material/HeadsetMic';
 import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 import GroupIcon from '@mui/icons-material/Group';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { DataTable, StatusChip, SearchBox } from '@real-estate-erp/ui';
 import { UserProfile, UserRole, UserStatus } from '@real-estate-erp/types';
 import { getFirebaseInstance, signUpWithEmail, sendPasswordResetEmail } from '@real-estate-erp/firebase';
 import { collection, doc, updateDoc, onSnapshot } from 'firebase/firestore';
-import { FirestoreSeederService } from '../../services/FirestoreSeederService';
 
 export interface ExtendedStaffUser extends UserProfile {
   department?: string;
@@ -415,41 +411,6 @@ export const UserManagementWorkspace: React.FC = () => {
   const [editPermissions, setEditPermissions] = useState<string[]>([]);
   const [editLoading, setEditLoading] = useState(false);
 
-  // Firestore Database Seeding state
-  const [seedingLoading, setSeedingLoading] = useState(false);
-  const [seedingProgress, setSeedingProgress] = useState<{ message: string; current: number; total: number } | null>(null);
-
-  const handleSeedDatabase = async () => {
-    setSeedingLoading(true);
-    setSeedingProgress({ message: 'Initializing Firestore database seeding...', current: 0, total: 100 });
-
-    try {
-      const result = await FirestoreSeederService.seedAll((prog) => {
-        setSeedingProgress(prog);
-      });
-
-      if (result.success) {
-        setBannerNotice({
-          text: `✅ Successfully populated ${result.totalDocuments} enterprise records directly into Firebase Firestore across 14 collections!`,
-          severity: 'success',
-        });
-      } else {
-        setBannerNotice({
-          text: `Notice: ${result.error || 'Seeding encountered an issue'}`,
-          severity: 'error',
-        });
-      }
-    } catch (err: any) {
-      setBannerNotice({
-        text: `Seeding error: ${err?.message || 'Failed to connect to Firestore'}`,
-        severity: 'error',
-      });
-    } finally {
-      setSeedingLoading(false);
-      setSeedingProgress(null);
-    }
-  };
-
   // Subscribe to live users from Firestore
   useEffect(() => {
     try {
@@ -686,21 +647,24 @@ export const UserManagementWorkspace: React.FC = () => {
       id: 'displayName',
       label: 'Staff Member',
       minWidth: 220,
-      format: (_: unknown, row: ExtendedStaffUser) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <Avatar sx={{ width: 36, height: 36, bgcolor: 'primary.main', fontSize: '0.9rem', fontWeight: 600 }}>
-            {row.displayName.charAt(0).toUpperCase()}
-          </Avatar>
-          <Box>
-            <Typography variant="body2" fontWeight={600} color="text.primary">
-              {row.displayName}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {row.email}
-            </Typography>
+      format: (_: unknown, row?: ExtendedStaffUser) => {
+        if (!row) return null;
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Avatar sx={{ width: 36, height: 36, bgcolor: 'primary.main', fontSize: '0.9rem', fontWeight: 600 }}>
+              {row.displayName.charAt(0).toUpperCase()}
+            </Avatar>
+            <Box>
+              <Typography variant="body2" fontWeight={600} color="text.primary">
+                {row.displayName}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {row.email}
+              </Typography>
+            </Box>
           </Box>
-        </Box>
-      ),
+        );
+      },
     },
     {
       id: 'role',
@@ -712,16 +676,19 @@ export const UserManagementWorkspace: React.FC = () => {
       id: 'department',
       label: 'Department & Phone',
       minWidth: 180,
-      format: (_: unknown, row: ExtendedStaffUser) => (
-        <Box>
-          <Typography variant="body2" color="text.primary">
-            {row.department || 'Operations'}
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            {row.phoneNumber || 'No phone'}
-          </Typography>
-        </Box>
-      ),
+      format: (_: unknown, row?: ExtendedStaffUser) => {
+        if (!row) return null;
+        return (
+          <Box>
+            <Typography variant="body2" color="text.primary">
+              {row.department || 'Operations'}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {row.phoneNumber || 'No phone'}
+            </Typography>
+          </Box>
+        );
+      },
     },
     {
       id: 'status',
@@ -749,92 +716,69 @@ export const UserManagementWorkspace: React.FC = () => {
       label: 'Actions',
       minWidth: 150,
       align: 'right' as const,
-      format: (_: unknown, row: ExtendedStaffUser) => (
-        <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-          <Tooltip title="Edit Role & Permissions">
-            <IconButton size="small" color="primary" onClick={() => handleOpenEditRole(row)}>
-              <EditIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title={row.status === 'active' ? 'Suspend Account' : 'Reactivate Account'}>
-            <IconButton
-              size="small"
-              color={row.status === 'active' ? 'warning' : 'success'}
-              onClick={() => handleToggleStatus(row)}
-            >
-              {row.status === 'active' ? <BlockIcon fontSize="small" /> : <CheckCircleOutlineIcon fontSize="small" />}
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Send Password Reset Email">
-            <IconButton size="small" color="info" onClick={() => handleSendReset(row.email)}>
-              <LockResetIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        </Stack>
-      ),
+      format: (_: unknown, row?: ExtendedStaffUser) => {
+        if (!row) return null;
+        return (
+          <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+            <Tooltip title="Edit Role & Permissions">
+              <IconButton size="small" color="primary" onClick={() => handleOpenEditRole(row)}>
+                <EditIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={row.status === 'active' ? 'Suspend Account' : 'Reactivate Account'}>
+              <IconButton
+                size="small"
+                color={row.status === 'active' ? 'warning' : 'success'}
+                onClick={() => handleToggleStatus(row)}
+              >
+                {row.status === 'active' ? <BlockIcon fontSize="small" /> : <CheckCircleOutlineIcon fontSize="small" />}
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Send Password Reset Email">
+              <IconButton size="small" color="info" onClick={() => handleSendReset(row.email)}>
+                <LockResetIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+        );
+      },
     },
   ];
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: { xs: 0.5, md: 1 }, display: 'flex', flexDirection: 'column', gap: 2 }}>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1.5 }}>
         <Box>
-          <Typography variant="h4" fontWeight={700} color="text.primary">
+          <Typography variant="h5" fontWeight={700} color="text.primary" sx={{ fontSize: { xs: '1.25rem', md: '1.45rem' } }}>
             Staff & User Management
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25 }}>
             Manage employee access, configure RBAC roles (Admin, Manager, Telecaller, Field Agent) & security.
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
           <Button
-            variant="outlined"
-            color="secondary"
-            startIcon={<CloudUploadIcon />}
-            onClick={handleSeedDatabase}
-            disabled={seedingLoading}
-            sx={{ fontWeight: 700, textTransform: 'none', px: 2, borderWidth: 2 }}
-          >
-            {seedingLoading ? 'Seeding Firestore...' : '⚡ Push All Demo Data to Database'}
-          </Button>
-          <Button
             variant="contained"
             color="primary"
+            size="medium"
             startIcon={<AddIcon />}
             onClick={handleOpenCreate}
-            sx={{ fontWeight: 600, textTransform: 'none', px: 2.5 }}
+            sx={{ fontWeight: 600, textTransform: 'none', px: 2, py: 0.75, borderRadius: 2, fontSize: '0.85rem' }}
           >
             Add Staff Member
           </Button>
         </Box>
       </Box>
 
-      {seedingLoading && seedingProgress && (
-        <Paper elevation={2} sx={{ p: 2.5, mb: 3, borderRadius: 2, bgcolor: 'background.paper', border: '1px solid', borderColor: 'secondary.main' }}>
-          <Typography variant="subtitle2" fontWeight={700} color="secondary.main" gutterBottom>
-            {seedingProgress.message}
-          </Typography>
-          <LinearProgress
-            variant="determinate"
-            value={seedingProgress.total > 0 ? (seedingProgress.current / seedingProgress.total) * 100 : 0}
-            color="secondary"
-            sx={{ height: 8, borderRadius: 4, my: 1 }}
-          />
-          <Typography variant="caption" color="text.secondary">
-            Writing {seedingProgress.current} of {seedingProgress.total} documents into Firebase Firestore collections...
-          </Typography>
-        </Paper>
-      )}
-
       {bannerNotice && (
-        <Alert severity={bannerNotice.severity} sx={{ mb: 3 }} onClose={() => setBannerNotice(null)}>
+        <Alert severity={bannerNotice.severity} sx={{ mb: 1 }} onClose={() => setBannerNotice(null)}>
           {bannerNotice.text}
         </Alert>
       )}
 
       {/* KPI Stats Cards */}
-      <Grid container spacing={2.5} sx={{ mb: 3.5 }}>
+      <Grid container spacing={2} sx={{ mb: 1 }}>
         <Grid item xs={12} sm={6} md={2.4}>
           <Card elevation={1} sx={{ borderRadius: 2 }}>
             <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 2 }}>
@@ -965,14 +909,14 @@ export const UserManagementWorkspace: React.FC = () => {
         </Box>
 
         {/* Data Table */}
-        <Box sx={{ p: 2 }}>
+        <Box sx={{ p: 0 }}>
           <DataTable
-            {...({
-              columns,
-              data: filteredUsers,
-              keyField: 'id',
-              emptyMessage: 'No staff members match the selected filters.',
-            } as unknown as React.ComponentProps<typeof DataTable>)}
+            columns={columns}
+            data={filteredUsers}
+            keyField="id"
+            rowsPerPage={20}
+            rowsPerPageOptions={[10, 20, 50, 100]}
+            emptyMessage="No staff members match the selected filters."
           />
         </Box>
       </Card>

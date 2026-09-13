@@ -38,7 +38,6 @@ import { PUBLIC_VENTURES, PUBLIC_PLOTS, PublicVenture, PublicPlot } from '../../
 import { SiteVisitModal } from '../../components/SiteVisitModal';
 import { TokenBookingModal } from '../../components/TokenBookingModal';
 import { MasterLayoutMap } from '../../components/MasterLayoutMap';
-import { useI18n } from '../../providers/LanguageContext';
 import { fetchPublicVentures, fetchPublicPlots, OnlineBookingResult } from '../../services/publicDataService';
 
 export const VentureDetailPage: FC = () => {

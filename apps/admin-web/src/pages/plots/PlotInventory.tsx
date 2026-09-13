@@ -321,26 +321,30 @@ export const PlotInventory = () => {
   ];
 
   return (
-    <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 3 }}>
+    <Box sx={{ p: { xs: 0.5, md: 1 }, display: 'flex', flexDirection: 'column', gap: 2 }}>
       {/* Header with Projects link */}
-      <Box display="flex" justifyContent="space-between" alignItems="flex-start" flexWrap="wrap" gap={2}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1.5}>
         <Box>
           <Stack direction="row" spacing={1} alignItems="center">
-            <Typography variant="h4" fontWeight={700}>Plot Inventory</Typography>
+            <Typography variant="h5" fontWeight={700} sx={{ fontSize: { xs: '1.25rem', md: '1.45rem' } }}>
+              Plot Inventory
+            </Typography>
           </Stack>
-          <Typography variant="body1" color="text.secondary">
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25 }}>
             Manage individual plot units, facing, dimensions, pricing, and live booking status
           </Typography>
         </Box>
         <Stack direction="row" spacing={1.5}>
           <Button 
             variant="outlined" 
+            size="medium"
             startIcon={<ArrowBackIcon />}
             onClick={() => navigate('/projects')}
+            sx={{ py: 0.75, fontSize: '0.85rem' }}
           >
             All Ventures
           </Button>
-          <Button variant="contained" color="primary">Bulk Import</Button>
+          <Button variant="contained" color="primary" size="medium" sx={{ py: 0.75, fontSize: '0.85rem' }}>Bulk Import</Button>
         </Stack>
       </Box>
 
@@ -349,7 +353,7 @@ export const PlotInventory = () => {
         <Paper
           elevation={0}
           sx={{
-            p: 2,
+            p: 1.5,
             borderRadius: 2,
             bgcolor: 'primary.lighter',
             border: 1,
@@ -384,18 +388,38 @@ export const PlotInventory = () => {
         </Paper>
       )}
 
-      <Grid container spacing={3}>
+      <Grid container spacing={2}>
         <Grid item xs={12} sm={6} md={3}>
-          <MetricCard title="Total Plots" value={metrics.total} />
+          <MetricCard
+            title="Total Plots"
+            value={metrics.total}
+            subtitle="Total Venture Plots"
+            color="#2563eb"
+          />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <MetricCard title="Available" value={metrics.available} />
+          <MetricCard
+            title="Available"
+            value={metrics.available}
+            subtitle="Open for Booking"
+            color="#16a34a"
+          />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <MetricCard title="Booked" value={metrics.booked} />
+          <MetricCard
+            title="Booked"
+            value={metrics.booked}
+            subtitle="Token Advance Received"
+            color="#f59e0b"
+          />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <MetricCard title="Registered" value={metrics.registered} />
+          <MetricCard
+            title="Registered"
+            value={metrics.registered}
+            subtitle="Sale Deeds Registered"
+            color="#7c3aed"
+          />
         </Grid>
       </Grid>
 

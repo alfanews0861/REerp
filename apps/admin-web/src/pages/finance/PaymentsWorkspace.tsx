@@ -18,6 +18,9 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import { DataTable, MetricCard, SearchBox, StatusChip } from '@real-estate-erp/ui';
 import { getFirebaseInstance, paymentService } from '@real-estate-erp/firebase';
 import { collection, query, getDocs, limit, orderBy } from 'firebase/firestore';
@@ -503,22 +506,23 @@ export const PaymentsWorkspace: React.FC = () => {
   ];
 
   return (
-    <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 3 }}>
+    <Box sx={{ p: { xs: 0.5, md: 1 }, display: 'flex', flexDirection: 'column', gap: 2 }}>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1.5 }}>
         <Box>
-          <Typography variant="h4" fontWeight={700} color="primary.main">
+          <Typography variant="h5" fontWeight={700} color="primary.main" sx={{ fontSize: { xs: '1.25rem', md: '1.45rem' } }}>
             Payments & Collections Workspace
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25 }}>
             Manage customer installments, banking reconciliation, and printable enterprise receipts.
           </Typography>
         </Box>
         <Button
           variant="contained"
+          size="medium"
           startIcon={<AddIcon />}
           onClick={() => setCreateDialogOpen(true)}
-          sx={{ borderRadius: 2 }}
+          sx={{ py: 0.75, px: 2, borderRadius: 2, fontSize: '0.85rem' }}
         >
           Record Payment
         </Button>
@@ -530,28 +534,40 @@ export const PaymentsWorkspace: React.FC = () => {
           <MetricCard
             title="Total Realized Revenue"
             value={`₹${(metrics.totalCollected / 100000).toFixed(1)} L`}
+            subtitle="Inward Bank Realizations"
             trend={{ value: 14, isPositive: true }}
+            icon={<CurrencyRupeeIcon />}
+            color="#16a34a"
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <MetricCard
             title="Verified Receipts"
             value={metrics.verifiedCount}
+            subtitle="Cleared & Reconciled"
             trend={{ value: 8, isPositive: true }}
+            icon={<CheckCircleIcon />}
+            color="#2563eb"
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <MetricCard
             title="Pending Verification"
             value={metrics.pendingCount}
+            subtitle="Cheques & Slips in Review"
             trend={{ value: 2, isPositive: false }}
+            icon={<HourglassEmptyIcon />}
+            color="#d97706"
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <MetricCard
             title="Total Receipts Issued"
             value={metrics.totalReceipts}
+            subtitle="All Transaction Vouchers"
             trend={{ value: 10, isPositive: true }}
+            icon={<TrendingUpIcon />}
+            color="#7c3aed"
           />
         </Grid>
       </Grid>

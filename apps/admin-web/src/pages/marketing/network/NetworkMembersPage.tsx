@@ -26,12 +26,23 @@ import {
   MenuItem,
   IconButton,
   Tooltip,
+  Alert,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
+import SecurityIcon from '@mui/icons-material/Security';
+import HowToRegIcon from '@mui/icons-material/HowToReg';
+import { useAuthContext } from '@real-estate-erp/firebase';
+import {
+  CadreLevel,
+  CADRE_DISPLAY_NAMES,
+  getAllowedAssignableCadres,
+  canApproveOfficeStaff,
+  canAssignCadre,
+} from '@real-estate-erp/types';
 
 interface NetworkMember {
   id: string;
@@ -269,12 +280,72 @@ export const initialMembers: NetworkMember[] = [
 ];
 
 export const NetworkMembersPage: React.FC = () => {
+  const { user } = useAuthContext();
   const [members, setMembers] = useState<NetworkMember[]>(initialMembers);
   const [search, setSearch] = useState('');
   const [positionFilter, setPositionFilter] = useState('ALL');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [openModal, setOpenModal] = useState(false);
+
+  // Cadre Assignment & Promotion State
+  const [selectedMember, setSelectedMember] = useState<NetworkMember | null>(null);
+  const [targetCadre, setTargetCadre] = useState<CadreLevel>('sales_executive');
+  const [cadreModalOpen, setCadreModalOpen] = useState(false);
+  const [cadreError, setCadreError] = useState<string | null>(null);
+  const [cadreSuccess, setCadreSuccess] = useState<string | null>(null);
+
+  // Current Actor's Effective Cadre Level
+  const actorCadre: CadreLevel =
+    (user?.cadre as CadreLevel) ||
+    (user?.role === 'super_admin' || user?.role === 'director'
+      ? 'director'
+      : user?.role === 'branch_manager'
+      ? 'gm'
+      : user?.role === 'sales_manager'
+      ? 'sales_manager'
+      : 'sales_executive');
+
+  const allowedCadres = getAllowedAssignableCadres(actorCadre);
+
+  const handleOpenCadreModal = (member: NetworkMember) => {
+    setSelectedMember(member);
+    setCadreError(null);
+    setCadreSuccess(null);
+    // Set default target cadre to first allowed option or sales_executive
+    setTargetCadre(allowedCadres[0] || 'sales_executive');
+    setCadreModalOpen(true);
+  };
+
+  const handleSaveCadreChange = () => {
+    if (!selectedMember) return;
+    setCadreError(null);
+
+    // Enforce Hierarchy Rule: Actor can only assign cadres strictly lower than own rank
+    if (!canAssignCadre(actorCadre, targetCadre)) {
+      setCadreError(
+        `Hierarchy Restriction: As a ${CADRE_DISPLAY_NAMES[actorCadre] || actorCadre}, you are not authorized to assign ${CADRE_DISPLAY_NAMES[targetCadre] || targetCadre}. You can only assign lower cadres.`
+      );
+      return;
+    }
+
+    // Enforce Office Staff rule
+    if (targetCadre === 'office_staff' && !canApproveOfficeStaff(actorCadre) && !canApproveOfficeStaff(user?.role)) {
+      setCadreError('Office Staff assignment requires Management or Director authorization.');
+      return;
+    }
+
+    const updatedPosition = CADRE_DISPLAY_NAMES[targetCadre] || targetCadre;
+    setMembers((prev) =>
+      prev.map((m) => (m.id === selectedMember.id ? { ...m, position: updatedPosition } : m))
+    );
+
+    setCadreSuccess(`Successfully updated ${selectedMember.name}'s Cadre to "${updatedPosition}".`);
+    setTimeout(() => {
+      setCadreModalOpen(false);
+      setCadreSuccess(null);
+    }, 1500);
+  };
 
   // Form State
   const [newMember, setNewMember] = useState({
@@ -433,6 +504,15 @@ export const NetworkMembersPage: React.FC = () => {
                   <TableCell>{getStatusChip(member.status)}</TableCell>
                   <TableCell align="right">
                     <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+                      <Tooltip title="Assign / Promote / Demote Cadre">
+                        <IconButton
+                          size="small"
+                          color="warning"
+                          onClick={() => handleOpenCadreModal(member)}
+                        >
+                          <HowToRegIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
                       <Tooltip title="View Profile">
                         <IconButton size="small" color="primary">
                           <VisibilityIcon fontSize="small" />
@@ -474,6 +554,77 @@ export const NetworkMembersPage: React.FC = () => {
           }}
         />
       </TableContainer>
+
+      {/* Cadre Assignment / Promotion Dialog */}
+      <Dialog
+        open={cadreModalOpen}
+        onClose={() => setCadreModalOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ fontWeight: '700', display: 'flex', alignItems: 'center', gap: 1 }}>
+          <SecurityIcon color="warning" /> Assign / Update Cadre Hierarchy
+        </DialogTitle>
+        <DialogContent dividers>
+          {selectedMember && (
+            <Stack spacing={2.5} sx={{ mt: 1 }}>
+              <Paper variant="outlined" sx={{ p: 2, bgcolor: 'action.hover', borderRadius: 2 }}>
+                <Typography variant="subtitle2" fontWeight="700">
+                  Target Associate: {selectedMember.name}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Member ID: {selectedMember.id} • Current Position: <strong>{selectedMember.position}</strong>
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Your Current Authority: <strong>{CADRE_DISPLAY_NAMES[actorCadre] || actorCadre}</strong>
+                </Typography>
+              </Paper>
+
+              <Alert severity="info">
+                <strong>Cadre Hierarchy Rule:</strong> You can only assign or promote members to cadres strictly lower than your own rank ({CADRE_DISPLAY_NAMES[actorCadre] || actorCadre}).
+              </Alert>
+
+              {cadreError && <Alert severity="error">{cadreError}</Alert>}
+              {cadreSuccess && <Alert severity="success">{cadreSuccess}</Alert>}
+
+              <FormControl fullWidth size="small">
+                <InputLabel>Select Target Cadre</InputLabel>
+                <Select
+                  value={targetCadre}
+                  label="Select Target Cadre"
+                  onChange={(e) => setTargetCadre(e.target.value as CadreLevel)}
+                >
+                  {allowedCadres.length > 0 ? (
+                    allowedCadres.map((c) => (
+                      <MenuItem key={c} value={c}>
+                        {CADRE_DISPLAY_NAMES[c] || c}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem value="sales_executive" disabled>
+                      No lower cadres available
+                    </MenuItem>
+                  )}
+                </Select>
+              </FormControl>
+            </Stack>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ px: 3, py: 2 }}>
+          <Button onClick={() => setCadreModalOpen(false)} color="inherit">
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="warning"
+            onClick={handleSaveCadreChange}
+            disabled={allowedCadres.length === 0 || !selectedMember}
+            sx={{ fontWeight: 700 }}
+          >
+            Apply Cadre Change
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Add Member Dialog */}
       <Dialog open={openModal} onClose={() => setOpenModal(false)} maxWidth="sm" fullWidth>

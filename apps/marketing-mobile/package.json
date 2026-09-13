@@ -13,7 +13,7 @@
     "web": "expo start --web",
     "type-check": "tsc --noEmit",
     "lint": "eslint . --ext .ts,.tsx",
-    "test": "vitest run",
+    "test": "vitest run --pool=threads",
     "postinstall": "node scripts/patch-screens.js"
   },
   "dependencies": {

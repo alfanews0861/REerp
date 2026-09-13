@@ -1,4 +1,4 @@
-import React, { FC, useState, useMemo } from 'react';
+import { FC, useState, useMemo } from 'react';
 import {
   Box,
   Paper,
@@ -20,7 +20,6 @@ import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import LockClockIcon from '@mui/icons-material/LockClock';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { PublicPlot } from '../data/venturesData';
 import { useI18n } from '../providers/LanguageContext';

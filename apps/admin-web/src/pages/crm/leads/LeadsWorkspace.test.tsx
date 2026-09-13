@@ -35,24 +35,24 @@ const renderWithProviders = (component: React.ReactNode) => {
 };
 
 describe('LeadsWorkspace', () => {
-  it('renders the workspace with default TABLE view', () => {
+  it('renders the workspace with default TABLE view and aligned search bar', () => {
     renderWithProviders(<LeadsWorkspace />);
     
-    // Check if Filters panel is rendered
-    expect(screen.getByText('Filters')).toBeInTheDocument();
-    
-    // Check if Search input is rendered
+    // Check if Search input is rendered in top toolbar
     expect(screen.getByPlaceholderText('Search leads...')).toBeInTheDocument();
+
+    // Check if Filters button is rendered
+    expect(screen.getByRole('button', { name: /Filters/i })).toBeInTheDocument();
   });
 
-  it('can toggle the filters panel', () => {
+  it('can open and close the filters menu panel', () => {
     renderWithProviders(<LeadsWorkspace />);
     
-    expect(screen.getAllByText('Filters')[0]).toBeInTheDocument();
-    
-    const toggleBtn = screen.getAllByLabelText('Toggle Filters')[0];
+    const toggleBtn = screen.getByRole('button', { name: /Filters/i });
     fireEvent.click(toggleBtn);
     
-    expect(screen.queryAllByText('Filters').length).toBeLessThan(2);
+    // Check that filters drawer content opens
+    expect(screen.getByText('Lead Status (0)')).toBeInTheDocument();
+    expect(screen.getByText('Lead Source (0)')).toBeInTheDocument();
   });
 });

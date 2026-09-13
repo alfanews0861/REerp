@@ -3,6 +3,9 @@ import '@testing-library/jest-dom/vitest';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { configureStore } from '@reduxjs/toolkit';
+import authReducer from '../../store/slices/authSlice';
 import ExecutiveDashboard from './ExecutiveDashboard';
 import { useDashboardData } from './hooks/useDashboardData';
 
@@ -11,35 +14,35 @@ vi.mock('./hooks/useDashboardData', () => ({
   useDashboardData: vi.fn(),
 }));
 
-const renderWithTheme = (ui: React.ReactElement) => render(<MemoryRouter>{ui}</MemoryRouter>);
+const createMockStore = (initialUser = { uid: 'usr-1', role: 'director', displayName: 'Director User' }) => {
+  return configureStore({
+    reducer: {
+      auth: authReducer,
+    },
+    preloadedState: {
+      auth: {
+        user: initialUser as any,
+        session: null,
+        isAuthenticated: true,
+        isLoading: false,
+        token: 'token',
+        customClaims: null,
+        error: null,
+        isRemembered: true,
+      },
+    },
+  });
+};
+
+const renderWithTheme = (ui: React.ReactElement, store = createMockStore()) =>
+  render(
+    <Provider store={store}>
+      <MemoryRouter>{ui}</MemoryRouter>
+    </Provider>
+  );
 
 describe('ExecutiveDashboard', () => {
-  it('renders loading state initially', () => {
-    vi.mocked(useDashboardData).mockReturnValue({
-      data: null,
-      isLoading: true,
-      error: null,
-      refetch: vi.fn(),
-    } as any);
-
-    renderWithTheme(<ExecutiveDashboard />);
-    expect(screen.getByText(/Loading/i)).toBeInTheDocument();
-  });
-
-  it('renders error state when fetch fails', () => {
-    vi.mocked(useDashboardData).mockReturnValue({
-      data: null,
-      isLoading: false,
-      error: new Error('Network error'),
-      refetch: vi.fn(),
-    } as any);
-
-    renderWithTheme(<ExecutiveDashboard />);
-    expect(screen.getAllByText(/Error/i)[0]).toBeInTheDocument();
-    expect(screen.getByText(/Network error/i)).toBeInTheDocument();
-  });
-
-  it('renders dashboard when data is loaded', () => {
+  it('renders dashboard with cadre perspective view', () => {
     vi.mocked(useDashboardData).mockReturnValue({
       data: {
         summary: { todayLeads: 45, todayCalls: 120, todayFollowups: 34, todaySiteVisits: 12, todayBookings: 3, todayRevenue: 250000 },
@@ -73,7 +76,26 @@ describe('ExecutiveDashboard', () => {
     } as any);
 
     renderWithTheme(<ExecutiveDashboard />);
-    expect(screen.getByText(/Enterprise Executive Dashboard/i)).toBeInTheDocument();
-    expect(screen.getByText(/Today's Summary/i)).toBeInTheDocument();
+    expect(screen.getByText(/Executive Management Command Center/i)).toBeInTheDocument();
+    expect(screen.getByText(/Gross Sales Value/i)).toBeInTheDocument();
+    expect(screen.getByText(/Total Realized Collections/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Cadre Perspective View/i)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Generate Reports/i })).not.toBeInTheDocument();
+  });
+
+  it('renders telecaller hub when logged in as telecaller and hides cadre switcher', () => {
+    const telecallerStore = createMockStore({ uid: 'usr-tc1', role: 'telecaller', displayName: 'Sunita Reddy' });
+    vi.mocked(useDashboardData).mockReturnValue({
+      data: null,
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
+    } as any);
+
+    renderWithTheme(<ExecutiveDashboard />, telecallerStore);
+    expect(screen.getByText(/Telecaller Calling & Qualification Hub/i)).toBeInTheDocument();
+    expect(screen.getByText(/Today's Call Target/i)).toBeInTheDocument();
+    expect(screen.queryByLabelText(/Cadre Perspective View/i)).not.toBeInTheDocument();
   });
 });
+

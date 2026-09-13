@@ -532,44 +532,67 @@ export const ExpensesWorkspace: React.FC = () => {
   ];
 
   return (
-    <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 3 }}>
+    <Box sx={{ p: { xs: 0.5, md: 1 }, display: 'flex', flexDirection: 'column', gap: 2 }}>
       {/* Top Header */}
-      <Box display="flex" justifyContent="space-between" alignItems="flex-start" flexWrap="wrap" gap={2}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1.5}>
         <Box>
-          <Typography variant="h4" fontWeight={700} gutterBottom>
+          <Typography variant="h5" fontWeight={700} sx={{ fontSize: { xs: '1.25rem', md: '1.45rem' } }}>
             Expenses & Claims Workspace
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25 }}>
             Manage site visit expenditures, fleet vehicle fuel bills, marketing spends, and employee reimbursement claims
           </Typography>
         </Box>
         <Button
           variant="contained"
           color="primary"
+          size="medium"
           startIcon={<AddIcon />}
           onClick={() => setAddDialogOpen(true)}
-          sx={{ px: 2.5, py: 1, fontWeight: 600, borderRadius: 2 }}
+          sx={{ px: 2, py: 0.75, fontWeight: 600, borderRadius: 2, fontSize: '0.85rem' }}
         >
           Submit Expense Claim
         </Button>
       </Box>
 
       {/* KPI Cards */}
-      <Grid container spacing={2.5}>
+      <Grid container spacing={2}>
         <Grid item xs={12} sm={6} md={3}>
-          <MetricCard title="Total Spends Recorded" value={metrics.totalSpends} />
+          <MetricCard
+            title="Total Spends Recorded"
+            value={metrics.totalSpends}
+            subtitle="All Recorded Expenses"
+            icon={<ReceiptLongIcon />}
+            color="#2563eb"
+          />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <MetricCard
             title="Pending Approvals"
-            value={`${metrics.pendingCount} Claims (${metrics.pendingAmount})`}
+            value={metrics.pendingCount}
+            unit="Claims"
+            subtitle={`Total: ${metrics.pendingAmount}`}
+            icon={<ReceiptLongIcon />}
+            color="#d97706"
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <MetricCard title="Approved & Settled" value={metrics.approvedAmount} />
+          <MetricCard
+            title="Approved & Settled"
+            value={metrics.approvedAmount}
+            subtitle="Disbursed & Settled"
+            icon={<CheckCircleIcon />}
+            color="#16a34a"
+          />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <MetricCard title="Site Visits & Fleet Fuel" value={metrics.fleetAndVisitCosts} />
+          <MetricCard
+            title="Site Visits & Fleet Fuel"
+            value={metrics.fleetAndVisitCosts}
+            subtitle="Travel & Fuel Spends"
+            icon={<LocalGasStationIcon />}
+            color="#7c3aed"
+          />
         </Grid>
       </Grid>
 

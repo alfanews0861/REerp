@@ -20,11 +20,15 @@ export interface AppThemeProviderProps {
 
 export const AppThemeProvider: FC<AppThemeProviderProps> = ({
   children,
-  defaultMode = 'system',
+  defaultMode = 'light',
 }) => {
   const [mode, setModeState] = useState<ThemeMode>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('app_theme_mode') as ThemeMode;
+      if (saved === 'dark') {
+        localStorage.setItem('app_theme_mode', 'light');
+        return 'light';
+      }
       return saved || defaultMode;
     }
     return defaultMode;

@@ -25,12 +25,11 @@ import {
   Chip,
   Button,
   Tooltip,
+  Stack,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import DarkMode from '@mui/icons-material/DarkMode';
-import LightMode from '@mui/icons-material/LightMode';
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
@@ -47,13 +46,16 @@ import BadgeIcon from '@mui/icons-material/Badge';
 import DirectionsCar from '@mui/icons-material/DirectionsCar';
 import Receipt from '@mui/icons-material/Receipt';
 import BarChart from '@mui/icons-material/BarChart';
+import Assessment from '@mui/icons-material/Assessment';
 import Settings from '@mui/icons-material/Settings';
 import AdminPanelSettings from '@mui/icons-material/AdminPanelSettings';
 import LogoutIcon from '@mui/icons-material/Logout';
+import ChatIcon from '@mui/icons-material/Chat';
 import { Outlet, Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
-import { useThemeMode } from '@real-estate-erp/ui';
 import { useAuthContext } from '@real-estate-erp/firebase';
-import { UserRole } from '@real-estate-erp/types';
+import { UserRole, CADRE_DISPLAY_NAMES, CadreLevel } from '@real-estate-erp/types';
+import { NotificationDropdown } from '../components/notifications/NotificationDropdown';
+import { messagingService } from '../services/messagingService';
 
 const drawerWidth = 260;
 const collapsedDrawerWidth = 72;
@@ -78,12 +80,42 @@ export const AppShell = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [notificationAnchorEl, setNotificationAnchorEl] = useState<null | HTMLElement>(null);
+  const [pendingCounts, setPendingCounts] = useState<{ unreadMessages: number; unreadNotifications: number; total: number }>({
+    unreadMessages: 0,
+    unreadNotifications: 0,
+    total: 0,
+  });
   const theme = useTheme();
-  const { mode, setMode } = useThemeMode();
   const location = useLocation();
 
   const currentRole: UserRole = (user?.role as UserRole) || 'customer';
   const isSuperOrDirector = currentRole === 'super_admin' || currentRole === 'director';
+
+  // Real-time unread messages & notification counter subscription
+  React.useEffect(() => {
+    const userId = user?.uid || 'usr-001';
+    const updateCounts = () => {
+      const counts = messagingService.getPendingCount(userId);
+      setPendingCounts(counts);
+    };
+
+    updateCounts();
+    const unsubC = messagingService.subscribeToConversations(userId, () => updateCounts());
+    const unsubN = messagingService.subscribeToNotifications(userId, () => updateCounts());
+
+    return () => {
+      unsubC();
+      unsubN();
+    };
+  }, [user]);
+
+  // Automatically redirect new users to complete their profile registration
+  React.useEffect(() => {
+    if (user && user.isProfileCompleted === false && location.pathname !== '/register-profile') {
+      navigate('/register-profile', { replace: true });
+    }
+  }, [user, location.pathname, navigate]);
 
   const handleLogout = async () => {
     handleClose();
@@ -93,6 +125,13 @@ export const AppShell = () => {
       console.error('Logout error:', e);
     }
     navigate('/login', { replace: true });
+  };
+
+  const handleNotificationOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setNotificationAnchorEl(event.currentTarget);
+  };
+  const handleNotificationClose = () => {
+    setNotificationAnchorEl(null);
   };
 
   // Role-mapped Navigation Items
@@ -105,6 +144,12 @@ export const AppShell = () => {
         { text: 'Executive Overview', path: '/dashboard' },
         { text: 'Command Center', path: '/dashboard/command-center', roles: ['super_admin', 'director', 'branch_manager'] },
       ],
+    },
+    {
+      text: 'Communications',
+      icon: <ChatIcon />,
+      path: '/messages',
+      roles: ['super_admin', 'director', 'branch_manager', 'marketing_manager', 'marketing_executive', 'sales_manager', 'sales_executive', 'telecaller', 'accountant', 'driver', 'customer'],
     },
     {
       text: 'CRM',
@@ -142,8 +187,20 @@ export const AppShell = () => {
     },
     { text: 'Vehicles', icon: <DirectionsCar />, path: '/vehicles', roles: ['super_admin', 'director', 'branch_manager', 'driver'] },
     { text: 'Expenses', icon: <Receipt />, path: '/expenses', roles: ['super_admin', 'director', 'branch_manager', 'accountant'] },
-    { text: 'Reports', icon: <BarChart />, path: '/reports', roles: ['super_admin', 'director', 'branch_manager', 'marketing_manager', 'sales_manager', 'accountant'] },
     { text: 'Analytics', icon: <BarChart />, path: '/analytics', roles: ['super_admin', 'director', 'branch_manager', 'marketing_manager', 'sales_manager'] },
+    {
+      text: 'Reports',
+      icon: <Assessment />,
+      roles: ['super_admin', 'director', 'branch_manager', 'marketing_manager', 'marketing_executive', 'sales_manager', 'sales_executive', 'telecaller', 'accountant', 'driver'],
+      children: [
+        { text: 'All Reports Overview', path: '/reports' },
+        { text: 'Sales & Revenue', path: '/reports?category=Sales', roles: ['super_admin', 'director', 'branch_manager', 'sales_manager', 'sales_executive'] },
+        { text: 'Marketing & Leads', path: '/reports?category=Marketing', roles: ['super_admin', 'director', 'branch_manager', 'marketing_manager', 'marketing_executive'] },
+        { text: 'Telecalling Performance', path: '/reports?category=Telecalling', roles: ['super_admin', 'director', 'branch_manager', 'marketing_manager', 'telecaller'] },
+        { text: 'Site Visits & Fleet', path: '/reports?category=Site+Visits', roles: ['super_admin', 'director', 'branch_manager', 'driver', 'sales_manager', 'sales_executive'] },
+        { text: 'Finance & Commissions', path: '/reports?category=Finance+%26+Commissions', roles: ['super_admin', 'director', 'branch_manager', 'accountant'] },
+      ],
+    },
     { text: 'Settings', icon: <Settings />, path: '/settings', roles: ['super_admin', 'director'] },
     { text: 'Administration', icon: <AdminPanelSettings />, path: '/administration', roles: ['super_admin', 'director'] },
   ];
@@ -173,62 +230,91 @@ export const AppShell = () => {
   const handleCollapseToggle = () => setIsCollapsed(!isCollapsed);
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
-  const toggleTheme = () => setMode(mode === 'light' ? 'dark' : mode === 'dark' ? 'corporate' : 'light');
 
-  const [openSubMenus, setOpenSubMenus] = useState<{ [key: string]: boolean }>({});
+  const [openSubMenus, setOpenSubMenus] = useState<{ [key: string]: boolean }>({
+    Reports: true,
+  });
   const handleSubMenuToggle = (text: string) => {
     setOpenSubMenus((prev) => ({ ...prev, [text]: !prev[text] }));
   };
 
+  const isPathActive = (path?: string) => {
+    if (!path) return false;
+    if (path.includes('?')) {
+      return (location.pathname + location.search) === path;
+    }
+    return location.pathname === path && !location.search;
+  };
+
   const renderNavItems = (items: any[]) => {
-    return items.map((item) => (
-      <React.Fragment key={item.text}>
-        <ListItem disablePadding sx={{ display: 'block' }}>
-          <ListItemButton
-            component={item.children ? 'div' : RouterLink}
-            to={item.children ? undefined : item.path}
-            onClick={() => (item.children ? handleSubMenuToggle(item.text) : undefined)}
-            sx={{
-              minHeight: 48,
-              justifyContent: isCollapsed ? 'center' : 'initial',
-              px: 2.5,
-              backgroundColor: location.pathname === item.path ? theme.palette.action.selected : 'transparent',
-            }}
-          >
-            <ListItemIcon
+    return items.map((item) => {
+      const isItemActive = item.children
+        ? item.children.some((c: any) => isPathActive(c.path))
+        : isPathActive(item.path);
+
+      return (
+        <React.Fragment key={item.text}>
+          <ListItem disablePadding sx={{ display: 'block' }}>
+            <ListItemButton
+              component={item.children ? 'div' : RouterLink}
+              to={item.children ? undefined : item.path}
+              onClick={() => (item.children ? handleSubMenuToggle(item.text) : undefined)}
               sx={{
-                minWidth: 0,
-                mr: isCollapsed ? 0 : 3,
-                justifyContent: 'center',
-                color: location.pathname === item.path ? theme.palette.primary.main : 'inherit',
+                minHeight: 48,
+                justifyContent: isCollapsed ? 'center' : 'initial',
+                px: 2.5,
+                backgroundColor: isItemActive ? theme.palette.action.selected : 'transparent',
               }}
             >
-              {item.icon}
-            </ListItemIcon>
-            <ListItemText primary={item.text} sx={{ opacity: isCollapsed ? 0 : 1 }} />
-            {!isCollapsed && item.children && (
-              openSubMenus[item.text] ? <ExpandLess /> : <ExpandMore />
-            )}
-          </ListItemButton>
-        </ListItem>
-        {!isCollapsed && item.children && (
-          <Collapse in={openSubMenus[item.text]} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
-              {item.children.map((child: any) => (
-                <ListItemButton
-                  key={child.text}
-                  component={RouterLink}
-                  to={child.path}
-                  sx={{ pl: 4, backgroundColor: location.pathname === child.path ? theme.palette.action.selected : 'transparent' }}
-                >
-                  <ListItemText primary={child.text} primaryTypographyProps={{ variant: 'body2' }} />
-                </ListItemButton>
-              ))}
-            </List>
-          </Collapse>
-        )}
-      </React.Fragment>
-    ));
+              <ListItemIcon
+                sx={{
+                  minWidth: 0,
+                  mr: isCollapsed ? 0 : 3,
+                  justifyContent: 'center',
+                  color: isItemActive ? theme.palette.primary.main : 'inherit',
+                }}
+              >
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText primary={item.text} sx={{ opacity: isCollapsed ? 0 : 1 }} />
+              {!isCollapsed && item.children && (
+                openSubMenus[item.text] ? <ExpandLess /> : <ExpandMore />
+              )}
+            </ListItemButton>
+          </ListItem>
+          {!isCollapsed && item.children && (
+            <Collapse in={openSubMenus[item.text]} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                {item.children.map((child: any) => {
+                  const isChildActive = isPathActive(child.path);
+                  return (
+                    <ListItemButton
+                      key={child.text}
+                      component={RouterLink}
+                      to={child.path}
+                      sx={{
+                        pl: 4,
+                        backgroundColor: isChildActive ? theme.palette.action.selected : 'transparent',
+                        borderLeft: isChildActive ? `3px solid ${theme.palette.primary.main}` : '3px solid transparent',
+                      }}
+                    >
+                      <ListItemText
+                        primary={child.text}
+                        primaryTypographyProps={{
+                          variant: 'body2',
+                          fontWeight: isChildActive ? 700 : 500,
+                          color: isChildActive ? theme.palette.primary.main : 'inherit',
+                        }}
+                      />
+                    </ListItemButton>
+                  );
+                })}
+              </List>
+            </Collapse>
+          )}
+        </React.Fragment>
+      );
+    });
   };
 
   const drawerContent = (
@@ -276,24 +362,43 @@ export const AppShell = () => {
           </IconButton>
           
           {/* Breadcrumbs */}
-          <Breadcrumbs aria-label="breadcrumb" sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+          <Breadcrumbs aria-label="breadcrumb" sx={{ display: { xs: 'none', lg: 'flex' }, minWidth: 160 }}>
             <Link underline="hover" color="inherit" component={RouterLink} to="/">
               Home
             </Link>
-            <Typography color="text.primary">
+            <Typography color="text.primary" fontWeight={700}>
               {location.pathname.split('/').filter(Boolean).pop()?.replace('-', ' ') || 'Dashboard'}
             </Typography>
           </Breadcrumbs>
 
-          {/* Global Search */}
-          <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: theme.palette.action.hover, borderRadius: 2, px: 2, py: 0.5, mr: 2, width: { xs: '100%', sm: 'auto' } }}>
-            <SearchIcon sx={{ color: 'text.secondary', mr: 1 }} />
-            <InputBase placeholder="Global Search…" inputProps={{ 'aria-label': 'search' }} />
+          {/* Global Search Bar (Spacious and prominent) */}
+          <Box
+            sx={{
+              display: { xs: 'none', sm: 'flex' },
+              alignItems: 'center',
+              backgroundColor: '#f1f5f9',
+              borderRadius: 2.5,
+              px: 2,
+              py: 0.75,
+              flex: 1,
+              maxWidth: 440,
+              mx: { sm: 1, md: 3 },
+              border: '1px solid #e2e8f0',
+            }}
+          >
+            <SearchIcon sx={{ color: '#64748b', mr: 1.5, fontSize: '1.2rem' }} />
+            <InputBase
+              placeholder="Global Search (leads, plots, bookings, reports)..."
+              inputProps={{ 'aria-label': 'global search' }}
+              fullWidth
+              sx={{ fontSize: '0.875rem' }}
+            />
           </Box>
 
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          {/* Right Header Actions & User Profile Card (All in ONE neat row!) */}
+          <Stack direction="row" spacing={1.5} alignItems="center" sx={{ ml: 'auto' }}>
             {/* Direct Link to Public Customer Website */}
-            <Tooltip title="Open Public Customer & Investor Website in a new tab">
+            <Tooltip title="Open Public Customer & Investor Website">
               <Button
                 component="a"
                 href="https://reerp-website.web.app"
@@ -301,16 +406,15 @@ export const AppShell = () => {
                 rel="noopener noreferrer"
                 size="small"
                 variant="outlined"
-                startIcon={<TravelExploreIcon sx={{ fontSize: '1.05rem !important', color: 'primary.main' }} />}
+                startIcon={<TravelExploreIcon sx={{ fontSize: '1rem !important', color: 'primary.main' }} />}
                 endIcon={<OpenInNewIcon sx={{ fontSize: '0.75rem !important' }} />}
                 sx={{
                   textTransform: 'none',
-                  fontWeight: 600,
+                  fontWeight: 700,
                   fontSize: '0.8rem',
                   borderRadius: 2,
-                  px: 1.5,
-                  py: 0.5,
-                  mr: 1.5,
+                  px: 1.75,
+                  py: 0.6,
                   whiteSpace: 'nowrap',
                   display: { xs: 'none', md: 'inline-flex' },
                   borderColor: theme.palette.divider,
@@ -325,39 +429,86 @@ export const AppShell = () => {
               </Button>
             </Tooltip>
 
-            <IconButton color="inherit" onClick={toggleTheme}>
-              {mode === 'dark' ? <LightMode /> : <DarkMode />}
-            </IconButton>
-            <IconButton color="inherit">
-              <Badge badgeContent={4} color="error">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
+            {/* Notifications & Communications Bell */}
+            <Tooltip title="Notifications & Messages">
+              <IconButton
+                color="inherit"
+                onClick={handleNotificationOpen}
+                sx={{ bgcolor: '#f1f5f9', p: 1, borderRadius: 2 }}
+              >
+                <Badge badgeContent={pendingCounts.total} color="error">
+                  <NotificationsIcon fontSize="small" sx={{ color: '#475569' }} />
+                </Badge>
+              </IconButton>
+            </Tooltip>
+
+            <NotificationDropdown
+              anchorEl={notificationAnchorEl}
+              open={Boolean(notificationAnchorEl)}
+              onClose={handleNotificationClose}
+            />
+
+            <Divider orientation="vertical" flexItem sx={{ mx: 0.5, height: 28, alignSelf: 'center' }} />
+
+            {/* Profile & Cadre Info Pill Card */}
             {user && (
-              <Box sx={{ display: { xs: 'none', md: 'flex' }, flexDirection: 'column', alignItems: 'flex-end', mr: 1.5 }}>
-                <Typography variant="body2" fontWeight={600} lineHeight={1.2}>
-                  {user.displayName || 'Staff User'}
-                </Typography>
-                <Chip
-                  label={(user.role || 'ADMIN').replace('_', ' ').toUpperCase()}
-                  size="small"
-                  color={user.role === 'super_admin' || user.role === 'director' ? 'error' : user.role?.includes('manager') ? 'secondary' : 'primary'}
-                  sx={{ height: 18, fontSize: '0.65rem', fontWeight: 700, mt: 0.3 }}
-                />
+              <Box
+                onClick={handleMenu}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1.25,
+                  p: '4px 10px 4px 6px',
+                  borderRadius: 2.5,
+                  cursor: 'pointer',
+                  bgcolor: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    bgcolor: '#f1f5f9',
+                    borderColor: 'primary.main',
+                  },
+                }}
+              >
+                <Avatar
+                  sx={{
+                    width: 36,
+                    height: 36,
+                    bgcolor: theme.palette.primary.main,
+                    fontSize: '0.95rem',
+                    fontWeight: 800,
+                    boxShadow: '0 2px 5px rgba(37,99,235,0.25)',
+                  }}
+                >
+                  {user.displayName ? user.displayName.charAt(0).toUpperCase() : 'A'}
+                </Avatar>
+
+                <Box sx={{ display: { xs: 'none', sm: 'flex' }, flexDirection: 'column', alignItems: 'flex-start' }}>
+                  <Typography variant="body2" fontWeight={800} color="#0f172a" sx={{ lineHeight: 1.2, whiteSpace: 'nowrap' }}>
+                    {user.displayName || 'Staff User'}
+                  </Typography>
+                  <Stack direction="row" spacing={0.75} alignItems="center" sx={{ mt: 0.3 }}>
+                    <Chip
+                      label={user.cadre ? (CADRE_DISPLAY_NAMES[user.cadre as CadreLevel] || user.cadre).toUpperCase() : (user.role || 'ADMIN').replace('_', ' ').toUpperCase()}
+                      size="small"
+                      color={user.role === 'super_admin' || user.role === 'director' ? 'error' : user.role?.includes('manager') ? 'secondary' : 'primary'}
+                      sx={{ height: 18, fontSize: '0.65rem', fontWeight: 800, borderRadius: 1 }}
+                    />
+                    {user.referralCode && (
+                      <Chip
+                        label={user.referralCode}
+                        size="small"
+                        variant="outlined"
+                        color="info"
+                        title="Your Reference Code"
+                        sx={{ height: 18, fontSize: '0.65rem', fontWeight: 800, borderRadius: 1 }}
+                      />
+                    )}
+                  </Stack>
+                </Box>
               </Box>
             )}
-            <IconButton
-              size="large"
-              edge="end"
-              aria-label="account of current user"
-              aria-haspopup="true"
-              onClick={handleMenu}
-              color="inherit"
-            >
-              <Avatar sx={{ width: 34, height: 34, bgcolor: theme.palette.primary.main, fontSize: '0.9rem', fontWeight: 600 }}>
-                {user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'A'}
-              </Avatar>
-            </IconButton>
+          </Stack>
             <Menu
               anchorEl={anchorEl}
               open={Boolean(anchorEl)}
@@ -365,6 +516,18 @@ export const AppShell = () => {
               anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
               transformOrigin={{ vertical: 'top', horizontal: 'right' }}
             >
+              <MenuItem
+                onClick={() => {
+                  handleClose();
+                  navigate('/profile');
+                }}
+                sx={{ py: 1.2, fontWeight: 700 }}
+              >
+                <ListItemIcon>
+                  <BadgeIcon fontSize="small" sx={{ color: 'primary.main' }} />
+                </ListItemIcon>
+                My Profile & ID Card
+              </MenuItem>
               <MenuItem
                 component="a"
                 href="https://reerp-website.web.app"
@@ -406,9 +569,8 @@ export const AppShell = () => {
                 Logout
               </MenuItem>
             </Menu>
-          </Box>
-        </Toolbar>
-      </AppBar>
+          </Toolbar>
+        </AppBar>
 
       <Box component="nav" sx={{ width: { sm: isCollapsed ? collapsedDrawerWidth : drawerWidth }, flexShrink: { sm: 0 } }}>
         <Drawer
@@ -447,23 +609,24 @@ export const AppShell = () => {
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
+          p: { xs: 1.5, sm: 2, md: 2.5 },
           width: { sm: `calc(100% - ${isCollapsed ? collapsedDrawerWidth : drawerWidth}px)` },
           backgroundColor: theme.palette.background.default,
           minHeight: '100vh',
           display: 'flex',
           flexDirection: 'column',
+          boxSizing: 'border-box',
         }}
       >
-        <Toolbar />
+        <Toolbar sx={{ minHeight: { xs: 56, sm: 60 } }} />
         <Box sx={{ flexGrow: 1 }}>
           <Outlet />
         </Box>
         
         {/* Footer */}
-        <Box component="footer" sx={{ mt: 'auto', py: 2, textAlign: 'center' }}>
-          <Typography variant="body2" color="text.secondary">
-            &copy; {new Date().getFullYear()} Enterprise Admin. All rights reserved.
+        <Box component="footer" sx={{ mt: 'auto', py: 1.5, textAlign: 'center' }}>
+          <Typography variant="caption" color="text.secondary">
+            &copy; {new Date().getFullYear()} Enterprise Real Estate Marketing ERP. All rights reserved.
           </Typography>
         </Box>
       </Box>

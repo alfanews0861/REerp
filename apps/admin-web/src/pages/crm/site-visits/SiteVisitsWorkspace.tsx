@@ -61,14 +61,14 @@ export const SiteVisitsWorkspace: React.FC = () => {
   const visits = data?.pages.flatMap((page) => page.data) || [];
 
   return (
-    <Box sx={{ display: 'flex', height: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+    <Box sx={{ display: 'flex', minHeight: 'calc(100vh - 120px)', borderRadius: 2, overflow: 'hidden', border: '1px solid #e2e8f0' }}>
       {/* LEFT PANEL: Filters */}
       {filtersOpen && (
         <Paper
           elevation={0}
           sx={{
-            width: 280,
-            minWidth: 280,
+            width: 260,
+            minWidth: 260,
             borderRight: 1,
             borderColor: 'divider',
             borderRadius: 0,

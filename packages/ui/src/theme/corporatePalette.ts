@@ -1,72 +1,69 @@
+import './theme.d';
 import { PaletteOptions } from '@mui/material/styles';
-
-declare module '@mui/material/styles' {
-  interface Palette {
-    status: {
-      lead: string;
-      hot: string;
-      warm: string;
-      cold: string;
-      booked: string;
-      sold: string;
-      cancelled: string;
-    };
-  }
-  interface PaletteOptions {
-    status?: {
-      lead: string;
-      hot: string;
-      warm: string;
-      cold: string;
-      booked: string;
-      sold: string;
-      cancelled: string;
-    };
-  }
-}
-
 
 export const corporatePalette: PaletteOptions = {
   mode: 'light',
   primary: {
-    main: '#0a369d',
-    light: '#4d60ce',
-    dark: '#00116e',
-    contrastText: '#ffffff',
+    main: '#0A192F', // Deep Imperial Midnight Navy
+    light: '#1E3A8A',
+    dark: '#030712',
+    contrastText: '#FFFFFF',
   },
   secondary: {
-    main: '#4470ad',
-    light: '#789edz',
-    dark: '#09457d',
-    contrastText: '#ffffff',
+    main: '#D97706', // Royal Champagne Gold / Amber
+    light: '#F59E0B',
+    dark: '#92400E',
+    contrastText: '#FFFFFF',
   },
   background: {
-    default: '#f4f6f8',
-    paper: '#ffffff',
+    default: '#F1F5F9', // Luxury Slate Alabaster
+    paper: '#FFFFFF',
   },
   text: {
-    primary: '#1c2b36',
-    secondary: '#5c6e7e',
+    primary: '#0F172A',
+    secondary: '#475569',
+    disabled: '#94A3B8',
   },
   error: {
-    main: '#d32f2f',
+    main: '#DC2626',
+    light: '#EF4444',
+    dark: '#991B1B',
+    contrastText: '#FFFFFF',
   },
   warning: {
-    main: '#ed6c02',
+    main: '#D97706',
+    light: '#FBBF24',
+    dark: '#B45309',
+    contrastText: '#FFFFFF',
   },
   info: {
-    main: '#0288d1',
+    main: '#0284C7',
+    light: '#38BDF8',
+    dark: '#0369A1',
+    contrastText: '#FFFFFF',
   },
   success: {
-    main: '#2e7d32',
+    main: '#059669', // Emerald Wealth Token
+    light: '#10B981',
+    dark: '#065F46',
+    contrastText: '#FFFFFF',
   },
+  divider: '#E2E8F0',
   status: {
-    lead: '#e0e0e0', // gray
-    hot: '#d32f2f', // red
-    warm: '#ed6c02', // orange
-    cold: '#0288d1', // blue
-    booked: '#9c27b0', // purple
-    sold: '#2e7d32', // green
-    cancelled: '#757575', // dark gray
+    lead: '#94A3B8',
+    hot: '#DC2626',
+    warm: '#D97706',
+    cold: '#0284C7',
+    booked: '#7C3AED',
+    sold: '#059669',
+    cancelled: '#64748B',
+  },
+  gradients: {
+    primary: 'linear-gradient(135deg, #0A192F 0%, #1E3A8A 100%)',
+    gold: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+    emerald: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+    dark: 'linear-gradient(135deg, #0F172A 0%, #0A192F 100%)',
+    card: 'linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)',
   },
 };
+

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, FC } from 'react';
+import { createContext, useContext, ReactNode, FC } from 'react';
 import {
   SupportedLanguage,
   SUPPORTED_LANGUAGES,
@@ -15,32 +15,15 @@ export interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-const STORAGE_KEY = 'real_estate_erp_lang';
-
 export const LanguageProvider: FC<{ children: ReactNode }> = ({ children }) => {
-  const [language, setLanguageState] = useState<SupportedLanguage>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY) as SupportedLanguage;
-      if (saved && (saved === 'en' || saved === 'te' || saved === 'hi')) {
-        return saved;
-      }
-    } catch {
-      // Fallback if localStorage is inaccessible
-    }
-    return 'en';
-  });
+  const language: SupportedLanguage = 'en';
 
-  const setLanguage = (lang: SupportedLanguage) => {
-    setLanguageState(lang);
-    try {
-      localStorage.setItem(STORAGE_KEY, lang);
-    } catch {
-      // Ignore storage errors
-    }
+  const setLanguage = (_lang: SupportedLanguage) => {
+    // English is fixed
   };
 
   const t = (key: string): string => {
-    return getTranslation(key, language);
+    return getTranslation(key, 'en');
   };
 
   return (

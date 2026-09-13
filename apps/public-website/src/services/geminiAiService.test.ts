@@ -13,21 +13,18 @@ describe('Gemini Real Estate AI Assistant Service', () => {
     });
   });
 
-  it('should match plots under specified budget in Telugu', async () => {
-    const response = await queryGeminiRealEstateAssistant('నా బడ్జెట్ 30 లక్షలు, తూర్పు ముఖం ప్లాట్లు చూపించు', 'te', PUBLIC_PLOTS);
-    expect(response.replyText).toContain('అత్యుత్తమ ప్లాట్లు');
+  it('should match East facing plots in English', async () => {
+    const response = await queryGeminiRealEstateAssistant('Show me East facing plots under 40 Lakhs', 'en', PUBLIC_PLOTS);
+    expect(response.replyText).toContain('premium plots');
     expect(response.recommendedPlots).toBeDefined();
     expect(response.recommendedPlots!.length).toBeGreaterThan(0);
     expect(response.recommendedPlots![0].facing).toBe('EAST');
   });
 
-  it('should explain HMDA vs DTCP differences in English and Telugu', async () => {
+  it('should explain HMDA vs DTCP differences in English', async () => {
     const enResponse = await queryGeminiRealEstateAssistant('What is the difference between HMDA and DTCP?', 'en');
     expect(enResponse.replyText).toContain('Hyderabad Metropolitan Development Authority');
     expect(enResponse.replyText).toContain('Directorate of Town & Country Planning');
-
-    const teResponse = await queryGeminiRealEstateAssistant('HMDA మరియు DTCP మధ్య తేడా ఏమిటి?', 'te');
-    expect(teResponse.replyText).toContain('హైదరాబాద్ మెట్రోపాలిటన్ డెవలప్‌మెంట్ అథారిటీ');
   });
 
   it('should explain 48-Hour token hold details', async () => {

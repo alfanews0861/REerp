@@ -20,39 +20,48 @@ export const LeadsGrid: React.FC<LeadsGridProps> = ({ leads, selected, onSelectC
     {
       id: 'fullName',
       label: 'Name',
-      minWidth: 150,
+      minWidth: 140,
       format: (value: any, row?: Lead) => (
         <Box 
-          sx={{ cursor: 'pointer', color: 'primary.main', fontWeight: 500 }}
+          sx={{ cursor: 'pointer', color: 'primary.main', fontWeight: 600, '&:hover': { textDecoration: 'underline' } }}
           onClick={() => row && dispatch(setSelectedLeadId(row.id))}
         >
-          {value}
+          {value || 'Unknown'}
         </Box>
       )
     },
-    { id: 'phone', label: 'Phone', minWidth: 120 },
+    { id: 'phone', label: 'Phone', minWidth: 115 },
     { id: 'email', label: 'Email', minWidth: 150 },
     {
       id: 'status',
       label: 'Status',
-      minWidth: 150,
+      minWidth: 130,
       format: (value: any) => <StatusChip status={value as any} />
     },
-    { id: 'source', label: 'Source', minWidth: 120 },
-    { id: 'city', label: 'City', minWidth: 100 },
+    {
+      id: 'source',
+      label: 'Source',
+      minWidth: 110,
+      format: (value: any) => (
+        <Typography variant="body2" sx={{ fontSize: '0.8rem', color: 'text.secondary' }}>
+          {value ? String(value).replace(/_/g, ' ') : '-'}
+        </Typography>
+      )
+    },
+    { id: 'city', label: 'City', minWidth: 90 },
     { 
       id: 'createdAt', 
       label: 'Created', 
-      minWidth: 120,
-      format: (value: any) => new Date(value).toLocaleDateString()
+      minWidth: 95,
+      format: (value: any) => value ? new Date(value).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : '-'
     },
     { 
       id: 'aiIntentScore', 
       label: 'Intent', 
-      minWidth: 80,
+      minWidth: 70,
       format: (value: any) => (
-        <Typography color={value > 75 ? 'success.main' : value > 40 ? 'warning.main' : 'error.main'}>
-          {value}
+        <Typography fontWeight={700} sx={{ fontSize: '0.85rem' }} color={value > 75 ? 'success.main' : value > 40 ? 'warning.main' : 'error.main'}>
+          {value ? `${value}%` : '-'}
         </Typography>
       )
     },

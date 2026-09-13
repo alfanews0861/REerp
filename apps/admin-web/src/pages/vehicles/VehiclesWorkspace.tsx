@@ -28,6 +28,8 @@ import { collection, query, getDocs, orderBy, limit } from 'firebase/firestore';
 import { AddVehicleDialog } from './components/AddVehicleDialog';
 import { AddTripLogDialog } from './components/AddTripLogDialog';
 import { CompleteTripDialog } from './components/CompleteTripDialog';
+import { LiveVehicleTrackingMap } from './components/LiveVehicleTrackingMap';
+
 
 export const SEED_DRIVERS: Driver[] = [
   {
@@ -759,32 +761,34 @@ export const VehiclesWorkspace: React.FC = () => {
   ];
 
   return (
-    <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 3 }}>
+    <Box sx={{ p: { xs: 0.5, md: 1 }, display: 'flex', flexDirection: 'column', gap: 2 }}>
       {/* Top Header */}
-      <Box display="flex" justifyContent="space-between" alignItems="flex-start" flexWrap="wrap" gap={2}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1.5}>
         <Box>
-          <Typography variant="h4" fontWeight={700} gutterBottom>
+          <Typography variant="h5" fontWeight={700} sx={{ fontSize: { xs: '1.25rem', md: '1.45rem' } }}>
             Vehicle Fleet & Drivers Workspace
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25 }}>
             Manage company vehicles, driver roster, customer site visit logs, and trip odometer readings
           </Typography>
         </Box>
         <Stack direction="row" spacing={1.5}>
           <Button
             variant="outlined"
+            size="medium"
             startIcon={<CommuteIcon />}
             onClick={() => setAddTripOpen(true)}
-            sx={{ px: 2, fontWeight: 600, borderRadius: 2 }}
+            sx={{ px: 2, py: 0.75, fontWeight: 600, borderRadius: 2, fontSize: '0.85rem' }}
           >
             Dispatch Trip
           </Button>
           <Button
             variant="contained"
             color="primary"
+            size="medium"
             startIcon={<AddIcon />}
             onClick={() => setAddVehicleOpen(true)}
-            sx={{ px: 2.5, fontWeight: 600, borderRadius: 2 }}
+            sx={{ px: 2, py: 0.75, fontWeight: 600, borderRadius: 2, fontSize: '0.85rem' }}
           >
             Add Fleet Car
           </Button>
@@ -792,23 +796,51 @@ export const VehiclesWorkspace: React.FC = () => {
       </Box>
 
       {/* KPI Cards */}
-      <Grid container spacing={2.5}>
+      <Grid container spacing={2}>
         <Grid item xs={12} sm={6} md={3}>
-          <MetricCard title="Total Fleet Vehicles" value={metrics.totalVehicles} />
+          <MetricCard
+            title="Total Fleet Vehicles"
+            value={metrics.totalVehicles}
+            subtitle="Company Fleet Fleet"
+            icon={<CommuteIcon />}
+            color="#2563eb"
+          />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <MetricCard title="In Transit / Active Trips" value={metrics.inTransit} />
+          <MetricCard
+            title="In Transit / Active Trips"
+            value={metrics.inTransit}
+            subtitle="Live Site Tours in Progress"
+            icon={<CheckCircleIcon />}
+            color="#16a34a"
+          />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <MetricCard title="Available for Site Trips" value={metrics.available} />
+          <MetricCard
+            title="Available for Site Trips"
+            value={metrics.available}
+            subtitle="Ready for Instant Dispatch"
+            icon={<AirlineSeatReclineNormalIcon />}
+            color="#0891b2"
+          />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <MetricCard title="Logged Mileage This Month" value={metrics.totalDistance} />
+          <MetricCard
+            title="Logged Mileage This Month"
+            value={metrics.totalDistance}
+            subtitle="Total Travel Recorded"
+            icon={<LocalGasStationIcon />}
+            color="#7c3aed"
+          />
         </Grid>
       </Grid>
 
+      {/* Real-time Fleet GPS Live Tracking Map */}
+      <LiveVehicleTrackingMap vehicles={vehicles} drivers={drivers} trips={trips} />
+
       {/* Navigation Tabs */}
       <Paper sx={{ borderRadius: 2 }}>
+
         <Tabs
           value={currentTab}
           onChange={(_, val) => setCurrentTab(val)}

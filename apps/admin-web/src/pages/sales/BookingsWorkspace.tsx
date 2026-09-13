@@ -23,6 +23,9 @@ import PaymentIcon from '@mui/icons-material/Payment';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import CloseIcon from '@mui/icons-material/Close';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
+import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
+import BookmarkAddedIcon from '@mui/icons-material/BookmarkAdded';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import { DataTable, MetricCard, SearchBox, StatusChip } from '@real-estate-erp/ui';
 import { getFirebaseInstance, inventoryBookingService, paymentService } from '@real-estate-erp/firebase';
 import { collection, query, getDocs, limit, orderBy } from 'firebase/firestore';
@@ -578,22 +581,23 @@ export const BookingsWorkspace: React.FC = () => {
   ];
 
   return (
-    <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 3 }}>
+    <Box sx={{ p: { xs: 0.5, md: 1 }, display: 'flex', flexDirection: 'column', gap: 2 }}>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1.5 }}>
         <Box>
-          <Typography variant="h4" fontWeight={700} color="primary.main">
+          <Typography variant="h5" fontWeight={700} color="primary.main" sx={{ fontSize: { xs: '1.25rem', md: '1.45rem' } }}>
             Plot Bookings Workspace
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25 }}>
             Manage customer plot reservations, advance payments, and booking lifecycles.
           </Typography>
         </Box>
         <Button
           variant="contained"
+          size="medium"
           startIcon={<AddIcon />}
           onClick={() => setCreateDialogOpen(true)}
-          sx={{ borderRadius: 2 }}
+          sx={{ py: 0.75, px: 2, borderRadius: 2, fontSize: '0.85rem' }}
         >
           New Booking
         </Button>
@@ -605,28 +609,40 @@ export const BookingsWorkspace: React.FC = () => {
           <MetricCard
             title="Total Bookings"
             value={metrics.total}
+            subtitle="Total Plot Reservations"
             trend={{ value: 12, isPositive: true }}
+            icon={<BookmarkAddedIcon />}
+            color="#2563eb"
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <MetricCard
             title="Active Reservations"
             value={metrics.active}
+            subtitle="Agreements in Process"
             trend={{ value: 5, isPositive: true }}
+            icon={<AssignmentTurnedInIcon />}
+            color="#16a34a"
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <MetricCard
             title="Total Sales Value"
             value={`₹${(metrics.totalSaleValue / 100000).toFixed(1)} L`}
+            subtitle="Gross Booked Inventory"
             trend={{ value: 8, isPositive: true }}
+            icon={<CurrencyRupeeIcon />}
+            color="#7c3aed"
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <MetricCard
             title="Advance Collected"
             value={`₹${(metrics.totalCollected / 100000).toFixed(1)} L`}
+            subtitle="Tokens & Advance Inflows"
             trend={{ value: 15, isPositive: true }}
+            icon={<ReceiptLongIcon />}
+            color="#d97706"
           />
         </Grid>
       </Grid>

@@ -558,41 +558,68 @@ export const ProjectsWorkspace: React.FC = () => {
   ];
 
   return (
-    <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 3 }}>
+    <Box sx={{ p: { xs: 0.5, md: 1 }, display: 'flex', flexDirection: 'column', gap: 2 }}>
       {/* Header Banner */}
-      <Box display="flex" justifyContent="space-between" alignItems="flex-start" flexWrap="wrap" gap={2}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1.5}>
         <Box>
-          <Typography variant="h4" fontWeight={700} gutterBottom>
+          <Typography variant="h5" fontWeight={700} sx={{ fontSize: { xs: '1.25rem', md: '1.45rem' } }}>
             Projects & Ventures Workspace
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25 }}>
             Manage residential layouts, DTCP & HMDA approved ventures, land records, and plot inventories
           </Typography>
         </Box>
         <Button
           variant="contained"
           color="primary"
+          size="medium"
           startIcon={<AddIcon />}
           onClick={() => setAddDialogOpen(true)}
-          sx={{ px: 2.5, py: 1, fontWeight: 600, borderRadius: 2 }}
+          sx={{ px: 2, py: 0.75, fontWeight: 600, borderRadius: 2, fontSize: '0.85rem' }}
         >
           Add New Venture
         </Button>
       </Box>
 
       {/* KPI Cards */}
-      <Grid container spacing={2.5}>
+      <Grid container spacing={2}>
         <Grid item xs={12} sm={6} md={3}>
-          <MetricCard title="Total Ventures" value={metrics.totalVentures} />
+          <MetricCard
+            title="Total Ventures"
+            value={metrics.totalVentures}
+            subtitle="All Real Estate Projects"
+            icon={<MapIcon />}
+            color="#2563eb"
+          />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <MetricCard title="Active Layouts" value={metrics.activeVentures} />
+          <MetricCard
+            title="Active Layouts"
+            value={metrics.activeVentures}
+            subtitle="Open for Customer Sales"
+            icon={<VerifiedIcon />}
+            color="#16a34a"
+          />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <MetricCard title="Total Acreage" value={`${metrics.totalAcres} Acres`} />
+          <MetricCard
+            title="Total Acreage"
+            value={metrics.totalAcres}
+            unit="Acres"
+            subtitle="Total Land Bank Developed"
+            icon={<ParkIcon />}
+            color="#0891b2"
+          />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <MetricCard title="Total Plot Inventory" value={`${metrics.totalPlots} Units`} />
+          <MetricCard
+            title="Total Plot Inventory"
+            value={metrics.totalPlots}
+            unit="Units"
+            subtitle="Developed Plot Units"
+            icon={<LocationOnIcon />}
+            color="#d97706"
+          />
         </Grid>
       </Grid>
 

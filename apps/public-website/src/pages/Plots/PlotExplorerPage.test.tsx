@@ -22,7 +22,7 @@ vi.mock('firebase/firestore', () => ({
   collection: vi.fn(),
   getDocs: vi.fn().mockResolvedValue({ empty: true, docs: [] }),
   doc: vi.fn(),
-  runTransaction: vi.fn().mockImplementation((db, fn) => fn({
+  runTransaction: vi.fn().mockImplementation((_db, fn) => fn({
     get: vi.fn().mockResolvedValue({ exists: () => true, data: () => ({}) }),
     set: vi.fn(),
     update: vi.fn(),

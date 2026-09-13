@@ -16,6 +16,7 @@ import {
   Divider,
   Fab,
   Tooltip,
+  Chip,
   useTheme,
   useMediaQuery,
 } from '@mui/material';
@@ -31,11 +32,14 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import LockIcon from '@mui/icons-material/Lock';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import PersonIcon from '@mui/icons-material/Person';
 import { Outlet, Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 import { SiteVisitModal } from '../components/SiteVisitModal';
 import { TokenBookingModal } from '../components/TokenBookingModal';
-import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { GeminiAIAssistantModal } from '../components/GeminiAIAssistantModal';
+import { CustomerAuthModal } from '../components/CustomerAuthModal';
+import { CustomerVehicleTrackerModal } from '../components/CustomerVehicleTrackerModal';
+import { useAuthContext } from '@real-estate-erp/firebase';
 import { useI18n } from '../providers/LanguageContext';
 import { PublicPlot } from '../data/venturesData';
 
@@ -43,11 +47,15 @@ export const PublicLayout: FC = () => {
   const { t } = useI18n();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { user, signOut } = useAuthContext();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [visitModalOpen, setVisitModalOpen] = useState(false);
+  const [trackerModalOpen, setTrackerModalOpen] = useState(false);
   const [aiModalOpen, setAiModalOpen] = useState(false);
   const [tokenModalOpen, setTokenModalOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
   const [holdPlot, setHoldPlot] = useState<PublicPlot | null>(null);
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -85,13 +93,90 @@ export const PublicLayout: FC = () => {
               </Box>
             </Box>
 
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 }, ml: 'auto' }}>
-              <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 0.75 }}>
-                <DirectionsCarIcon sx={{ fontSize: 16, color: '#fbc02d' }} />
-                <Typography variant="caption" sx={{ fontWeight: 600, color: '#ffecb3', whiteSpace: 'nowrap' }}>
-                  {t('complimentary_cab')}
-                </Typography>
-              </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.5 }, ml: 'auto' }}>
+              <Button
+                size="small"
+                onClick={() => setTrackerModalOpen(true)}
+                startIcon={<DirectionsCarIcon sx={{ fontSize: '0.9rem !important', color: '#fbc02d' }} />}
+                sx={{
+                  bgcolor: 'rgba(251, 192, 45, 0.2)',
+                  color: '#ffecb3',
+                  textTransform: 'none',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  py: 0.2,
+                  px: 1.2,
+                  borderRadius: 1.5,
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
+                  border: '1px solid rgba(251, 192, 45, 0.35)',
+                  '&:hover': {
+                    bgcolor: 'rgba(251, 192, 45, 0.3)',
+                    color: '#ffffff',
+                  },
+                }}
+              >
+                Track Site Visit Cab
+              </Button>
+
+
+              {/* Customer Portal Auth Button / Status */}
+              {user ? (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                  <Chip
+                    size="small"
+                    icon={<PersonIcon sx={{ fontSize: '0.9rem !important', color: '#ffffff !important' }} />}
+                    label={user.displayName || user.phoneNumber || user.email || 'Customer'}
+                    sx={{
+                      bgcolor: 'rgba(255, 255, 255, 0.2)',
+                      color: '#ffffff',
+                      fontWeight: 600,
+                      fontSize: '0.72rem',
+                      height: 24,
+                    }}
+                  />
+                  <Button
+                    size="small"
+                    onClick={() => signOut()}
+                    sx={{
+                      color: '#ffcdd2',
+                      textTransform: 'none',
+                      fontSize: '0.72rem',
+                      fontWeight: 600,
+                      py: 0,
+                      px: 0.8,
+                      minWidth: 'auto',
+                      '&:hover': { color: '#ffffff' },
+                    }}
+                  >
+                    Logout
+                  </Button>
+                </Box>
+              ) : (
+                <Button
+                  size="small"
+                  onClick={() => setAuthModalOpen(true)}
+                  startIcon={<PersonIcon sx={{ fontSize: '0.85rem !important' }} />}
+                  sx={{
+                    bgcolor: 'rgba(255, 255, 255, 0.2)',
+                    color: '#ffffff',
+                    textTransform: 'none',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    py: 0.2,
+                    px: 1.2,
+                    borderRadius: 1.5,
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
+                    border: '1px solid rgba(255, 255, 255, 0.3)',
+                    '&:hover': {
+                      bgcolor: 'rgba(255, 255, 255, 0.3)',
+                    },
+                  }}
+                >
+                  Customer Login
+                </Button>
+              )}
 
               {/* Staff / Admin ERP Direct Link Button */}
               <Button
@@ -103,24 +188,24 @@ export const PublicLayout: FC = () => {
                 startIcon={<LockIcon sx={{ fontSize: '0.85rem !important' }} />}
                 endIcon={<OpenInNewIcon sx={{ fontSize: '0.75rem !important' }} />}
                 sx={{
-                  bgcolor: 'rgba(255, 255, 255, 0.15)',
+                  bgcolor: 'rgba(255, 255, 255, 0.12)',
                   color: '#ffffff',
                   textTransform: 'none',
-                  fontSize: '0.75rem',
+                  fontSize: '0.72rem',
                   fontWeight: 700,
-                  py: 0.25,
-                  px: 1.2,
+                  py: 0.2,
+                  px: 1,
                   borderRadius: 1.5,
                   whiteSpace: 'nowrap',
                   flexShrink: 0,
-                  border: '1px solid rgba(255, 255, 255, 0.25)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
                   '&:hover': {
                     bgcolor: 'rgba(255, 255, 255, 0.25)',
                     borderColor: '#ffffff',
                   },
                 }}
               >
-                Staff / Admin ERP Login
+                Staff ERP
               </Button>
             </Box>
           </Box>
@@ -222,8 +307,6 @@ export const PublicLayout: FC = () => {
                   );
                 })}
 
-                <LanguageSwitcher />
-
                 <Button
                   variant="contained"
                   color="primary"
@@ -279,10 +362,9 @@ export const PublicLayout: FC = () => {
               </Stack>
             )}
 
-            {/* Mobile Menu Icon & Compact Language Switcher */}
+            {/* Mobile Menu Icon */}
             {isMobile && (
               <Stack direction="row" spacing={1} alignItems="center">
-                <LanguageSwitcher variant="compact" />
                 <IconButton
                   color="inherit"
                   aria-label="open drawer"
@@ -315,9 +397,6 @@ export const PublicLayout: FC = () => {
             <CloseIcon />
           </IconButton>
         </Box>
-        <Box sx={{ mb: 2 }}>
-          <LanguageSwitcher />
-        </Box>
         <Divider sx={{ mb: 2 }} />
         <List>
           {navItems.map((item) => (
@@ -347,6 +426,20 @@ export const PublicLayout: FC = () => {
           >
             {t('book_free_visit')}
           </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            fullWidth
+            startIcon={<DirectionsCarIcon sx={{ color: '#fbc02d' }} />}
+            onClick={() => {
+              handleDrawerToggle();
+              setTrackerModalOpen(true);
+            }}
+            sx={{ py: 1.2, fontWeight: 700, textTransform: 'none', whiteSpace: 'nowrap' }}
+          >
+            Track Site Visit Vehicle
+          </Button>
+
           <Button
             variant="outlined"
             color="success"
@@ -611,6 +704,20 @@ export const PublicLayout: FC = () => {
         onClose={() => setTokenModalOpen(false)}
         plot={holdPlot}
       />
+
+      {/* Customer Portal Auth Modal (Google & Phone OTP) */}
+      <CustomerAuthModal
+        open={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+      />
+
+      {/* Customer Real-Time Vehicle Tracker & Pickup Location Modal */}
+      <CustomerVehicleTrackerModal
+        open={trackerModalOpen}
+        onClose={() => setTrackerModalOpen(false)}
+        defaultCustomerPhone={user?.phoneNumber || ''}
+      />
     </Box>
   );
 };
+

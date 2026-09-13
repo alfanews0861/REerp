@@ -72,12 +72,40 @@ export interface FuelReceipt {
   createdAt: string;
 }
 
+export interface CustomerPickupLocation {
+  customerId?: string;
+  customerName: string;
+  phone?: string;
+  latitude: number;
+  longitude: number;
+  address?: string;
+  pickupTime?: string;
+  status?: 'WAITING' | 'PICKED_UP' | 'DROPPED';
+}
+
 export interface VehicleLocation {
   vehicleId: string;
   driverId: string;
+  driverName?: string;
+  driverPhone?: string;
+  registrationNumber?: string;
+  makeModel?: string;
+  vehicleType?: 'CAB' | 'BUS' | 'MINI_BUS' | 'SUV' | 'TWO_WHEELER';
   latitude: number;
   longitude: number;
   speedKmH?: number;
   headingDegrees?: number;
+  status: VehicleStatus | 'IDLE';
+  currentTripId?: string;
+  destinationVenture?: string;
+  customerPickup?: CustomerPickupLocation;
+  batteryLevelPercent?: number;
+  accuracyMeters?: number;
   timestamp: string;
 }
+
+
+export interface VehicleLiveTelemetry {
+  [vehicleId: string]: VehicleLocation;
+}
+

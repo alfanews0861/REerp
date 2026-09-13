@@ -9,7 +9,7 @@ export * from './deal';
 export * from './lead';
 export * from './marketing';
 export * from './booking';
-export * from './user';
+export * from './cadre';
 export * from './vehicle';
 export * from './zod-schemas';
 export * from './person';
@@ -26,4 +26,4 @@ export * from './notification';
 export * from './dashboard';
 export * from './ai';
 export * from './expense';
-
+export * from './messaging';

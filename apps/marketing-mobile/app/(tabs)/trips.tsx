@@ -1,12 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity } from 'react-native';
 import { Card } from '../../src/components/Card';
 import { Button } from '../../src/components/Button';
 import { Input } from '../../src/components/Input';
 import { queueOfflineMutation } from '../../src/services/backgroundSync';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Location from 'expo-location';
+import { getFirebaseInstance } from '@real-estate-erp/firebase';
+import { doc, setDoc } from 'firebase/firestore';
 
 import { useAuth } from '../../src/providers/AuthProvider';
+
 
 const VEHICLES = [
   { id: 'veh-1', name: 'Toyota Innova Crysta (TS 09 UB 1001)', currentKm: 48250 },
@@ -26,9 +30,92 @@ export default function TripsScreen() {
   const [fuelLitres, setFuelLitres] = useState('');
   const [tripHistory, setTripHistory] = useState<any[]>([]);
 
+  // Live Telemetry State
+  const [currentGps, setCurrentGps] = useState<{
+    latitude: number;
+    longitude: number;
+    speed: number;
+    heading: number;
+    lastPing: string;
+  } | null>(null);
+  const locationSubRef = useRef<Location.LocationSubscription | null>(null);
+
   useEffect(() => {
     loadActiveTrip();
+    return () => {
+      stopLocationTracking();
+    };
   }, []);
+
+  const startLocationTracking = async (vehicleId: string, tripId: string) => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'GPS permission is required for live fleet tracking.');
+        return;
+      }
+
+      // Stop existing if any
+      stopLocationTracking();
+
+      locationSubRef.current = await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.High,
+          timeInterval: 4000,
+          distanceInterval: 10,
+        },
+        async (location) => {
+          const { latitude, longitude, speed, heading } = location.coords;
+          const speedKmH = Math.max(0, Math.round((speed || 0) * 3.6));
+          const nowStr = new Date().toLocaleTimeString();
+
+          setCurrentGps({
+            latitude,
+            longitude,
+            speed: speedKmH,
+            heading: heading || 0,
+            lastPing: nowStr,
+          });
+
+          // Broadcast to Firestore
+          try {
+            const { db } = getFirebaseInstance();
+            if (db) {
+              const locRef = doc(db, 'vehicle_live_locations', vehicleId);
+              await setDoc(
+                locRef,
+                {
+                  vehicleId,
+                  driverId: user?.uid || 'drv-1',
+                  driverName: user?.displayName || 'Fleet Driver',
+                  latitude,
+                  longitude,
+                  speedKmH,
+                  headingDegrees: heading || 0,
+                  status: 'IN_TRANSIT',
+                  currentTripId: tripId,
+                  destinationVenture,
+                  timestamp: new Date().toISOString(),
+                },
+                { merge: true }
+              );
+            }
+          } catch (e) {
+            console.warn('Live location Firestore push skipped (offline/fallback):', e);
+          }
+        }
+      );
+    } catch (err) {
+      console.warn('Error starting location watcher:', err);
+    }
+  };
+
+  const stopLocationTracking = async () => {
+    if (locationSubRef.current) {
+      locationSubRef.current.remove();
+      locationSubRef.current = null;
+    }
+  };
 
   const loadActiveTrip = async () => {
     const saved = await AsyncStorage.getItem('active_driver_trip');
@@ -38,6 +125,11 @@ export default function TripsScreen() {
       setStartOdometer(parsed.startOdometer.toString());
       setClientPickupLocation(parsed.clientPickupLocation);
       setDestinationVenture(parsed.destinationVenture);
+
+      const foundVeh = VEHICLES.find((v) => v.id === parsed.vehicleId);
+      if (foundVeh) setSelectedVehicle(foundVeh);
+
+      startLocationTracking(parsed.vehicleId || selectedVehicle.id, parsed.tripId || 'trip-active');
     }
   };
 
@@ -75,7 +167,8 @@ export default function TripsScreen() {
     }));
 
     setIsTripActive(true);
-    Alert.alert('Trip Started', `Trip initiated with start odometer: ${startKm} KM`);
+    startLocationTracking(selectedVehicle.id, tripData.id);
+    Alert.alert('Trip Started', `Trip initiated with start odometer: ${startKm} KM. Live GPS tracking active!`);
   };
 
   const handleEndTrip = async () => {
@@ -92,7 +185,27 @@ export default function TripsScreen() {
     const saved = await AsyncStorage.getItem('active_driver_trip');
     const parsed = saved ? JSON.parse(saved) : {};
 
-    // 1. Queue trip end mutation
+    // 1. Stop GPS Tracking & update status in Firestore
+    stopLocationTracking();
+    try {
+      const { db } = getFirebaseInstance();
+      if (db) {
+        const locRef = doc(db, 'vehicle_live_locations', selectedVehicle.id);
+        await setDoc(
+          locRef,
+          {
+            status: 'AVAILABLE',
+            speedKmH: 0,
+            timestamp: new Date().toISOString(),
+          },
+          { merge: true }
+        );
+      }
+    } catch (e) {
+      console.warn('Firestore location update on trip complete error:', e);
+    }
+
+    // 2. Queue trip end mutation
     await queueOfflineMutation({
       type: 'TRIP_END',
       payload: {
@@ -103,6 +216,7 @@ export default function TripsScreen() {
         endedAt: new Date().toISOString(),
       },
     });
+
 
     // 2. If fuel expense entered, queue expense mutation
     if (fuelExpenseAmount && Number(fuelExpenseAmount) > 0) {
@@ -185,6 +299,23 @@ export default function TripsScreen() {
             <Text style={styles.routeText}>{clientPickupLocation} ➔ {destinationVenture}</Text>
             <Text style={styles.startKmText}>Departure Reading: {startOdometer} KM</Text>
           </View>
+
+          {/* Live GPS Broadcasting Indicator */}
+          <View style={styles.gpsBanner}>
+            <View style={styles.gpsDotRow}>
+              <View style={styles.gpsDot} />
+              <Text style={styles.gpsHeading}>BROADCASTING LIVE GPS LOCATION</Text>
+            </View>
+            <Text style={styles.gpsCoords}>
+              {currentGps
+                ? `📍 ${currentGps.latitude.toFixed(4)}° N, ${currentGps.longitude.toFixed(4)}° E  •  Speed: ${currentGps.speed} km/h`
+                : '🛰️ Acquiring GPS satellite fix...'}
+            </Text>
+            <Text style={styles.gpsPing}>
+              Admin & Customers can view this vehicle in real-time. Last ping: {currentGps?.lastPing || 'Connecting...'}
+            </Text>
+          </View>
+
 
           <Input
             label="Final End Odometer Reading (KM)"
@@ -277,7 +408,44 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#bfdbfe',
+    marginBottom: 12,
+  },
+  gpsBanner: {
+    backgroundColor: '#f0fdf4',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#86efac',
     marginBottom: 16,
+  },
+  gpsDotRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  gpsDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#16a34a',
+    marginRight: 6,
+  },
+  gpsHeading: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#166534',
+    letterSpacing: 0.5,
+  },
+  gpsCoords: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#15803d',
+    marginTop: 2,
+  },
+  gpsPing: {
+    fontSize: 11,
+    color: '#475569',
+    marginTop: 3,
   },
   inProgressText: {
     fontSize: 12,
@@ -326,3 +494,4 @@ const styles = StyleSheet.create({
     color: '#2563eb',
   },
 });
+

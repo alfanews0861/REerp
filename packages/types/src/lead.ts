@@ -73,6 +73,9 @@ export interface Lead {
   leadIntroducerId?: string;
   networkMemberId?: string;
   telecallerId?: string;
+  appointedByUid?: string; // Leader UID who appointed the telecaller/agent
+  appointedByName?: string;
+  hierarchyPath?: string[]; // Reporting chain UIDs authorized to view this lead
   campaignId?: string;
   
   // Qualification fields

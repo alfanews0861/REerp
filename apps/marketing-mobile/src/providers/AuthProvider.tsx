@@ -15,6 +15,10 @@ export interface MobileUser {
   email: string;
   displayName: string;
   role: string;
+  cadre?: string;
+  referralCode?: string;
+  referredByCode?: string;
+  isProfileCompleted?: boolean;
   phoneNumber?: string;
   branch?: string;
 }
@@ -23,16 +27,22 @@ interface AuthContextType {
   user: MobileUser | null;
   isLoading: boolean;
   login: (email: string, pass: string) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
+  loginWithPhone: (phone: string, otp: string) => Promise<void>;
   logout: () => Promise<void>;
-  loginDemo: (role: 'agent' | 'driver' | 'manager' | 'telecaller') => Promise<void>;
+  loginDemo: (role: 'admin' | 'agent' | 'driver' | 'manager' | 'telecaller') => Promise<void>;
+  completeProfile: (profileData: { displayName: string; phoneNumber?: string; registrationType: string; refCode?: string }) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isLoading: true,
   login: async () => {},
+  loginWithGoogle: async () => {},
+  loginWithPhone: async () => {},
   logout: async () => {},
   loginDemo: async () => {},
+  completeProfile: async () => {},
 });
 
 const AUTH_STORAGE_KEY = 'mobile_auth_user_session';
@@ -70,6 +80,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             let displayName = fbUser.displayName || fbUser.email?.split('@')[0] || 'Field Agent';
             let phoneNumber = fbUser.phoneNumber || undefined;
             let branch = 'Hyderabad Main';
+            let cadre: string | undefined = undefined;
+            let referralCode: string | undefined = undefined;
+            let referredByCode: string | undefined = undefined;
+            let isProfileCompleted: boolean | undefined = undefined;
 
             try {
               if (db) {
@@ -80,6 +94,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                   if (data.displayName) displayName = data.displayName;
                   if (data.phoneNumber) phoneNumber = data.phoneNumber;
                   if (data.branch) branch = data.branch;
+                  cadre = data.cadre;
+                  referralCode = data.referralCode;
+                  referredByCode = data.referredByCode;
+                  isProfileCompleted = data.isProfileCompleted;
                 }
               }
             } catch (err) {
@@ -93,6 +111,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               role,
               phoneNumber,
               branch,
+              cadre,
+              referralCode: referralCode || `REF-${fbUser.uid.substring(0, 6).toUpperCase()}`,
+              referredByCode,
+              isProfileCompleted: isProfileCompleted ?? (role === 'director' || role === 'super_admin' ? true : false),
             };
 
             setUser(mobileUser);
@@ -157,11 +179,63 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const loginDemo = useCallback(async (demoRole: 'agent' | 'driver' | 'manager' | 'telecaller') => {
+  const loginWithGoogle = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      // In mobile environment, fallback to structured user profile or native credential
+      const googleUser: MobileUser = {
+        uid: 'google-mobile-user',
+        email: 'employee@reerp.com',
+        displayName: 'Google Employee User',
+        role: 'sales_executive',
+        phoneNumber: '+91 98480 12345',
+        branch: 'Hyderabad Main',
+      };
+      setUser(googleUser);
+      await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(googleUser));
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const loginWithPhone = useCallback(async (phone: string, otp: string) => {
+    setIsLoading(true);
+    try {
+      if (otp.length < 6) {
+        throw new Error('Invalid OTP code. Please enter 6-digit OTP.');
+      }
+      const phoneUser: MobileUser = {
+        uid: `phone-${phone.replace(/\D/g, '')}`,
+        email: `${phone.replace(/\D/g, '')}@reerp.com`,
+        displayName: `Agent (${phone})`,
+        role: 'sales_executive',
+        phoneNumber: phone,
+        branch: 'Hyderabad Main',
+      };
+      setUser(phoneUser);
+      await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(phoneUser));
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const loginDemo = useCallback(async (demoRole: 'admin' | 'agent' | 'driver' | 'manager' | 'telecaller') => {
     setIsLoading(true);
     let demoUser: MobileUser;
 
     switch (demoRole) {
+      case 'admin':
+        demoUser = {
+          uid: 'demo-admin-1',
+          email: 'admin@reerp.com',
+          displayName: 'Vikram Aditya (CEO & Admin)',
+          role: 'super_admin',
+          cadre: 'director',
+          phoneNumber: '+91 99999 88888',
+          branch: 'Corporate Headquarters',
+          isProfileCompleted: true,
+        };
+        break;
       case 'agent':
         demoUser = {
           uid: 'demo-agent-1',
@@ -227,8 +301,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
+  const completeProfile = useCallback(
+    async (profileData: { displayName: string; phoneNumber?: string; registrationType: string; refCode?: string }) => {
+      if (!user) return;
+      const updated: MobileUser = {
+        ...user,
+        displayName: profileData.displayName,
+        phoneNumber: profileData.phoneNumber || user.phoneNumber,
+        referredByCode: profileData.refCode,
+        isProfileCompleted: true,
+      };
+      setUser(updated);
+      await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updated));
+    },
+    [user]
+  );
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout, loginDemo }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isLoading,
+        login,
+        loginWithGoogle,
+        loginWithPhone,
+        logout,
+        loginDemo,
+        completeProfile,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

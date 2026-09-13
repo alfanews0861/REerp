@@ -1,4 +1,4 @@
-import { FC, lazy, Suspense } from 'react';
+import { FC, lazy, Suspense, ComponentType, LazyExoticComponent } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Box, CircularProgress } from '@mui/material';
 import {
@@ -9,30 +9,67 @@ import {
 } from '@real-estate-erp/ui';
 import { AppShell } from '../layouts/AppShell';
 
-// Lazy loading for all modules
-const ExecutiveDashboard = lazy(() => import('../pages/dashboard/ExecutiveDashboard'));
-const CommandCenter = lazy(() => import('../pages/dashboard/CommandCenter'));
-const LeadsWorkspace = lazy(() => import('../pages/crm/leads/LeadsWorkspace'));
-const SiteVisitsWorkspace = lazy(() => import('../pages/crm/site-visits/SiteVisitsWorkspace'));
-const Customer360View = lazy(() => import('../pages/crm/Customer360View'));
-const ProjectsWorkspace = lazy(() => import('../pages/projects/ProjectsWorkspace'));
-const PlotInventory = lazy(() => import('../pages/plots/PlotInventory'));
-const PlotDetails = lazy(() => import('../pages/plots/PlotDetails'));
-const CampaignList = lazy(() => import('../pages/marketing/campaigns/CampaignList'));
-const CampaignDetail = lazy(() => import('../pages/marketing/campaigns/CampaignDetail'));
-const NetworkWorkspace = lazy(() => import('../pages/marketing/network/NetworkWorkspace'));
-const CommissionLedgerPage = lazy(() => import('../pages/marketing/commission/CommissionLedgerPage'));
-const CommissionRulesPage = lazy(() => import('../pages/marketing/commission/CommissionRulesPage'));
-const TelecallerWorkspace = lazy(() => import('../pages/marketing/telecaller/TelecallerWorkspace'));
-const MarketingReports = lazy(() => import('../pages/reports/MarketingReports'));
-const AnalyticsWorkspace = lazy(() => import('../pages/analytics/AnalyticsWorkspace'));
-const BookingsWorkspace = lazy(() => import('../pages/sales/BookingsWorkspace'));
-const PaymentsWorkspace = lazy(() => import('../pages/finance/PaymentsWorkspace'));
-const ExpensesWorkspace = lazy(() => import('../pages/expenses/ExpensesWorkspace'));
-const VehiclesWorkspace = lazy(() => import('../pages/vehicles/VehiclesWorkspace'));
-const UserManagementWorkspace = lazy(() => import('../pages/administration/UserManagementWorkspace'));
-const AttendanceWorkspace = lazy(() => import('../pages/employees/AttendanceWorkspace'));
-const LoginScreen = lazy(() => import('../pages/auth/LoginScreen'));
+/**
+ * Resilient lazy loader that automatically retries dynamic chunk imports
+ * upon network blips or new deployment version transitions.
+ */
+function lazyRetry<T extends ComponentType<any>>(
+  factory: () => Promise<{ default: T }>,
+  retries = 2
+): LazyExoticComponent<T> {
+  return lazy(async () => {
+    for (let i = 0; i <= retries; i++) {
+      try {
+        return await factory();
+      } catch (err: any) {
+        if (i === retries) {
+          const isChunkError =
+            err?.message?.includes('Failed to fetch dynamically imported module') ||
+            err?.message?.includes('Importing a module script failed') ||
+            err?.message?.includes('dynamically imported module');
+          if (isChunkError) {
+            const lastReload = Number(sessionStorage.getItem('last_chunk_reload_time') || 0);
+            if (Date.now() - lastReload > 15000) {
+              sessionStorage.setItem('last_chunk_reload_time', String(Date.now()));
+              window.location.reload();
+            }
+          }
+          throw err;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 350 * (i + 1)));
+      }
+    }
+    throw new Error('Component failed to load');
+  });
+}
+
+// Resilient Lazy loading for all modules
+const ExecutiveDashboard = lazyRetry(() => import('../pages/dashboard/ExecutiveDashboard'));
+const CommandCenter = lazyRetry(() => import('../pages/dashboard/CommandCenter'));
+const LeadsWorkspace = lazyRetry(() => import('../pages/crm/leads/LeadsWorkspace'));
+const SiteVisitsWorkspace = lazyRetry(() => import('../pages/crm/site-visits/SiteVisitsWorkspace'));
+const Customer360View = lazyRetry(() => import('../pages/crm/Customer360View'));
+const ProjectsWorkspace = lazyRetry(() => import('../pages/projects/ProjectsWorkspace'));
+const PlotInventory = lazyRetry(() => import('../pages/plots/PlotInventory'));
+const PlotDetails = lazyRetry(() => import('../pages/plots/PlotDetails'));
+const CampaignList = lazyRetry(() => import('../pages/marketing/campaigns/CampaignList'));
+const CampaignDetail = lazyRetry(() => import('../pages/marketing/campaigns/CampaignDetail'));
+const NetworkWorkspace = lazyRetry(() => import('../pages/marketing/network/NetworkWorkspace'));
+const CommissionLedgerPage = lazyRetry(() => import('../pages/marketing/commission/CommissionLedgerPage'));
+const CommissionRulesPage = lazyRetry(() => import('../pages/marketing/commission/CommissionRulesPage'));
+const TelecallerWorkspace = lazyRetry(() => import('../pages/marketing/telecaller/TelecallerWorkspace'));
+const MarketingReports = lazyRetry(() => import('../pages/reports/MarketingReports'));
+const AnalyticsWorkspace = lazyRetry(() => import('../pages/analytics/AnalyticsWorkspace'));
+const BookingsWorkspace = lazyRetry(() => import('../pages/sales/BookingsWorkspace'));
+const PaymentsWorkspace = lazyRetry(() => import('../pages/finance/PaymentsWorkspace'));
+const ExpensesWorkspace = lazyRetry(() => import('../pages/expenses/ExpensesWorkspace'));
+const VehiclesWorkspace = lazyRetry(() => import('../pages/vehicles/VehiclesWorkspace'));
+const UserManagementWorkspace = lazyRetry(() => import('../pages/administration/UserManagementWorkspace'));
+const AttendanceWorkspace = lazyRetry(() => import('../pages/employees/AttendanceWorkspace'));
+const LoginScreen = lazyRetry(() => import('../pages/auth/LoginScreen'));
+const ProfileRegistrationPage = lazyRetry(() => import('../pages/auth/ProfileRegistrationPage'));
+const UserProfilePage = lazyRetry(() => import('../pages/profile/UserProfilePage'));
+const CommunicationsWorkspace = lazyRetry(() => import('../pages/communications/CommunicationsWorkspace'));
 
 const LoadingFallback = () => (
   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', minHeight: '50vh' }}>
@@ -44,6 +81,11 @@ export const AppRoutes: FC = () => {
   return (
     <Suspense fallback={<LoadingFallback />}>
       <Routes>
+        {/* Profile Onboarding / Registration (First time only) */}
+        <Route element={<PrivateRoute redirectTo="/login" />}>
+          <Route path="/register-profile" element={<ProfileRegistrationPage />} />
+        </Route>
+
         {/* Public Routes */}
         <Route element={<PublicRoute />}>
           <Route path="/public" element={<LoginScreen />} />
@@ -59,6 +101,11 @@ export const AppRoutes: FC = () => {
           <Route element={<AppShell />}>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<ExecutiveDashboard />} />
+            <Route path="/profile" element={<UserProfilePage />} />
+            
+            {/* Internal Messaging & Communications Center */}
+            <Route path="/messages" element={<CommunicationsWorkspace />} />
+            <Route path="/communications" element={<CommunicationsWorkspace />} />
             
             {/* Leadership / Command Center */}
             <Route element={<RoleRoute allowedRoles={['super_admin', 'director', 'branch_manager']} unauthorizedTo="/dashboard" />}>
@@ -110,7 +157,7 @@ export const AppRoutes: FC = () => {
             </Route>
             
             {/* Reports & Analytics */}
-            <Route element={<RoleRoute allowedRoles={['super_admin', 'director', 'branch_manager', 'marketing_manager', 'sales_manager', 'accountant']} unauthorizedTo="/dashboard" />}>
+            <Route element={<RoleRoute allowedRoles={['super_admin', 'director', 'branch_manager', 'marketing_manager', 'marketing_executive', 'sales_manager', 'sales_executive', 'accountant', 'telecaller', 'driver']} unauthorizedTo="/dashboard" />}>
               <Route path="/reports" element={<MarketingReports />} />
               <Route path="/reports/marketing" element={<MarketingReports />} />
               <Route path="/analytics" element={<AnalyticsWorkspace />} />

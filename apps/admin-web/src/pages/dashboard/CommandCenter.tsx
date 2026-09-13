@@ -4,7 +4,6 @@ import {
   Typography,
   Grid,
   Card,
-  CardActionArea,
   Tabs,
   Tab,
   Chip,
@@ -23,6 +22,7 @@ import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import SupportAgentIcon from '@mui/icons-material/SupportAgent';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { MetricCard } from '@real-estate-erp/ui';
 import { DashboardService } from '../../services/DashboardService';
 import { ExecutiveDashboardData } from '@real-estate-erp/types';
 import { useNavigate } from 'react-router-dom';
@@ -53,7 +53,7 @@ export const CommandCenter: React.FC = () => {
       value: data.kpis.bookings,
       path: '/bookings',
       icon: <TrendingUpIcon />,
-      color: theme.palette.primary.main,
+      gradient: 'linear-gradient(135deg, #10b981 0%, #047857 100%)',
       subtitle: 'Active & Confirmed Deals',
     },
     {
@@ -61,7 +61,7 @@ export const CommandCenter: React.FC = () => {
       value: `₹ ${(data.kpis.grossSales / 10000000).toFixed(2)} Cr`,
       path: '/payments',
       icon: <CurrencyRupeeIcon />,
-      color: theme.palette.success.main,
+      gradient: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
       subtitle: 'Total Contract Value',
     },
     {
@@ -69,7 +69,7 @@ export const CommandCenter: React.FC = () => {
       value: `₹ ${(data.kpis.collectedAmount / 10000000).toFixed(2)} Cr`,
       path: '/payments',
       icon: <ReceiptLongIcon />,
-      color: theme.palette.warning.main,
+      gradient: 'linear-gradient(135deg, #f59e0b 0%, #b45309 100%)',
       subtitle: 'Realized Revenue Receipts',
     },
     {
@@ -77,20 +77,20 @@ export const CommandCenter: React.FC = () => {
       value: data.kpis.afterSalesOpenCases,
       path: '/crm/customers',
       icon: <SupportAgentIcon />,
-      color: theme.palette.secondary.main,
+      gradient: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
       subtitle: 'Support & After-Sales',
     },
   ];
 
   return (
-    <Box sx={{ p: { xs: 2, md: 3 } }}>
+    <Box sx={{ p: { xs: 0.5, md: 1 } }}>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, flexDirection: { xs: 'column', sm: 'row' }, mb: 3, gap: 2 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, flexDirection: { xs: 'column', sm: 'row' }, mb: 2, gap: 1.5 }}>
         <Box>
-          <Typography variant="h4" fontWeight={700} color="text.primary">
+          <Typography variant="h5" fontWeight={700} color="text.primary" sx={{ fontSize: { xs: '1.25rem', md: '1.45rem' } }}>
             Management Command Center
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25 }}>
             Real-time executive oversight, operational indicators, and AI strategic signals
           </Typography>
         </Box>
@@ -116,36 +116,17 @@ export const CommandCenter: React.FC = () => {
       </Box>
 
       {/* KPI Cards Grid */}
-      <Grid container spacing={2.5} sx={{ mb: 4 }}>
+      <Grid container spacing={2} sx={{ mb: 2.5 }}>
         {kpis.map((kpi, idx) => (
           <Grid item xs={12} sm={6} md={3} key={idx}>
-            <Card
-              elevation={2}
-              sx={{
-                borderRadius: 2.5,
-                borderLeft: `5px solid ${kpi.color}`,
-                transition: 'transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out',
-                '&:hover': {
-                  transform: 'translateY(-3px)',
-                  boxShadow: 4,
-                },
-              }}
-            >
-              <CardActionArea onClick={() => navigate(kpi.path)} sx={{ p: 2.5 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                  <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                    {kpi.title}
-                  </Typography>
-                  <Box sx={{ color: kpi.color }}>{kpi.icon}</Box>
-                </Box>
-                <Typography variant="h4" fontWeight={700} color="text.primary" sx={{ mb: 0.5 }}>
-                  {kpi.value}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {kpi.subtitle}
-                </Typography>
-              </CardActionArea>
-            </Card>
+            <MetricCard
+              title={kpi.title}
+              value={kpi.value}
+              subtitle={kpi.subtitle}
+              icon={kpi.icon}
+              gradient={kpi.gradient}
+              onClick={() => navigate(kpi.path)}
+            />
           </Grid>
         ))}
       </Grid>

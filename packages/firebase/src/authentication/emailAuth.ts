@@ -44,6 +44,8 @@ export async function signUpWithEmail(
     await updateProfile(credential.user, { displayName });
 
     try {
+      const generatedReferralCode = `REF-${Math.floor(100000 + Math.random() * 900000)}`;
+      const isPrivileged = role === 'super_admin' || role === 'director' || role === 'branch_manager';
       await setDoc(
         doc(db, 'users', credential.user.uid),
         {
@@ -52,7 +54,9 @@ export async function signUpWithEmail(
           displayName,
           phoneNumber: phoneNumber || null,
           role,
-          status: 'active',
+          status: isPrivileged ? 'active' : 'pending',
+          isProfileCompleted: isPrivileged ? true : false,
+          referralCode: generatedReferralCode,
           permissions: [],
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),

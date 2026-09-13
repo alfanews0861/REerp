@@ -499,9 +499,9 @@ export const AttendanceWorkspace: React.FC = () => {
         return <Chip label={status.replace('_', ' ')} size="small" color="warning" sx={{ fontWeight: 700 }} />;
       case 'ON_LEAVE':
       case 'ABSENT':
-        return <Chip label={status.replace('_', ' ')} size="small" color="error" sx={{ fontWeight: 700 }} />;
+        return <Chip label={status.replace('_', ' ')} size="small" color="error" sx={{ fontWeight: 800, fontSize: '0.7rem', height: 22 }} />;
       default:
-        return <Chip label={status} size="small" sx={{ fontWeight: 700 }} />;
+        return <Chip label={status} size="small" sx={{ fontWeight: 800, fontSize: '0.7rem', height: 22 }} />;
     }
   };
 
@@ -510,12 +510,13 @@ export const AttendanceWorkspace: React.FC = () => {
       id: 'userName',
       label: 'Employee & Role',
       sortable: true,
+      minWidth: 170,
       render: (row: AttendanceRecord) => (
-        <Box>
-          <Typography variant="body2" fontWeight={700} color="primary">
+        <Box sx={{ whiteSpace: 'nowrap' }}>
+          <Typography variant="body2" fontWeight={700} color="#0f172a">
             {row.userName}
           </Typography>
-          <Typography variant="caption" color="text.secondary">
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.75rem' }}>
             {row.userRole}
           </Typography>
         </Box>
@@ -524,21 +525,26 @@ export const AttendanceWorkspace: React.FC = () => {
     {
       id: 'staffType',
       label: 'Staff Category',
+      minWidth: 150,
       render: (row: AttendanceRecord) => (
-        <Chip
-          size="small"
-          icon={row.staffType === 'FIELD_STAFF' ? <TerrainIcon /> : <BusinessIcon />}
-          label={row.staffType === 'FIELD_STAFF' ? 'Field Site Staff' : 'Head Office Staff'}
-          color={row.staffType === 'FIELD_STAFF' ? 'primary' : 'default'}
-          variant="outlined"
-        />
+        <Box sx={{ whiteSpace: 'nowrap' }}>
+          <Chip
+            size="small"
+            icon={row.staffType === 'FIELD_STAFF' ? <TerrainIcon sx={{ fontSize: '14px !important' }} /> : <BusinessIcon sx={{ fontSize: '14px !important' }} />}
+            label={row.staffType === 'FIELD_STAFF' ? 'Field Site Staff' : 'Head Office Staff'}
+            color={row.staffType === 'FIELD_STAFF' ? 'primary' : 'default'}
+            variant="outlined"
+            sx={{ fontWeight: 700, fontSize: '0.72rem', height: 24 }}
+          />
+        </Box>
       ),
     },
     {
       id: 'location',
       label: 'Assigned Site / Branch',
+      minWidth: 190,
       render: (row: AttendanceRecord) => (
-        <Typography variant="body2" fontWeight={500}>
+        <Typography variant="body2" fontWeight={500} color="#334155" sx={{ fontSize: '0.82rem' }}>
           {row.assignedLocationName || 'Head Office'}
         </Typography>
       ),
@@ -546,25 +552,28 @@ export const AttendanceWorkspace: React.FC = () => {
     {
       id: 'punchInTime',
       label: 'Punch In / Out',
+      minWidth: 130,
       render: (row: AttendanceRecord) => (
-        <Box>
-          <Typography variant="body2">
+        <Box sx={{ whiteSpace: 'nowrap' }}>
+          <Typography variant="body2" sx={{ fontWeight: 700, fontSize: '0.8rem', color: '#0f172a' }}>
             In:{' '}
             {row.punchInTime
-              ? new Date(row.punchInTime).toLocaleTimeString('en-IN', {
+              ? new Date(row.punchInTime).toLocaleTimeString('en-US', {
                   hour: '2-digit',
                   minute: '2-digit',
+                  hour12: true,
                 })
               : '--:--'}
           </Typography>
-          <Typography variant="caption" color="text.secondary">
+          <Typography variant="caption" sx={{ color: row.punchOutTime ? 'text.secondary' : '#16a34a', fontWeight: row.punchOutTime ? 500 : 700, display: 'block', fontSize: '0.72rem' }}>
             Out:{' '}
             {row.punchOutTime
-              ? new Date(row.punchOutTime).toLocaleTimeString('en-IN', {
+              ? new Date(row.punchOutTime).toLocaleTimeString('en-US', {
                   hour: '2-digit',
                   minute: '2-digit',
+                  hour12: true,
                 })
-              : 'Active'}
+              : 'Active Duty'}
           </Typography>
         </Box>
       ),
@@ -572,32 +581,37 @@ export const AttendanceWorkspace: React.FC = () => {
     {
       id: 'geoFence',
       label: 'Geo-Fence Status',
-      render: (row: AttendanceRecord) =>
-        row.isGeoFenceVerified ? (
-          <Chip
-            size="small"
-            icon={<VerifiedIcon />}
-            label="Verified On-Site"
-            color="success"
-            variant="outlined"
-            sx={{ fontWeight: 600 }}
-          />
-        ) : (
-          <Chip
-            size="small"
-            icon={<LocationOffIcon />}
-            label="Outside Boundary"
-            color="warning"
-            variant="outlined"
-            sx={{ fontWeight: 600 }}
-          />
-        ),
+      minWidth: 150,
+      render: (row: AttendanceRecord) => (
+        <Box sx={{ whiteSpace: 'nowrap' }}>
+          {row.isGeoFenceVerified ? (
+            <Chip
+              size="small"
+              icon={<VerifiedIcon sx={{ fontSize: '14px !important' }} />}
+              label="Verified On-Site"
+              color="success"
+              variant="outlined"
+              sx={{ fontWeight: 700, fontSize: '0.72rem', height: 24 }}
+            />
+          ) : (
+            <Chip
+              size="small"
+              icon={<LocationOffIcon sx={{ fontSize: '14px !important' }} />}
+              label="Outside Boundary"
+              color="warning"
+              variant="outlined"
+              sx={{ fontWeight: 700, fontSize: '0.72rem', height: 24 }}
+            />
+          )}
+        </Box>
+      ),
     },
     {
       id: 'hours',
       label: 'Hours',
+      minWidth: 80,
       render: (row: AttendanceRecord) => (
-        <Typography variant="body2" fontWeight={600}>
+        <Typography variant="body2" fontWeight={700} sx={{ whiteSpace: 'nowrap', fontSize: '0.82rem' }}>
           {row.totalHoursWorked || 8} Hrs
         </Typography>
       ),
@@ -606,11 +620,13 @@ export const AttendanceWorkspace: React.FC = () => {
       id: 'status',
       label: 'Attendance Status',
       sortable: true,
+      minWidth: 130,
       render: (row: AttendanceRecord) => getStatusChip(row.status),
     },
     {
       id: 'actions',
       label: 'Actions',
+      minWidth: 90,
       render: (row: AttendanceRecord) => (
         <Button
           size="small"
@@ -618,6 +634,15 @@ export const AttendanceWorkspace: React.FC = () => {
           onClick={(e) => {
             e.stopPropagation();
             handleOpenDetails(row);
+          }}
+          sx={{
+            fontWeight: 700,
+            textTransform: 'none',
+            borderRadius: 1.5,
+            py: 0.3,
+            px: 1.5,
+            fontSize: '0.75rem',
+            whiteSpace: 'nowrap',
           }}
         >
           Details
@@ -627,41 +652,66 @@ export const AttendanceWorkspace: React.FC = () => {
   ];
 
   return (
-    <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 3 }}>
+    <Box sx={{ p: { xs: 0.5, md: 1 }, display: 'flex', flexDirection: 'column', gap: 2 }}>
       {/* Top Header */}
-      <Box display="flex" justifyContent="space-between" alignItems="flex-start" flexWrap="wrap" gap={2}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1.5}>
         <Box>
-          <Typography variant="h4" fontWeight={700} gutterBottom>
+          <Typography variant="h5" fontWeight={700} sx={{ fontSize: { xs: '1.25rem', md: '1.45rem' } }}>
             Employee Attendance & HR Workspace
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25 }}>
             Daily check-in and attendance tracking for field staff on venture sites and office personnel
           </Typography>
         </Box>
         <Button
           variant="contained"
           color="primary"
+          size="medium"
           startIcon={<AddIcon />}
           onClick={() => setPunchDialogOpen(true)}
-          sx={{ px: 2.5, py: 1, fontWeight: 600, borderRadius: 2 }}
+          sx={{ px: 2, py: 0.75, fontWeight: 600, borderRadius: 2, fontSize: '0.85rem' }}
         >
           Record Attendance / Punch In
         </Button>
       </Box>
 
       {/* KPI Cards */}
-      <Grid container spacing={2.5}>
+      <Grid container spacing={2}>
         <Grid item xs={12} sm={6} md={3}>
-          <MetricCard title="Staff Present Today" value={`${metrics.totalPresent} Checked In`} />
+          <MetricCard
+            title="Staff Present Today"
+            value={metrics.totalPresent}
+            subtitle="Checked In Today"
+            icon={<VerifiedIcon />}
+            color="#16a34a"
+          />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <MetricCard title="Field Staff on Site Duty" value={`${metrics.fieldStaffCount} on Venture Sites`} />
+          <MetricCard
+            title="Field Staff on Site Duty"
+            value={metrics.fieldStaffCount}
+            subtitle="Active on Venture Sites"
+            icon={<TerrainIcon />}
+            color="#2563eb"
+          />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <MetricCard title="Office Staff Present" value={`${metrics.officeStaffCount} at Head Office`} />
+          <MetricCard
+            title="Office Staff Present"
+            value={metrics.officeStaffCount}
+            subtitle="At Corporate / Branch Office"
+            icon={<BusinessIcon />}
+            color="#0891b2"
+          />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <MetricCard title="On Leave / Absent" value={`${metrics.onLeaveCount} Staff`} />
+          <MetricCard
+            title="On Leave / Absent"
+            value={metrics.onLeaveCount}
+            subtitle="Approved Leave / Off-Duty"
+            icon={<LocationOffIcon />}
+            color="#d97706"
+          />
         </Grid>
       </Grid>
 

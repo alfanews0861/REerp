@@ -12,7 +12,6 @@ import {
   Chip,
   Paper,
   Avatar,
-  Divider,
   Card,
   CardContent,
   CardActions,
@@ -52,12 +51,7 @@ export const GeminiAIAssistantModal: FC<GeminiAIAssistantModalProps> = ({
   const initialGreeting: AIMessage = {
     id: 'msg-init',
     sender: 'assistant',
-    text:
-      language === 'te'
-        ? `నమస్కారం! నేను మీ **జెమిని AI రియల్ ఎస్టేట్ సలహాదారుని**. \n\nహైదరాబాద్‌లోని HMDA/DTCP ఆమోదిత లేఅవుట్లు, మోకిల, శంకర్‌పల్లి, షాద్‌నగర్, కొల్లూరు కారిడార్లలో ప్లాట్లు, రిజిస్ట్రేషన్ మరియు మీ బడ్జెట్‌లోని ప్లాట్ల గురించి అడగండి.`
-        : language === 'hi'
-        ? `नमस्ते! मैं आपका **जेमिनी एआई रियल एस्टेट सलाहकार** हूँ। \n\nहैदराबाद के HMDA/DTCP प्रोजेक्ट्स, मोकिला, शादनगर गलियारों, रजिस्ट्री प्रक्रिया और अपने बजट में प्लॉट्स के बारे में पूछें।`
-        : `Hello! I am your **Gemini AI Real Estate Advisor**. \n\nI can assist you with Hyderabad growth corridors, HMDA vs DTCP regulatory guidelines, finding plots within your exact budget, and scheduling complimentary AC cab site visits.`,
+    text: `Hello! I am your **Gemini AI Real Estate Advisor**. \n\nI can assist you with Hyderabad growth corridors, HMDA vs DTCP regulatory guidelines, finding plots within your exact budget, and scheduling complimentary AC cab site visits.`,
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
   };
 
