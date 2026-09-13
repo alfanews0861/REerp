@@ -5,7 +5,11 @@ import { LocationProvider } from '../src/providers/LocationProvider';
 import { Button } from '../src/components/Button';
 import React, { useEffect } from 'react';
 import { registerBackgroundSync } from '../src/services/backgroundSync';
-import { initFirebase } from '@real-estate-erp/firebase';
+// IMPORTANT: Import directly from local mobile-safe firebase wrapper, NOT from '@real-estate-erp/firebase'.
+// The shared package imports 'firebase/messaging' (browser-only ServiceWorker/navigator APIs)
+// and 'session/deviceValidation' (localStorage/navigator) which fatally crash React Native
+// at bundle evaluation time before any React component can mount.
+import { initFirebase } from '../src/services/firebase';
 
 // Global error protection to prevent silent blank screens on native
 if (typeof (global as any).ErrorUtils !== 'undefined') {

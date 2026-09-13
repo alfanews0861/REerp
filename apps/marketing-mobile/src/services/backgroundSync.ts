@@ -2,7 +2,10 @@ import * as BackgroundFetch from 'expo-background-fetch';
 import * as TaskManager from 'expo-task-manager';
 import NetInfo from '@react-native-community/netinfo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getFirebaseInstance, collection, addDoc, doc, updateDoc } from '@real-estate-erp/firebase';
+// IMPORTANT: Import directly from local mobile-safe firebase wrapper, NOT from '@real-estate-erp/firebase'.
+// The shared package imports 'firebase/messaging' and 'session/deviceValidation' which use
+// browser-only APIs that fatally crash React Native at bundle evaluation time.
+import { getFirebaseInstance, collection, addDoc, doc, updateDoc } from './firebase';
 
 const BACKGROUND_SYNC_TASK = 'background-sync-task';
 
