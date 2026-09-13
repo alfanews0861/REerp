@@ -43,7 +43,12 @@ export const LocationProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    requestPermission();
+    const timer = setTimeout(() => {
+      requestPermission().catch((err) => {
+        console.warn('Initial LocationProvider request notice:', err);
+      });
+    }, 800);
+    return () => clearTimeout(timer);
   }, []);
 
   return (

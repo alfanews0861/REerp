@@ -45,7 +45,13 @@ export async function queueOfflineMutation(mutation: Omit<OfflineMutation, 'id' 
 }
 
 async function syncSingleMutation(mutation: OfflineMutation): Promise<void> {
-  const { db } = getFirebaseInstance();
+  let db: any = null;
+  try {
+    const instance = getFirebaseInstance();
+    db = instance?.db;
+  } catch {
+    return;
+  }
   if (!db) return;
 
   switch (mutation.type) {
@@ -126,42 +132,50 @@ async function syncSingleMutation(mutation: OfflineMutation): Promise<void> {
   }
 }
 
-TaskManager.defineTask(BACKGROUND_SYNC_TASK, async () => {
-  try {
-    const netInfo = await NetInfo.fetch();
-    if (!netInfo.isConnected) {
-      return BackgroundFetch.BackgroundFetchResult.NoData;
-    }
-
-    const offlineQueue = await AsyncStorage.getItem('offline_mutations');
-    if (offlineQueue) {
-      const mutations: OfflineMutation[] = JSON.parse(offlineQueue);
-      if (mutations.length > 0) {
-        for (const mutation of mutations) {
-          try {
-            await syncSingleMutation(mutation);
-          } catch (mErr) {
-            console.warn('Failed to sync individual mutation:', mErr);
-          }
-        }
-        
-        // On completion, clear the queue
-        await AsyncStorage.removeItem('offline_mutations');
-        return BackgroundFetch.BackgroundFetchResult.NewData;
+try {
+  TaskManager.defineTask(BACKGROUND_SYNC_TASK, async () => {
+    try {
+      const netInfo = await NetInfo.fetch();
+      if (!netInfo.isConnected) {
+        return BackgroundFetch.BackgroundFetchResult.NoData;
       }
+
+      const offlineQueue = await AsyncStorage.getItem('offline_mutations');
+      if (offlineQueue) {
+        const mutations: OfflineMutation[] = JSON.parse(offlineQueue);
+        if (mutations.length > 0) {
+          for (const mutation of mutations) {
+            try {
+              await syncSingleMutation(mutation);
+            } catch (mErr) {
+              console.warn('Failed to sync individual mutation:', mErr);
+            }
+          }
+          
+          // On completion, clear the queue
+          await AsyncStorage.removeItem('offline_mutations');
+          return BackgroundFetch.BackgroundFetchResult.NewData;
+        }
+      }
+      
+      return BackgroundFetch.BackgroundFetchResult.NoData;
+    } catch (error) {
+      console.error('Background sync failed:', error);
+      return BackgroundFetch.BackgroundFetchResult.Failed;
     }
-    
-    return BackgroundFetch.BackgroundFetchResult.NoData;
-  } catch (error) {
-    console.error('Background sync failed:', error);
-    return BackgroundFetch.BackgroundFetchResult.Failed;
-  }
-});
+  });
+} catch (e) {
+  console.warn('TaskManager.defineTask skipped or not supported:', e);
+}
 
 export async function registerBackgroundSync() {
-  return BackgroundFetch.registerTaskAsync(BACKGROUND_SYNC_TASK, {
-    minimumInterval: 15 * 60, // 15 minutes
-    stopOnTerminate: false,
-    startOnBoot: true,
-  });
+  try {
+    return await BackgroundFetch.registerTaskAsync(BACKGROUND_SYNC_TASK, {
+      minimumInterval: 15 * 60, // 15 minutes
+      stopOnTerminate: false,
+      startOnBoot: true,
+    });
+  } catch (err) {
+    console.warn('registerBackgroundSync notice:', err);
+  }
 }
