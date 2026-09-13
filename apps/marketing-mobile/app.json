@@ -15,12 +15,7 @@
     },
     "scheme": "marketing-mobile",
     "plugins": [
-      [
-        "expo-router",
-        {
-          "root": "./src/app"
-        }
-      ],
+      "expo-router",
       [
         "expo-location",
         {
@@ -33,11 +28,6 @@
           "cameraPermission": "Allow Marketing App to access your camera."
         }
       ]
-    ],
-    "extra": {
-      "router": {
-        "root": "./src/app"
-      }
-    }
+    ]
   }
 }

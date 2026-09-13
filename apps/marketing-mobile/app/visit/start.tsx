@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Button } from '../../components/Button';
-import { Card } from '../../components/Card';
-import { useLocation } from '../../providers/LocationProvider';
+import { Button } from '../../src/components/Button';
+import { Card } from '../../src/components/Card';
+import { useLocation } from '../../src/providers/LocationProvider';
 
 export default function StartVisitScreen() {
   const { visitId } = useLocalSearchParams();

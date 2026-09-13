@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
-import { Card } from '../../components/Card';
-import { Button } from '../../components/Button';
+import { Card } from '../../src/components/Card';
+import { Button } from '../../src/components/Button';
 import { useRouter } from 'expo-router';
 
 const MOCK_VISITS = [

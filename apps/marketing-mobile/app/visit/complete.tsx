@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Button } from '../../components/Button';
-import { Card } from '../../components/Card';
-import { useLocation } from '../../providers/LocationProvider';
+import { Button } from '../../src/components/Button';
+import { Card } from '../../src/components/Card';
+import { useLocation } from '../../src/providers/LocationProvider';
 import * as ImagePicker from 'expo-image-picker';
 import { Audio } from 'expo-av';
 

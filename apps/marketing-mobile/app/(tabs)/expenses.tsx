@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Text, StyleSheet, ScrollView } from 'react-native';
-import { Input } from '../../components/Input';
-import { Button } from '../../components/Button';
+import { Input } from '../../src/components/Input';
+import { Button } from '../../src/components/Button';
 import { useMutation } from '@tanstack/react-query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 

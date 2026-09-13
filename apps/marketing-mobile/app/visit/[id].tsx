@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Alert, ScrollView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useLocation } from '../../providers/LocationProvider';
-import { queueOfflineMutation } from '../../services/backgroundSync';
-import { Button } from '../../components/Button';
-import { Card } from '../../components/Card';
+import { useLocation } from '../../src/providers/LocationProvider';
+import { queueOfflineMutation } from '../../src/services/backgroundSync';
+import { Button } from '../../src/components/Button';
+import { Card } from '../../src/components/Card';
 import NetInfo from '@react-native-community/netinfo';
 
 export default function VisitDetailRoute() {

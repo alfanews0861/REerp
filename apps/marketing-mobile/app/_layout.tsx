@@ -1,10 +1,10 @@
 import { Stack } from 'expo-router';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { QueryProvider } from '../providers/QueryProvider';
-import { LocationProvider } from '../providers/LocationProvider';
-import { Button } from '../components/Button';
+import { QueryProvider } from '../src/providers/QueryProvider';
+import { LocationProvider } from '../src/providers/LocationProvider';
+import { Button } from '../src/components/Button';
 import React, { useEffect } from 'react';
-import { registerBackgroundSync } from '../services/backgroundSync';
+import { registerBackgroundSync } from '../src/services/backgroundSync';
 import { initFirebase } from '@real-estate-erp/firebase';
 
 // Global error protection to prevent silent blank screens on native
@@ -104,6 +104,7 @@ export default function RootLayout() {
       <QueryProvider>
         <LocationProvider>
           <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="index" options={{ headerShown: false }} />
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="lead/[id]" options={{ title: 'Lead Details', headerShown: true }} />
             <Stack.Screen name="commission/index" options={{ title: 'My Commission', headerShown: true }} />
