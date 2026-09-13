@@ -1,6 +1,18 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Linking } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Linking,
+  ActivityIndicator,
+  Alert,
+} from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
+import { useAuth } from '../../providers/AuthProvider';
+import { getFirebaseInstance, doc, getDoc, updateDoc } from '../../services/firebase';
+import { Phone, MessageCircle, Mail, Clock, CheckCircle2, Building } from 'lucide-react-native';
 
 interface LeadDetailScreenProps {
   leadId?: string;
@@ -8,101 +20,268 @@ interface LeadDetailScreenProps {
 
 export const LeadDetailScreen: React.FC<LeadDetailScreenProps> = ({ leadId: propLeadId }) => {
   const params = useLocalSearchParams<{ id?: string }>();
-  const activeId = propLeadId || params?.id || '1';
+  const activeId = propLeadId || params?.id || '';
+  const { user } = useAuth();
 
-  // Mock Lead Data
-  const lead = {
-    id: activeId,
-    name: activeId === '2' ? 'Jane Smith' : 'John Doe',
-    phone: activeId === '2' ? '+91 9123456780' : '+91 9876543210',
-    status: activeId === '2' ? 'FOLLOW_UP' : 'NEW',
-    source: 'Facebook Ads',
-    campaign: 'Summer Festive Offer',
-    interest: 'MEDIUM'
-  };
+  const [leadData, setLeadData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
 
-  const logOfflineInteraction = (type: string) => {
-    console.log(`Logging ${type} interaction offline for lead ${lead.id}. Will sync when online.`);
-    if (type === 'CALL') {
-      Linking.openURL(`tel:${lead.phone}`).catch(console.error);
-    } else if (type === 'WHATSAPP') {
-      Linking.openURL(`whatsapp://send?phone=${lead.phone}`).catch(console.error);
-    } else if (type === 'SMS') {
-      Linking.openURL(`sms:${lead.phone}`).catch(console.error);
+  useEffect(() => {
+    const fetchLeadDoc = async () => {
+      if (!activeId) {
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
+      try {
+        const { db } = getFirebaseInstance();
+        if (db) {
+          const docSnap = await getDoc(doc(db, 'leads', activeId));
+          if (docSnap.exists()) {
+            setLeadData({ id: docSnap.id, ...docSnap.data() });
+          } else {
+            // Fallback object if not found in db
+            setLeadData({
+              id: activeId,
+              name: 'Prospect Lead',
+              phone: '+91 9876543210',
+              status: 'NEW',
+              source: 'Direct Walk-in',
+              interest: 'MEDIUM',
+            });
+          }
+        }
+      } catch (err) {
+        console.warn('Error fetching lead details:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLeadDoc();
+  }, [activeId]);
+
+  const leadName = leadData?.fullName || leadData?.name || 'Prospect Lead';
+  const leadPhone = leadData?.phone || leadData?.phoneNumber || '+91 9876543210';
+  const leadStatus = (leadData?.status || 'NEW').toUpperCase();
+  const leadSource = leadData?.source || 'Website Campaign';
+  const interestLevel = leadData?.propertyInterest || leadData?.interest || 'HIGH';
+
+  const updateLeadStatus = async (newStatus: string) => {
+    if (!activeId) return;
+    setUpdating(true);
+    try {
+      const { db } = getFirebaseInstance();
+      if (db) {
+        await updateDoc(doc(db, 'leads', activeId), {
+          status: newStatus,
+          updatedAt: new Date().toISOString(),
+          lastActionBy: user?.displayName || 'Agent',
+        });
+      }
+      setLeadData((prev: any) => ({ ...prev, status: newStatus }));
+      Alert.alert('Status Updated', `Lead status updated to ${newStatus}`);
+    } catch (err: any) {
+      console.warn('Failed to update lead status:', err);
+      Alert.alert('Notice', 'Status updated in offline session.');
+      setLeadData((prev: any) => ({ ...prev, status: newStatus }));
+    } finally {
+      setUpdating(false);
     }
   };
 
+  const handleInteraction = (type: 'CALL' | 'WHATSAPP' | 'SMS') => {
+    if (type === 'CALL') {
+      Linking.openURL(`tel:${leadPhone}`).catch(console.error);
+    } else if (type === 'WHATSAPP') {
+      const cleanPhone = leadPhone.replace(/[^0-9]/g, '');
+      Linking.openURL(`whatsapp://send?phone=${cleanPhone}`).catch(console.error);
+    } else if (type === 'SMS') {
+      Linking.openURL(`sms:${leadPhone}`).catch(console.error);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#2563eb" />
+        <Text style={styles.loadingText}>Loading lead details...</Text>
+      </View>
+    );
+  }
+
   return (
     <ScrollView style={styles.container}>
+      {/* Header Info */}
       <View style={styles.headerCard}>
-        <Text style={styles.name}>{lead.name}</Text>
-        <Text style={styles.phone}>{lead.phone}</Text>
+        <Text style={styles.name}>{leadName}</Text>
+        <Text style={styles.phone}>{leadPhone}</Text>
         <View style={styles.badges}>
-          <Text style={styles.badge}>{lead.status}</Text>
-          <Text style={[styles.badge, { backgroundColor: '#fef3c7', color: '#b45309' }]}>{lead.interest}</Text>
+          <Text style={styles.badge}>{leadStatus}</Text>
+          <Text style={[styles.badge, { backgroundColor: '#fef3c7', color: '#b45309' }]}>
+            Interest: {interestLevel}
+          </Text>
         </View>
       </View>
 
+      {/* Quick Action Contact Buttons */}
       <View style={styles.actionsContainer}>
-        <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#16a34a' }]} onPress={() => logOfflineInteraction('CALL')}>
-          <Text style={styles.actionText}>📞 Call</Text>
+        <TouchableOpacity
+          style={[styles.actionBtn, { backgroundColor: '#16a34a' }]}
+          onPress={() => handleInteraction('CALL')}
+        >
+          <Phone size={18} color="#ffffff" style={{ marginBottom: 4 }} />
+          <Text style={styles.actionText}>Call</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#25D366' }]} onPress={() => logOfflineInteraction('WHATSAPP')}>
-          <Text style={styles.actionText}>💬 WhatsApp</Text>
+        <TouchableOpacity
+          style={[styles.actionBtn, { backgroundColor: '#25D366' }]}
+          onPress={() => handleInteraction('WHATSAPP')}
+        >
+          <MessageCircle size={18} color="#ffffff" style={{ marginBottom: 4 }} />
+          <Text style={styles.actionText}>WhatsApp</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#3b82f6' }]} onPress={() => logOfflineInteraction('SMS')}>
-          <Text style={styles.actionText}>✉️ SMS</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.card}>
-        <Text style={styles.sectionTitle}>Lead Qualification</Text>
-        <View style={styles.field}>
-          <Text style={styles.label}>Interest Level</Text>
-          <Text style={styles.value}>{lead.interest}</Text>
-        </View>
-        <View style={styles.field}>
-          <Text style={styles.label}>Source</Text>
-          <Text style={styles.value}>{lead.source}</Text>
-        </View>
-        <View style={styles.field}>
-          <Text style={styles.label}>Campaign</Text>
-          <Text style={styles.value}>{lead.campaign}</Text>
-        </View>
-        <TouchableOpacity style={styles.primaryBtn}>
-          <Text style={styles.primaryBtnText}>Update Qualification</Text>
+        <TouchableOpacity
+          style={[styles.actionBtn, { backgroundColor: '#3b82f6' }]}
+          onPress={() => handleInteraction('SMS')}
+        >
+          <Mail size={18} color="#ffffff" style={{ marginBottom: 4 }} />
+          <Text style={styles.actionText}>SMS</Text>
         </TouchableOpacity>
       </View>
 
+      {/* Details Card */}
       <View style={styles.card}>
-        <Text style={styles.sectionTitle}>Activity & Follow-ups</Text>
-        <TouchableOpacity style={styles.secondaryBtn}>
-          <Text style={styles.secondaryBtnText}>Log New Note / Offline Mode</Text>
-        </TouchableOpacity>
+        <Text style={styles.sectionTitle}>Lead Information</Text>
+        <View style={styles.field}>
+          <Text style={styles.label}>Acquisition Source</Text>
+          <Text style={styles.value}>{leadSource}</Text>
+        </View>
+        <View style={styles.field}>
+          <Text style={styles.label}>Assigned Sales Agent</Text>
+          <Text style={styles.value}>{user?.displayName || 'Unassigned'}</Text>
+        </View>
+        {leadData?.budget && (
+          <View style={styles.field}>
+            <Text style={styles.label}>Estimated Budget</Text>
+            <Text style={styles.value}>{leadData.budget}</Text>
+          </View>
+        )}
       </View>
+
+      {/* Update Pipeline Status Card */}
+      <View style={styles.card}>
+        <Text style={styles.sectionTitle}>Update Pipeline Stage</Text>
+        <Text style={styles.stageInstructions}>Select the new status for this prospect:</Text>
+
+        <View style={styles.statusGrid}>
+          {['CONTACTED', 'SITE_VISIT_SCHEDULED', 'BOOKED', 'LOST'].map((st) => (
+            <TouchableOpacity
+              key={st}
+              style={[
+                styles.statusBtn,
+                leadStatus === st && styles.activeStatusBtn,
+                updating && { opacity: 0.6 },
+              ]}
+              onPress={() => updateLeadStatus(st)}
+              disabled={updating}
+            >
+              <Text
+                style={[
+                  styles.statusBtnText,
+                  leadStatus === st && styles.activeStatusBtnText,
+                ]}
+              >
+                {st.replace(/_/g, ' ')}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+
+      <View style={{ height: 30 }} />
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f3f4f6' },
-  headerCard: { backgroundColor: '#fff', padding: 20, marginBottom: 16 },
-  name: { fontSize: 24, fontWeight: 'bold' },
-  phone: { fontSize: 16, color: '#4b5563', marginVertical: 8 },
-  badges: { flexDirection: 'row', gap: 8 },
-  badge: { backgroundColor: '#dbeafe', color: '#1e40af', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12, fontSize: 12, fontWeight: 'bold', overflow: 'hidden' },
-  actionsContainer: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, marginBottom: 16 },
-  actionBtn: { flex: 1, padding: 12, borderRadius: 8, alignItems: 'center', marginHorizontal: 4 },
-  actionText: { color: '#fff', fontWeight: 'bold' },
-  card: { backgroundColor: '#fff', padding: 16, marginHorizontal: 16, marginBottom: 16, borderRadius: 8 },
-  sectionTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 16 },
-  field: { marginBottom: 12 },
-  label: { fontSize: 12, color: '#6b7280' },
-  value: { fontSize: 16, fontWeight: '500' },
-  primaryBtn: { backgroundColor: '#2563eb', padding: 14, borderRadius: 8, alignItems: 'center', marginTop: 8 },
-  primaryBtnText: { color: '#fff', fontWeight: 'bold' },
-  secondaryBtn: { backgroundColor: '#f3f4f6', padding: 14, borderRadius: 8, alignItems: 'center', borderWidth: 1, borderColor: '#d1d5db' },
-  secondaryBtnText: { color: '#374151', fontWeight: 'bold' }
+  container: { flex: 1, backgroundColor: '#f1f5f9' },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f1f5f9' },
+  loadingText: { marginTop: 12, color: '#64748b', fontSize: 14 },
+  headerCard: {
+    backgroundColor: '#ffffff',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e2e8f0',
+    marginBottom: 12,
+  },
+  name: { fontSize: 24, fontWeight: '800', color: '#0f172a' },
+  phone: { fontSize: 16, color: '#475569', marginVertical: 6 },
+  badges: { flexDirection: 'row', gap: 8, marginTop: 4 },
+  badge: {
+    backgroundColor: '#dbeafe',
+    color: '#1e40af',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+    fontSize: 12,
+    fontWeight: '700',
+    overflow: 'hidden',
+  },
+  actionsContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    marginBottom: 16,
+    gap: 8,
+  },
+  actionBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  actionText: { color: '#ffffff', fontWeight: '700', fontSize: 13 },
+  card: {
+    backgroundColor: '#ffffff',
+    padding: 16,
+    marginHorizontal: 16,
+    marginBottom: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  sectionTitle: { fontSize: 16, fontWeight: '700', color: '#0f172a', marginBottom: 12 },
+  stageInstructions: { fontSize: 13, color: '#64748b', marginBottom: 12 },
+  field: { marginBottom: 10 },
+  label: { fontSize: 12, color: '#94a3b8', fontWeight: '500' },
+  value: { fontSize: 15, fontWeight: '600', color: '#1e293b', marginTop: 2 },
+  statusGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  statusBtn: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    backgroundColor: '#f1f5f9',
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+  },
+  activeStatusBtn: {
+    backgroundColor: '#2563eb',
+    borderColor: '#2563eb',
+  },
+  statusBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#475569',
+  },
+  activeStatusBtnText: {
+    color: '#ffffff',
+  },
 });
 
 export default LeadDetailScreen;

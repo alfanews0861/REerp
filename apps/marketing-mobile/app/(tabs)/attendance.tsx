@@ -30,7 +30,10 @@ function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: num
   return R * c;
 }
 
+import { useAuth } from '../../src/providers/AuthProvider';
+
 export default function AttendanceScreen() {
+  const { user } = useAuth();
   const [status, setStatus] = useState<'NOT_PUNCHED' | 'PRESENT' | 'PUNCHED_OUT'>('NOT_PUNCHED');
   const [punchInTime, setPunchInTime] = useState<string | null>(null);
   const [locationText, setLocationText] = useState<string>('Detecting location...');
@@ -46,13 +49,21 @@ export default function AttendanceScreen() {
   }, []);
 
   const loadTodayAttendance = async () => {
-    const saved = await AsyncStorage.getItem('today_attendance_status');
+    const key = `today_attendance_status_${user?.uid || 'default'}`;
+    const saved = await AsyncStorage.getItem(key);
     if (saved) {
       const parsed = JSON.parse(saved);
       setStatus(parsed.status);
       setPunchInTime(parsed.punchInTime);
+    } else {
+      setStatus('NOT_PUNCHED');
+      setPunchInTime(null);
     }
   };
+
+  useEffect(() => {
+    loadTodayAttendance();
+  }, [user?.uid]);
 
   const checkLocation = async () => {
     try {
@@ -111,9 +122,9 @@ export default function AttendanceScreen() {
     const now = new Date().toISOString();
     const payload = {
       id: `att_${Date.now()}`,
-      userId: 'mobile-agent-1',
-      userName: 'Vamshi Krishna',
-      userRole: 'Sales Executive',
+      userId: user?.uid || 'mobile-agent-1',
+      userName: user?.displayName || 'Field Agent',
+      userRole: user?.role || 'Sales Executive',
       punchInTime: now,
       isGeoFenceVerified: isGeoFenceValid,
       assignedLocationName: SITE_OFFICE.name,
@@ -127,10 +138,11 @@ export default function AttendanceScreen() {
       payload,
     });
 
+    const key = `today_attendance_status_${user?.uid || 'default'}`;
     setStatus('PRESENT');
     setPunchInTime(new Date().toLocaleTimeString());
     await AsyncStorage.setItem(
-      'today_attendance_status',
+      key,
       JSON.stringify({ status: 'PRESENT', punchInTime: new Date().toLocaleTimeString() })
     );
 

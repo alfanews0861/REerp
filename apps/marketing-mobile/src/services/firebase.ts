@@ -16,8 +16,29 @@ import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import { getFunctions } from 'firebase/functions';
 
-// Re-export Firestore helpers so backgroundSync.ts can use them
-export { collection, doc, addDoc, updateDoc } from 'firebase/firestore';
+// Re-export Firestore helpers
+export {
+  collection,
+  doc,
+  addDoc,
+  updateDoc,
+  setDoc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+  orderBy,
+  limit,
+  onSnapshot,
+} from 'firebase/firestore';
+
+// Re-export Auth helpers
+export {
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  type User as FirebaseUser,
+} from 'firebase/auth';
 
 export interface FirebaseInstance {
   app: any;

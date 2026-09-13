@@ -6,6 +6,8 @@ import { Input } from '../../src/components/Input';
 import { queueOfflineMutation } from '../../src/services/backgroundSync';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { useAuth } from '../../src/providers/AuthProvider';
+
 const VEHICLES = [
   { id: 'veh-1', name: 'Toyota Innova Crysta (TS 09 UB 1001)', currentKm: 48250 },
   { id: 'veh-2', name: 'Force Tempo Traveller (TS 08 EX 4050)', currentKm: 64120 },
@@ -13,6 +15,7 @@ const VEHICLES = [
 ];
 
 export default function TripsScreen() {
+  const { user } = useAuth();
   const [selectedVehicle, setSelectedVehicle] = useState(VEHICLES[0]);
   const [isTripActive, setIsTripActive] = useState(false);
   const [startOdometer, setStartOdometer] = useState(VEHICLES[0].currentKm.toString());
@@ -49,8 +52,8 @@ export default function TripsScreen() {
       id: `trip_${Date.now()}`,
       vehicleId: selectedVehicle.id,
       vehicleName: selectedVehicle.name,
-      driverId: 'drv-1',
-      driverName: 'Ramesh Goud',
+      driverId: user?.uid || 'drv-1',
+      driverName: user?.displayName || 'Fleet Driver',
       startOdometerKm: startKm,
       pickupLocation: clientPickupLocation,
       destinationVenture,

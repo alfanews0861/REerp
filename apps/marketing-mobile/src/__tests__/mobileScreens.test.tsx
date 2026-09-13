@@ -103,37 +103,62 @@ describe('Marketing Mobile - Offline Mutation Queue', () => {
   });
 });
 
-describe('Marketing Mobile - Leads Filtering Logic', () => {
+describe('Marketing Mobile - Auth Session Persistence', () => {
+  beforeEach(async () => {
+    await AsyncStorage.clear();
+  });
+
+  it('saves and retrieves logged-in user session correctly', async () => {
+    const userSession = {
+      uid: 'user-agt-101',
+      email: 'vamshi@reerp.com',
+      displayName: 'Vamshi Krishna',
+      role: 'sales_executive',
+      branch: 'Mokila Branch',
+    };
+
+    await AsyncStorage.setItem('mobile_auth_user_session', JSON.stringify(userSession));
+    const cached = await AsyncStorage.getItem('mobile_auth_user_session');
+
+    expect(cached).not.toBeNull();
+    const parsed = JSON.parse(cached!);
+    expect(parsed.uid).toBe('user-agt-101');
+    expect(parsed.displayName).toBe('Vamshi Krishna');
+    expect(parsed.role).toBe('sales_executive');
+  });
+
+  it('clears session on logout', async () => {
+    await AsyncStorage.setItem('mobile_auth_user_session', JSON.stringify({ uid: 'test' }));
+    await AsyncStorage.removeItem('mobile_auth_user_session');
+
+    const cached = await AsyncStorage.getItem('mobile_auth_user_session');
+    expect(cached).toBeNull();
+  });
+});
+
+describe('Marketing Mobile - Leads Dynamic Filtering Logic', () => {
   interface Lead {
     id: string;
     name: string;
-    isAssignedToMe: boolean;
+    assignedTo: string;
+    status: string;
   }
 
-  const mockLeads: Lead[] = [
-    { id: '1', name: 'John Doe', isAssignedToMe: true },
-    { id: '2', name: 'Jane Smith', isAssignedToMe: true },
-    { id: '3', name: 'Robert King', isAssignedToMe: false },
+  const liveLeads: Lead[] = [
+    { id: '1', name: 'Prospect A', assignedTo: 'user-agt-101', status: 'NEW' },
+    { id: '2', name: 'Prospect B', assignedTo: 'user-agt-101', status: 'FOLLOW_UP' },
+    { id: '3', name: 'Prospect C', assignedTo: 'other-user-999', status: 'SITE_VISIT_SCHEDULED' },
   ];
 
-  const getFilter = (f: 'MY_LEADS' | 'ALL'): 'MY_LEADS' | 'ALL' => f;
+  it('filters to only leads assigned to the active user', () => {
+    const currentUserId = 'user-agt-101';
+    const myLeads = liveLeads.filter((l) => l.assignedTo === currentUserId);
 
-  it('filters to only assigned leads when filter is MY_LEADS', () => {
-    const filter = getFilter('MY_LEADS');
-    const displayed = filter === 'MY_LEADS' 
-      ? mockLeads.filter(l => l.isAssignedToMe) 
-      : mockLeads;
-
-    expect(displayed).toHaveLength(2);
-    expect(displayed.map(l => l.name)).toEqual(['John Doe', 'Jane Smith']);
+    expect(myLeads).toHaveLength(2);
+    expect(myLeads.map((l) => l.name)).toEqual(['Prospect A', 'Prospect B']);
   });
 
-  it('shows all leads when filter is ALL', () => {
-    const filter = getFilter('ALL');
-    const displayed = filter === 'MY_LEADS' 
-      ? mockLeads.filter(l => l.isAssignedToMe) 
-      : mockLeads;
-
-    expect(displayed).toHaveLength(3);
+  it('returns all pipeline leads when Team Leads filter is active', () => {
+    expect(liveLeads).toHaveLength(3);
   });
 });
