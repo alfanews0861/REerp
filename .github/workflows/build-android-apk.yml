@@ -29,11 +29,14 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Patch Expo Modules for Android API 36 Compatibility
+      - name: Patch Expo Modules & React Native Screens for Android API 36 Compatibility
         run: |
           echo "Patching PermissionsService.kt for Android API 36 nullability..."
           find node_modules -name "PermissionsService.kt" -exec sed -i 's/return requestedPermissions\.contains(permission)/return requestedPermissions?.contains(permission) == true/g' {} +
           find node_modules -name "PermissionsService.kt" -exec grep -n "requestedPermissions" {} +
+          echo "Patching ScreenStack.kt for Android API < 35 NoSuchMethodError removeLast compatibility..."
+          find node_modules -name "ScreenStack.kt" -exec sed -i 's/drawingOpPool\.removeLast()/drawingOpPool.removeAt(drawingOpPool.size - 1)/g' {} +
+          find node_modules -name "ScreenStack.kt" -exec grep -n "drawingOpPool.remove" {} +
 
       - name: Setup Java 17
         uses: actions/setup-java@v4

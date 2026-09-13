@@ -13,7 +13,8 @@
     "web": "expo start --web",
     "type-check": "tsc --noEmit",
     "lint": "eslint . --ext .ts,.tsx",
-    "test": "vitest run"
+    "test": "vitest run",
+    "postinstall": "node scripts/patch-screens.js"
   },
   "dependencies": {
     "@babel/runtime": "^7.24.0",
