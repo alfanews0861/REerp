@@ -6,7 +6,7 @@ import { Input } from '../../src/components/Input';
 import { queueOfflineMutation } from '../../src/services/backgroundSync';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
-import { getFirebaseInstance } from '@real-estate-erp/firebase';
+import { getFirebaseInstance } from '../../src/services/firebase';
 import { doc, setDoc } from 'firebase/firestore';
 
 import { useAuth } from '../../src/providers/AuthProvider';
