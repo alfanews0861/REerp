@@ -32,10 +32,11 @@ export default function TabLayout() {
           fontWeight: '700',
           letterSpacing: 0.2,
         },
-        header: ({ options }) => (
+        header: () => (
           <MobileAppHeader
-            title={options.title === 'Home' ? undefined : options.title}
-            subtitle={options.title === 'Home' ? 'NUDA & DTCP APPROVED TOWNSHIPS' : undefined}
+            showLogo={true}
+            showMenu={true}
+            subtitle="NUDA & DTCP APPROVED TOWNSHIPS"
           />
         ),
       }}

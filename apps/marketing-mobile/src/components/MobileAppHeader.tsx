@@ -4,27 +4,38 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useMobileTheme } from '../theme';
 import { useMobileDrawer } from '../providers/MobileDrawerContext';
-import { Menu, Building2 } from 'lucide-react-native';
+import { Menu, Building2, ArrowLeft } from 'lucide-react-native';
 
 export interface MobileAppHeaderProps {
   title?: string;
   subtitle?: string;
   showLogo?: boolean;
   showMenu?: boolean;
+  showBack?: boolean;
+  onBack?: () => void;
   rightElement?: React.ReactNode;
 }
 
 export const MobileAppHeader: React.FC<MobileAppHeaderProps> = ({
-  title,
-  subtitle,
+  subtitle = 'NUDA & DTCP APPROVED TOWNSHIPS',
   showLogo = true,
   showMenu = true,
+  showBack = false,
+  onBack,
   rightElement,
 }) => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { isDark } = useMobileTheme();
   const { openDrawer } = useMobileDrawer();
+
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+    } else {
+      router.back();
+    }
+  };
 
   return (
     <View
@@ -38,8 +49,18 @@ export const MobileAppHeader: React.FC<MobileAppHeaderProps> = ({
       ]}
     >
       <View style={styles.headerRow}>
-        {/* LEFT: Hamburger Menu Button */}
-        {showMenu ? (
+        {/* LEFT: Back Button or Hamburger Menu Button */}
+        {showBack ? (
+          <TouchableOpacity
+            style={styles.menuButton}
+            onPress={handleBack}
+            activeOpacity={0.7}
+            accessibilityLabel="Go Back"
+            accessibilityRole="button"
+          >
+            <ArrowLeft size={20} color="#FFFFFF" strokeWidth={2.5} />
+          </TouchableOpacity>
+        ) : showMenu ? (
           <TouchableOpacity
             style={styles.menuButton}
             onPress={openDrawer}
@@ -53,7 +74,7 @@ export const MobileAppHeader: React.FC<MobileAppHeaderProps> = ({
           <View style={styles.placeholder} />
         )}
 
-        {/* CENTER: Company Logo + Name / Tagline Branding (Centered & Clean) */}
+        {/* CENTER: Fixed Company Logo + Permanent 'ISKON DEVELOPERS' Title */}
         <TouchableOpacity
           style={styles.brandingContainer}
           onPress={() => router.push('/')}
@@ -67,15 +88,15 @@ export const MobileAppHeader: React.FC<MobileAppHeaderProps> = ({
 
           <View style={styles.titleColumn}>
             <Text style={styles.companyTitle} numberOfLines={1}>
-              {title ? title : 'ISKON DEVELOPERS'}
+              ISKON DEVELOPERS
             </Text>
             <Text style={styles.companyTagline} numberOfLines={1}>
-              {subtitle ? subtitle : 'NUDA & DTCP APPROVED TOWNSHIPS'}
+              {subtitle}
             </Text>
           </View>
         </TouchableOpacity>
 
-        {/* RIGHT: Minimal Spacer or custom element if passed (defaults to clean spacer) */}
+        {/* RIGHT: Minimal Spacer or custom element if passed */}
         <View style={styles.rightContainer}>
           {rightElement ? rightElement : <View style={styles.placeholder} />}
         </View>

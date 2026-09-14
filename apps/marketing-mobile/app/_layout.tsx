@@ -74,6 +74,8 @@ import { MobileDrawerProvider } from '../src/providers/MobileDrawerContext';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { MobileThemeProvider } from '../src/theme';
 
+import { MobileAppHeader } from '../src/components/MobileAppHeader';
+
 export default function RootLayout() {
   useEffect(() => {
     // Safe initialization inside useEffect
@@ -118,28 +120,63 @@ export default function RootLayout() {
                   <Stack
                     screenOptions={{
                       headerShown: false,
-                      headerStyle: {
-                        backgroundColor: '#0F172A',
-                      },
-                      headerTintColor: '#FFFFFF',
-                      headerTitleStyle: {
-                        fontWeight: '700',
-                      },
                     }}
                     initialRouteName="index"
                   >
                     <Stack.Screen name="index" options={{ headerShown: false }} />
                     <Stack.Screen name="login" options={{ headerShown: false }} />
-                    <Stack.Screen name="register-profile" options={{ title: 'Profile Registration', headerShown: false }} />
+                    <Stack.Screen name="register-profile" options={{ headerShown: false }} />
                     <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                    <Stack.Screen name="lead/[id]" options={{ title: 'Lead Details', headerShown: true }} />
-                    <Stack.Screen name="commission/index" options={{ title: 'My Commission', headerShown: true }} />
-                    <Stack.Screen name="network/index" options={{ title: 'My Network & Team', headerShown: true }} />
-                    <Stack.Screen name="inventory" options={{ title: 'Plot Inventory & Status', headerShown: true }} />
-                    <Stack.Screen name="public-site" options={{ title: 'Public Portal', headerShown: false }} />
-                    <Stack.Screen name="visit/[id]" options={{ title: 'Visit Details', headerShown: true }} />
-                    <Stack.Screen name="visit/start" options={{ title: 'Start Site Visit', headerShown: true }} />
-                    <Stack.Screen name="visit/complete" options={{ title: 'Complete Site Visit', headerShown: true }} />
+                    <Stack.Screen
+                      name="lead/[id]"
+                      options={{
+                        headerShown: true,
+                        header: () => <MobileAppHeader showBack={true} />,
+                      }}
+                    />
+                    <Stack.Screen
+                      name="commission/index"
+                      options={{
+                        headerShown: true,
+                        header: () => <MobileAppHeader showBack={true} />,
+                      }}
+                    />
+                    <Stack.Screen
+                      name="network/index"
+                      options={{
+                        headerShown: true,
+                        header: () => <MobileAppHeader showBack={true} />,
+                      }}
+                    />
+                    <Stack.Screen
+                      name="inventory"
+                      options={{
+                        headerShown: true,
+                        header: () => <MobileAppHeader showBack={true} />,
+                      }}
+                    />
+                    <Stack.Screen name="public-site" options={{ headerShown: false }} />
+                    <Stack.Screen
+                      name="visit/[id]"
+                      options={{
+                        headerShown: true,
+                        header: () => <MobileAppHeader showBack={true} />,
+                      }}
+                    />
+                    <Stack.Screen
+                      name="visit/start"
+                      options={{
+                        headerShown: true,
+                        header: () => <MobileAppHeader showBack={true} />,
+                      }}
+                    />
+                    <Stack.Screen
+                      name="visit/complete"
+                      options={{
+                        headerShown: true,
+                        header: () => <MobileAppHeader showBack={true} />,
+                      }}
+                    />
                   </Stack>
                 </MobileDrawerProvider>
               </LocationProvider>
