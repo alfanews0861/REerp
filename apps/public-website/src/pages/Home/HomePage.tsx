@@ -504,10 +504,21 @@ export const HomePage: FC = () => {
                     onClick={() => handleOpenVisitModal()}
                     sx={{
                       mt: 3,
-                      bgcolor: '#ffffff',
-                      color: 'primary.main',
-                      fontWeight: 700,
-                      '&:hover': { bgcolor: '#f3f4f6' },
+                      background: '#ffffff !important',
+                      backgroundColor: '#ffffff !important',
+                      color: '#1e40af !important',
+                      fontWeight: 800,
+                      py: 1.2,
+                      fontSize: '0.95rem',
+                      borderRadius: 2,
+                      boxShadow: '0 4px 14px rgba(0, 0, 0, 0.15)',
+                      textTransform: 'none',
+                      '&:hover': {
+                        background: '#f8fafc !important',
+                        backgroundColor: '#f8fafc !important',
+                        transform: 'translateY(-1px)',
+                        boxShadow: '0 6px 18px rgba(0, 0, 0, 0.2)',
+                      },
                     }}
                   >
                     Lock In A Plot Today
@@ -565,7 +576,7 @@ export const HomePage: FC = () => {
       </Box>
 
       {/* 7. FREE CAB CALL TO ACTION */}
-      <Box sx={{ py: 8, bgcolor: 'primary.dark', color: '#ffffff' }}>
+      <Box sx={{ py: 8, background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', color: '#ffffff' }}>
         <Container maxWidth="lg">
           <Grid container spacing={4} alignItems="center">
             <Grid item xs={12} md={8}>
@@ -583,17 +594,28 @@ export const HomePage: FC = () => {
               <Button
                 variant="contained"
                 size="large"
-                startIcon={<DirectionsCarIcon />}
+                startIcon={<DirectionsCarIcon sx={{ color: '#1e3a8a !important' }} />}
                 onClick={() => handleOpenVisitModal()}
                 sx={{
-                  bgcolor: '#ffffff',
-                  color: 'primary.dark',
+                  background: '#ffffff !important',
+                  backgroundColor: '#ffffff !important',
+                  color: '#1e3a8a !important',
                   fontWeight: 800,
                   px: 4,
                   py: 1.5,
-                  borderRadius: 2,
+                  borderRadius: 2.5,
                   fontSize: '1.05rem',
-                  '&:hover': { bgcolor: '#f3f4f6' },
+                  textTransform: 'none',
+                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
+                  '&:hover': {
+                    background: '#f8fafc !important',
+                    backgroundColor: '#f8fafc !important',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 12px 30px rgba(0, 0, 0, 0.3)',
+                  },
+                  '& .MuiButton-startIcon': {
+                    color: '#1e3a8a !important',
+                  },
                 }}
               >
                 Book Free AC Cab

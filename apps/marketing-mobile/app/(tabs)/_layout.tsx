@@ -35,7 +35,7 @@ export default function TabLayout() {
         header: ({ options }) => (
           <MobileAppHeader
             title={options.title === 'Home' ? undefined : options.title}
-            subtitle={options.title === 'Home' ? 'DTCP & HMDA APPROVED TOWNSHIPS' : undefined}
+            subtitle={options.title === 'Home' ? 'NUDA & DTCP APPROVED TOWNSHIPS' : undefined}
           />
         ),
       }}

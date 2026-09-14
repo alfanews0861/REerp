@@ -5,7 +5,7 @@ export interface PublicVenture {
   location: string;
   city: string;
   state: string;
-  approvalAuthority: 'NUDA' | 'HMDA' | 'DTCP' | 'RERA';
+  approvalAuthority: 'NUDA' | 'DTCP' | 'RERA';
   approvalNumber: string;
   reraId: string;
   totalAreaAcres: number;

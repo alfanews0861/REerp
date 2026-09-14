@@ -68,8 +68,8 @@ export const PublicMainPortal: React.FC<PublicMainPortalProps> = ({ onOpenLogin 
             <ShieldCheck size={20} color="#F59E0B" />
           </View>
           <View>
-            <Text style={styles.brandTitle}>REOS Open Plots</Text>
-            <Text style={styles.brandSub}>HMDA & DTCP Gated Layouts</Text>
+            <Text style={styles.brandTitle}>ISKON Developers</Text>
+            <Text style={styles.brandSub}>NUDA & DTCP Approved Townships</Text>
           </View>
         </View>
 

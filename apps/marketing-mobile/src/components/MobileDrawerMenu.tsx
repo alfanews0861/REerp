@@ -137,8 +137,8 @@ export const MobileDrawerMenu: React.FC<MobileDrawerMenuProps> = ({ visible, onC
 
   const handleSupportCall = () => {
     onClose();
-    Linking.openURL('tel:+919876543210').catch(() => {
-      Alert.alert('Helpline', 'Contact Head Office at +91 98765 43210');
+    Linking.openURL('tel:+919848012345').catch(() => {
+      Alert.alert('Helpline', 'Contact Head Office at +91 98480 12345');
     });
   };
 
@@ -222,7 +222,7 @@ export const MobileDrawerMenu: React.FC<MobileDrawerMenuProps> = ({ visible, onC
     {
       id: 'inventory',
       title: 'Plot Inventory & Layout',
-      subtitle: 'DTCP/HMDA layouts & status',
+      subtitle: 'NUDA & DTCP layouts & status',
       route: '/inventory',
       icon: Layers,
       iconBg: '#0D9488',
@@ -530,7 +530,7 @@ export const MobileDrawerMenu: React.FC<MobileDrawerMenuProps> = ({ visible, onC
                   <Text style={[styles.navTitle, { color: colors.textPrimary }]}>
                     Head Office Support
                   </Text>
-                  <Text style={styles.navSubtitle}>+91 98765 43210 (Toll Free)</Text>
+                  <Text style={styles.navSubtitle}>+91 98480 12345 (Nellore Desk)</Text>
                 </View>
               </TouchableOpacity>
 
@@ -552,7 +552,7 @@ export const MobileDrawerMenu: React.FC<MobileDrawerMenuProps> = ({ visible, onC
             {/* Footer Information */}
             <View style={styles.drawerFooter}>
               <CheckCircle size={13} color="#10B981" />
-              <Text style={styles.footerText}>RealEstateERP Mobile • RBAC Protected v1.0.0</Text>
+              <Text style={styles.footerText}>ISKON Developers Mobile • RBAC Protected v1.0.0</Text>
             </View>
           </ScrollView>
         </View>

@@ -35,15 +35,15 @@ const INITIAL_MESSAGES: AIMessage[] = [
   {
     id: 'msg-1',
     sender: 'assistant',
-    text: `నమస్కారం! 🙏 నేను మీ **Gemini AI రియల్ ఎస్టేట్ అసిస్టెంట్‌ని**.\n\nహైదరాబాద్ ఓపెన్ ప్లాట్లు, HMDA/DTCP నిబంధనలు, మీ బడ్జెట్‌కు తగిన ప్లాట్ల వివరాలు మరియు ఉచిత సైట్ విజిట్ గురించి నన్ను ఏదైనా అడగవచ్చు!`,
+    text: `నమస్కారం! 🙏 నేను మీ **ISKON Developers Gemini AI రియల్ ఎస్టేట్ అసిస్టెంట్‌ని**.\n\nనెల్లూరు ఓపెన్ ప్లాట్లు (ISKON City - 2, Dream City), NUDA/DTCP నిబంధనలు, మీ బడ్జెట్‌కు తగిన ప్లాట్ల వివరాలు మరియు ఉచిత ఏసీ క్యాబ్ సైట్ విజిట్ గురించి నన్ను ఏదైనా అడగవచ్చు!`,
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
   },
 ];
 
 const SUGGESTIONS = [
   'తూర్పు ముఖం (East facing) ప్లాట్లు చూపించు',
-  'HMDA vs DTCP తేడాలు ఏమిటి?',
-  'మోకిల ప్రాంతం విశేషాలు?',
+  'NUDA vs DTCP తేడాలు ఏమిటి?',
+  'పొదలకూరు రోడ్ / ISKON City - 2 విశేషాలు?',
   'Plots under ₹30 Lakhs',
   'ఉచిత క్యాబ్ సైట్ విజిట్ ఎలా బుక్ చేయాలి?',
 ];

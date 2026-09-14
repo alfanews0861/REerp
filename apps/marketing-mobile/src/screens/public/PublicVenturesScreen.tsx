@@ -39,7 +39,7 @@ export const PublicVenturesScreen: React.FC<PublicVenturesScreenProps> = ({
 }) => {
   const [ventures, setVentures] = useState<PublicVenture[]>(PUBLIC_VENTURES);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedAuthority, setSelectedAuthority] = useState<'ALL' | 'HMDA' | 'DTCP'>('ALL');
+  const [selectedAuthority, setSelectedAuthority] = useState<'ALL' | 'NUDA' | 'DTCP'>('ALL');
   const [selectedVenture, setSelectedVenture] = useState<PublicVenture | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -95,11 +95,11 @@ export const PublicVenturesScreen: React.FC<PublicVenturesScreenProps> = ({
       <View style={styles.heroCard}>
         <View style={styles.heroBadgeRow}>
           <ShieldCheck size={16} color="#F59E0B" />
-          <Text style={styles.heroBadgeText}>100% HMDA / DTCP APPROVED</Text>
+          <Text style={styles.heroBadgeText}>100% NUDA / DTCP APPROVED</Text>
         </View>
         <Text style={styles.heroTitle}>Premium Open Plots in Growth Corridors</Text>
         <Text style={styles.heroSubtitle}>
-          మోకిల, శంకర్‌పల్లి, షాద్‌నగర్, కొల్లూరు & శ్రీశైలం హైవేలలో అత్యుత్తమ గేటెడ్ లేఅవుట్లు.
+          పొదలకూరు రోడ్ (ISKON City - 2), నెల్లూరు-బొంబాయి హైవే (Dream City), చింతారెడ్డిపాలెంలలో అత్యుత్తమ గేటెడ్ టౌన్‌షిప్‌లు.
         </Text>
 
         {/* Quick Search */}
@@ -121,7 +121,7 @@ export const PublicVenturesScreen: React.FC<PublicVenturesScreenProps> = ({
 
         {/* Authority Filter Chips */}
         <View style={styles.filterRow}>
-          {(['ALL', 'HMDA', 'DTCP'] as const).map((auth) => (
+          {(['ALL', 'NUDA', 'DTCP'] as const).map((auth) => (
             <TouchableOpacity
               key={auth}
               style={[styles.filterChip, selectedAuthority === auth && styles.filterChipActive]}

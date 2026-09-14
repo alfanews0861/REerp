@@ -170,7 +170,7 @@ export default function LoginScreen() {
           <View style={styles.logoBadge}>
             <ShieldCheck size={36} color="#ffffff" />
           </View>
-          <Text style={styles.appTitle}>REOS Enterprise</Text>
+          <Text style={styles.appTitle}>ISKON Developers</Text>
           <Text style={styles.appSubtitle}>Executive, Sales & Operations Management Suite</Text>
         </View>
 

@@ -427,15 +427,26 @@ export const VentureDetailPage: FC = () => {
                 <Button
                   variant="contained"
                   fullWidth
-                  startIcon={<DirectionsCarIcon />}
+                  startIcon={<DirectionsCarIcon sx={{ color: '#1e3a8a !important' }} />}
                   onClick={() => setVisitModalOpen(true)}
                   sx={{
-                    bgcolor: '#ffffff',
-                    color: 'primary.main',
-                    fontWeight: 700,
+                    background: '#ffffff !important',
+                    backgroundColor: '#ffffff !important',
+                    color: '#1e3a8a !important',
+                    fontWeight: 800,
                     mb: 1.5,
-                    py: 1,
-                    '&:hover': { bgcolor: '#f3f4f6' },
+                    py: 1.3,
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    boxShadow: '0 4px 14px rgba(0, 0, 0, 0.2)',
+                    '&:hover': {
+                      background: '#f8fafc !important',
+                      backgroundColor: '#f8fafc !important',
+                      transform: 'translateY(-1px)',
+                    },
+                    '& .MuiButton-startIcon': {
+                      color: '#1e3a8a !important',
+                    },
                   }}
                 >
                   Book Free AC Cab

@@ -154,25 +154,48 @@ export const AboutPage: FC = () => {
         </Box>
 
         {/* CTA Banner */}
-        <Box sx={{ bgcolor: 'primary.main', color: '#ffffff', p: 5, borderRadius: 3, textAlign: 'center' }}>
-          <Typography variant="h4" fontWeight={800} gutterBottom>
+        <Box
+          sx={{
+            background: 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 60%, #2563eb 100%)',
+            color: '#ffffff',
+            p: { xs: 4, md: 6 },
+            borderRadius: 4,
+            textAlign: 'center',
+            boxShadow: '0 10px 30px rgba(30, 58, 138, 0.25)',
+          }}
+        >
+          <Typography variant="h4" fontWeight={800} gutterBottom sx={{ fontSize: { xs: '1.6rem', sm: '2.2rem' } }}>
             Ready to Begin Your Real Estate Journey?
           </Typography>
-          <Typography variant="body1" sx={{ opacity: 0.9, maxWidth: 600, mx: 'auto', mb: 3 }}>
-            Book a complimentary site visit today. Our air-conditioned fleet will pick you up from your doorstep.
+          <Typography variant="body1" sx={{ opacity: 0.92, maxWidth: 620, mx: 'auto', mb: 3.5, fontSize: '1.05rem', lineHeight: 1.6 }}>
+            Book a complimentary site visit today. Our air-conditioned fleet will pick you up directly from your doorstep in Nellore.
           </Typography>
           <Button
             variant="contained"
             size="large"
-            startIcon={<DirectionsCarIcon />}
+            startIcon={<DirectionsCarIcon sx={{ fontSize: '1.4rem !important', color: '#1e3a8a !important' }} />}
             onClick={() => navigate('/contact')}
             sx={{
-              bgcolor: '#ffffff',
-              color: 'primary.main',
+              background: '#ffffff !important',
+              backgroundColor: '#ffffff !important',
+              color: '#1e3a8a !important',
               fontWeight: 800,
-              px: 4,
-              py: 1.2,
-              '&:hover': { bgcolor: '#f3f4f6' },
+              fontSize: '1.05rem',
+              px: 4.5,
+              py: 1.5,
+              borderRadius: 2.5,
+              textTransform: 'none',
+              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.22)',
+              transition: 'all 0.25s ease',
+              '&:hover': {
+                background: '#f8fafc !important',
+                backgroundColor: '#f8fafc !important',
+                transform: 'translateY(-2px)',
+                boxShadow: '0 12px 30px rgba(0, 0, 0, 0.3)',
+              },
+              '& .MuiButton-startIcon': {
+                color: '#1e3a8a !important',
+              },
             }}
           >
             Schedule Free Site Visit

@@ -161,13 +161,25 @@ export const ContactPage: FC = () => {
                 <Button
                   variant="contained"
                   fullWidth
-                  startIcon={<WhatsAppIcon />}
+                  startIcon={<WhatsAppIcon sx={{ color: '#1b5e20 !important' }} />}
                   onClick={openWhatsApp}
                   sx={{
-                    bgcolor: '#ffffff',
-                    color: '#2e7d32',
-                    fontWeight: 700,
-                    '&:hover': { bgcolor: '#f3f4f6' },
+                    background: '#ffffff !important',
+                    backgroundColor: '#ffffff !important',
+                    color: '#1b5e20 !important',
+                    fontWeight: 800,
+                    py: 1.2,
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    boxShadow: '0 4px 14px rgba(0, 0, 0, 0.2)',
+                    '&:hover': {
+                      background: '#f8fafc !important',
+                      backgroundColor: '#f8fafc !important',
+                      transform: 'translateY(-1px)',
+                    },
+                    '& .MuiButton-startIcon': {
+                      color: '#1b5e20 !important',
+                    },
                   }}
                 >
                   Start WhatsApp Chat
