@@ -11,14 +11,26 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Svg, { Path } from 'react-native-svg';
 import { useAuth } from '../src/providers/AuthProvider';
 import { Input } from '../src/components/Input';
 import { Button } from '../src/components/Button';
-import { ShieldCheck, ArrowLeft, Lock, Mail, Phone, KeyRound, CheckCircle2 } from 'lucide-react-native';
+import { ShieldCheck, ArrowLeft, Lock, Mail, Phone, KeyRound, CheckCircle2, Key } from 'lucide-react-native';
+
+const GoogleIcon: React.FC = () => (
+  <Svg width={20} height={20} viewBox="0 0 48 48" style={{ marginRight: 8 }}>
+    <Path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+    <Path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+    <Path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.79l7.97-6.2z" />
+    <Path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+  </Svg>
+);
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { login, loginWithGoogle, loginWithPhone, isLoading } = useAuth();
+  const insets = useSafeAreaInsets();
+  const { login, loginWithGoogle, loginWithPhone, loginDemo, isLoading } = useAuth();
 
   const [method, setMethod] = useState<'email' | 'phone'>('email');
   const [email, setEmail] = useState('');
@@ -58,6 +70,35 @@ export default function LoginScreen() {
       router.replace('/(tabs)');
     } catch (err: any) {
       setError('Google Sign-In failed. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleQuickDemo = async (role: 'admin' | 'manager' | 'telecaller' | 'agent') => {
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      if (role === 'admin') {
+        setEmail('admin@reerp.com');
+        setPassword('Admin@2026');
+        await loginDemo('admin');
+      } else if (role === 'manager') {
+        setEmail('manager@reerp.com');
+        setPassword('Manager@2026');
+        await loginDemo('manager');
+      } else if (role === 'telecaller') {
+        setEmail('telecaller@reerp.com');
+        setPassword('Telecaller@2026');
+        await loginDemo('telecaller');
+      } else {
+        setEmail('agent@reerp.com');
+        setPassword('Agent@2026');
+        await loginDemo('agent');
+      }
+      router.replace('/(tabs)');
+    } catch {
+      setError('Quick sign-in failed. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -105,7 +146,15 @@ export default function LoginScreen() {
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.container,
+          {
+            paddingTop: Math.max(insets.top, 24) + 12,
+            paddingBottom: Math.max(insets.bottom, 16) + 24,
+          },
+        ]}
+      >
         {/* Back to Public Website Gateway */}
         <TouchableOpacity
           style={styles.backToPublicBtn}
@@ -273,8 +322,44 @@ export default function LoginScreen() {
             disabled={isSubmitting || isLoading}
             activeOpacity={0.8}
           >
-            <Text style={styles.googleButtonText}>Continue with Google Workspace</Text>
+            <GoogleIcon />
+            <Text style={styles.googleButtonText}>Sign in with Google</Text>
           </TouchableOpacity>
+
+          {/* Quick Demo Credentials for Fast Testing */}
+          <View style={styles.demoSection}>
+            <Text style={styles.demoTitle}>QUICK TEST CREDENTIALS:</Text>
+            <View style={styles.demoChipsRow}>
+              <TouchableOpacity
+                style={[styles.demoChip, { borderColor: '#1E40AF', backgroundColor: '#EFF6FF' }]}
+                onPress={() => handleQuickDemo('admin')}
+              >
+                <Key size={12} color="#1E40AF" />
+                <Text style={[styles.demoChipText, { color: '#1E40AF' }]}>Admin</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.demoChip, { borderColor: '#7C3AED', backgroundColor: '#F5F3FF' }]}
+                onPress={() => handleQuickDemo('manager')}
+              >
+                <Text style={[styles.demoChipText, { color: '#7C3AED' }]}>Manager</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.demoChip, { borderColor: '#0284C7', backgroundColor: '#F0F9FF' }]}
+                onPress={() => handleQuickDemo('telecaller')}
+              >
+                <Text style={[styles.demoChipText, { color: '#0284C7' }]}>Telecaller</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.demoChip, { borderColor: '#059669', backgroundColor: '#ECFDF5' }]}
+                onPress={() => handleQuickDemo('agent')}
+              >
+                <Text style={[styles.demoChipText, { color: '#059669' }]}>Field Agent</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
 
         {/* Security & Compliance Footer */}
@@ -458,12 +543,45 @@ const styles = StyleSheet.create({
     borderColor: '#CBD5E1',
     borderRadius: 12,
     paddingVertical: 12,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
   },
   googleButtonText: {
     color: '#0F172A',
     fontSize: 13.5,
+    fontWeight: '700',
+  },
+  demoSection: {
+    marginTop: 18,
+    paddingTop: 14,
+    borderTopWidth: 1,
+    borderTopColor: '#E2E8F0',
+    borderStyle: 'dashed',
+  },
+  demoTitle: {
+    fontSize: 10.5,
+    fontWeight: '800',
+    color: '#64748B',
+    marginBottom: 8,
+    letterSpacing: 0.5,
+  },
+  demoChipsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  demoChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    gap: 4,
+  },
+  demoChipText: {
+    fontSize: 11.5,
     fontWeight: '700',
   },
   securityFooter: {

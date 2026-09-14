@@ -70,7 +70,7 @@ export function ErrorBoundary({ error, retry }: { error: Error; retry: () => voi
 }
 
 import { AuthProvider } from '../src/providers/AuthProvider';
-
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { MobileThemeProvider } from '../src/theme';
 
 export default function RootLayout() {
@@ -109,40 +109,42 @@ export default function RootLayout() {
 
   return (
     <SafeRootErrorBoundary>
-      <MobileThemeProvider>
-        <QueryProvider>
-          <AuthProvider>
-            <LocationProvider>
-              <Stack
-                screenOptions={{
-                  headerShown: false,
-                  headerStyle: {
-                    backgroundColor: '#0F172A',
-                  },
-                  headerTintColor: '#FFFFFF',
-                  headerTitleStyle: {
-                    fontWeight: '700',
-                  },
-                }}
-                initialRouteName="index"
-              >
-                <Stack.Screen name="index" options={{ headerShown: false }} />
-                <Stack.Screen name="login" options={{ headerShown: false }} />
-                <Stack.Screen name="register-profile" options={{ title: 'Profile Registration', headerShown: false }} />
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen name="lead/[id]" options={{ title: 'Lead Details', headerShown: true }} />
-                <Stack.Screen name="commission/index" options={{ title: 'My Commission', headerShown: true }} />
-                <Stack.Screen name="network/index" options={{ title: 'My Network & Team', headerShown: true }} />
-                <Stack.Screen name="inventory" options={{ title: 'Plot Inventory & Status', headerShown: true }} />
-                <Stack.Screen name="public-site" options={{ title: 'Public Portal', headerShown: false }} />
-                <Stack.Screen name="visit/[id]" options={{ title: 'Visit Details', headerShown: true }} />
-                <Stack.Screen name="visit/start" options={{ title: 'Start Site Visit', headerShown: true }} />
-                <Stack.Screen name="visit/complete" options={{ title: 'Complete Site Visit', headerShown: true }} />
-              </Stack>
-            </LocationProvider>
-          </AuthProvider>
-        </QueryProvider>
-      </MobileThemeProvider>
+      <SafeAreaProvider>
+        <MobileThemeProvider>
+          <QueryProvider>
+            <AuthProvider>
+              <LocationProvider>
+                <Stack
+                  screenOptions={{
+                    headerShown: false,
+                    headerStyle: {
+                      backgroundColor: '#0F172A',
+                    },
+                    headerTintColor: '#FFFFFF',
+                    headerTitleStyle: {
+                      fontWeight: '700',
+                    },
+                  }}
+                  initialRouteName="index"
+                >
+                  <Stack.Screen name="index" options={{ headerShown: false }} />
+                  <Stack.Screen name="login" options={{ headerShown: false }} />
+                  <Stack.Screen name="register-profile" options={{ title: 'Profile Registration', headerShown: false }} />
+                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                  <Stack.Screen name="lead/[id]" options={{ title: 'Lead Details', headerShown: true }} />
+                  <Stack.Screen name="commission/index" options={{ title: 'My Commission', headerShown: true }} />
+                  <Stack.Screen name="network/index" options={{ title: 'My Network & Team', headerShown: true }} />
+                  <Stack.Screen name="inventory" options={{ title: 'Plot Inventory & Status', headerShown: true }} />
+                  <Stack.Screen name="public-site" options={{ title: 'Public Portal', headerShown: false }} />
+                  <Stack.Screen name="visit/[id]" options={{ title: 'Visit Details', headerShown: true }} />
+                  <Stack.Screen name="visit/start" options={{ title: 'Start Site Visit', headerShown: true }} />
+                  <Stack.Screen name="visit/complete" options={{ title: 'Complete Site Visit', headerShown: true }} />
+                </Stack>
+              </LocationProvider>
+            </AuthProvider>
+          </QueryProvider>
+        </MobileThemeProvider>
+      </SafeAreaProvider>
     </SafeRootErrorBoundary>
   );
 }

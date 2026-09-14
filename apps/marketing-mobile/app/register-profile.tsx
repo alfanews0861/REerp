@@ -10,6 +10,7 @@ import {
   Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../src/providers/AuthProvider';
 import { getFirebaseInstance, doc, updateDoc, collection, query, where, getDocs, limit, serverTimestamp } from '../src/services/firebase';
 import { Shield, Award, Building, CheckCircle } from 'lucide-react-native';
@@ -24,6 +25,7 @@ const QUICK_CODES = [
 export default function RegisterProfileScreen() {
   const { user, completeProfile } = useAuth();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const [fullName, setFullName] = useState(user?.displayName || '');
   const [phone, setPhone] = useState(user?.phoneNumber || '');
@@ -152,7 +154,16 @@ export default function RegisterProfileScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={[
+        styles.content,
+        {
+          paddingTop: Math.max(insets.top, 16) + 10,
+          paddingBottom: Math.max(insets.bottom, 16) + 30,
+        },
+      ]}
+    >
       <View style={styles.header}>
         <View style={styles.iconCircle}>
           <Shield size={32} color="#2563eb" />

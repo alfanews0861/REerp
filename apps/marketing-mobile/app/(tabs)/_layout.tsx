@@ -1,10 +1,12 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Home, Users, MapPin, ReceiptText, CalendarCheck, Car } from 'lucide-react-native';
 import { useMobileTheme } from '../../src/theme';
 
 export default function TabLayout() {
   const { colors, isDark } = useMobileTheme();
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
@@ -15,8 +17,8 @@ export default function TabLayout() {
           backgroundColor: colors.surfaceCard,
           borderTopColor: colors.border,
           borderTopWidth: 1,
-          height: 60,
-          paddingBottom: 6,
+          height: 60 + (insets.bottom > 0 ? insets.bottom : 0),
+          paddingBottom: insets.bottom > 0 ? insets.bottom : 6,
           paddingTop: 6,
           elevation: 10,
           shadowColor: '#000000',

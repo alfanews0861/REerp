@@ -134,6 +134,40 @@ describe('Marketing Mobile - Auth Session Persistence', () => {
     const cached = await AsyncStorage.getItem('mobile_auth_user_session');
     expect(cached).toBeNull();
   });
+
+  it('authenticates demo admin with super_admin role and director cadre', async () => {
+    const adminSession = {
+      uid: 'demo-admin-1',
+      email: 'admin@reerp.com',
+      displayName: 'Vikram Aditya (CEO & Admin)',
+      role: 'super_admin',
+      cadre: 'director',
+      phoneNumber: '+91 99999 88888',
+      branch: 'Corporate Headquarters',
+      isProfileCompleted: true,
+    };
+
+    await AsyncStorage.setItem('mobile_auth_user_session', JSON.stringify(adminSession));
+    const cached = JSON.parse((await AsyncStorage.getItem('mobile_auth_user_session'))!);
+    expect(cached.role).toBe('super_admin');
+    expect(cached.cadre).toBe('director');
+    expect(cached.email).toBe('admin@reerp.com');
+  });
+
+  it('authenticates demo telecaller with dedicated inbound sales role', async () => {
+    const teleSession = {
+      uid: 'demo-tele-1',
+      email: 'telecaller@reerp.com',
+      displayName: 'Pooja Reddy',
+      role: 'telecaller',
+      branch: 'Inbound Sales',
+    };
+
+    await AsyncStorage.setItem('mobile_auth_user_session', JSON.stringify(teleSession));
+    const cached = JSON.parse((await AsyncStorage.getItem('mobile_auth_user_session'))!);
+    expect(cached.role).toBe('telecaller');
+    expect(cached.branch).toBe('Inbound Sales');
+  });
 });
 
 describe('Marketing Mobile - Leads Dynamic Filtering Logic', () => {

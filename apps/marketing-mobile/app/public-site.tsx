@@ -1,16 +1,25 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, SafeAreaView } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PublicMainPortal } from '../src/screens/public/PublicMainPortal';
 import { ArrowLeft, Shield } from 'lucide-react-native';
 
 export default function PublicSiteRoute() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   return (
     <View style={styles.container}>
       {/* Return to Admin / Staff Console Banner */}
-      <SafeAreaView style={styles.topBanner}>
+      <View
+        style={[
+          styles.topBanner,
+          {
+            paddingTop: Math.max(insets.top, 10),
+          },
+        ]}
+      >
         <TouchableOpacity
           style={styles.returnBtn}
           onPress={() => router.back()}
@@ -20,7 +29,7 @@ export default function PublicSiteRoute() {
           <Shield size={16} color="#F59E0B" />
           <Text style={styles.returnBtnText}>Return to Staff / Admin Suite (కన్సోల్‌కు తిరిగి వెళ్లు)</Text>
         </TouchableOpacity>
-      </SafeAreaView>
+      </View>
 
       <View style={styles.portalWrapper}>
         <PublicMainPortal onOpenLogin={() => router.back()} />

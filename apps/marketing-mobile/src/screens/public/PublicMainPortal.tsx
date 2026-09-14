@@ -4,9 +4,9 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PublicVenturesScreen } from './PublicVenturesScreen';
 import { PublicPlotsExplorerScreen } from './PublicPlotsExplorerScreen';
 import { PublicSiteVisitScreen } from './PublicSiteVisitScreen';
@@ -30,6 +30,7 @@ interface PublicMainPortalProps {
 }
 
 export const PublicMainPortal: React.FC<PublicMainPortalProps> = ({ onOpenLogin }) => {
+  const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<PublicTab>('ventures');
   const [selectedVentureIdForPlots, setSelectedVentureIdForPlots] = useState<string | undefined>();
   const [selectedVentureIdForVisit, setSelectedVentureIdForVisit] = useState<string | undefined>();
@@ -50,11 +51,18 @@ export const PublicMainPortal: React.FC<PublicMainPortalProps> = ({ onOpenLogin 
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor="#0F172A" />
 
       {/* Top Main Navigation Header */}
-      <View style={styles.header}>
+      <View
+        style={[
+          styles.header,
+          {
+            paddingTop: Math.max(insets.top, 12),
+          },
+        ]}
+      >
         <View style={styles.brandRow}>
           <View style={styles.brandLogo}>
             <ShieldCheck size={20} color="#F59E0B" />
@@ -106,7 +114,14 @@ export const PublicMainPortal: React.FC<PublicMainPortalProps> = ({ onOpenLogin 
       </View>
 
       {/* Bottom Navigation Bar */}
-      <View style={styles.bottomNav}>
+      <View
+        style={[
+          styles.bottomNav,
+          {
+            paddingBottom: insets.bottom > 0 ? insets.bottom : 10,
+          },
+        ]}
+      >
         <TouchableOpacity
           style={[styles.navItem, activeTab === 'ventures' && styles.navItemActive]}
           onPress={() => setActiveTab('ventures')}
@@ -193,7 +208,7 @@ export const PublicMainPortal: React.FC<PublicMainPortalProps> = ({ onOpenLogin 
           </Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

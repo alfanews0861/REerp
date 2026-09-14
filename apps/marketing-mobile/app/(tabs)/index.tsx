@@ -12,6 +12,7 @@ import { Card } from '../../src/components/Card';
 import { Button } from '../../src/components/Button';
 import { Badge } from '../../src/components/Badge';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../src/providers/AuthProvider';
 import { useMobileTheme } from '../../src/theme';
 import { getFirebaseInstance, collection, query, where, getDocs, limit } from '../../src/services/firebase';
@@ -36,6 +37,7 @@ import {
 
 export default function HomeScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { user, logout } = useAuth();
   const { colors, isDark } = useMobileTheme();
 
@@ -143,7 +145,13 @@ export default function HomeScreen() {
 
   return (
     <ScrollView
-      style={[styles.container, { backgroundColor: colors.background }]}
+      style={[
+        styles.container,
+        {
+          backgroundColor: colors.background,
+          paddingTop: Math.max(insets.top, 16) + 6,
+        },
+      ]}
       refreshControl={
         <RefreshControl
           refreshing={refreshing}
