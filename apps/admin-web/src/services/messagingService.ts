@@ -68,7 +68,7 @@ const DEFAULT_SYSTEM_NOTIFICATIONS: SystemNotificationItem[] = [
     id: 'notif-004',
     userId: 'all',
     title: 'Site Visit Scheduled: Sunday Special Bus Tour',
-    message: '3 Luxury Van site visits scheduled for Mokila Sunrise Meadows with 18 prospective buyers.',
+    message: '3 Luxury Van site visits scheduled for Podalakur Road ISKON City - 2 with 18 prospective buyers.',
     type: 'visit',
     severity: 'warning',
     read: true,

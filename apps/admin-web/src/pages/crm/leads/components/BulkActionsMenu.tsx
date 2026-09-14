@@ -40,10 +40,10 @@ const SALES_EXECUTIVES = [
 ];
 
 const BRANCHES = [
-  { id: 'branch-1', name: 'Hyderabad Head Office (Financial District)' },
-  { id: 'branch-2', name: 'Mokila Regional Site Office' },
-  { id: 'branch-3', name: 'Shadnagar Branch Office' },
-  { id: 'branch-4', name: 'Vijayawada Regional Office' },
+  { id: 'branch-1', name: 'Nellore Head Office (RKRI Towers, Annamayya Circle)' },
+  { id: 'branch-2', name: 'Podalakur Road Site Office (ISKON City - 2)' },
+  { id: 'branch-3', name: 'Mini Bypass Branch Office' },
+  { id: 'branch-4', name: 'Kovuru Highway Site Office (Dream City)' },
 ];
 
 export const BulkActionsMenu: React.FC<BulkActionsMenuProps> = ({

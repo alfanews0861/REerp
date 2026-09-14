@@ -67,10 +67,10 @@ export const MobileAppHeader: React.FC<MobileAppHeaderProps> = ({
 
           <View style={styles.titleColumn}>
             <Text style={styles.companyTitle} numberOfLines={1}>
-              {title ? title : 'SREEKANTH REDDY REALTY'}
+              {title ? title : 'ISKON DEVELOPERS'}
             </Text>
             <Text style={styles.companyTagline} numberOfLines={1}>
-              {subtitle ? subtitle : 'DTCP & HMDA APPROVED TOWNSHIPS'}
+              {subtitle ? subtitle : 'NUDA & DTCP APPROVED TOWNSHIPS'}
             </Text>
           </View>
         </TouchableOpacity>

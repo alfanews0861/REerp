@@ -133,7 +133,7 @@ export const SiteVisitModal: FC<SiteVisitModalProps> = ({
             <Alert severity="info" sx={{ mb: 3, textAlign: 'left' }}>
               <strong>Venture:</strong> {selectedVenture?.name} <br />
               <strong>Date:</strong> {visitDate} <br />
-              <strong>Complimentary Cab:</strong> {cabRequired === 'YES' ? `Yes (${pickupLocation || 'Hyderabad'})` : 'Self Drive'}
+              <strong>Complimentary Cab:</strong> {cabRequired === 'YES' ? `Yes (${pickupLocation || 'Nellore'})` : 'Self Drive'}
             </Alert>
             <Button
               variant="contained"
@@ -239,7 +239,7 @@ export const SiteVisitModal: FC<SiteVisitModalProps> = ({
                 <TextField
                   fullWidth
                   label="Pickup Location / Landmark"
-                  placeholder={cabRequired === 'YES' ? 'e.g. Gachibowli, Kukatpally' : 'Not applicable'}
+                  placeholder={cabRequired === 'YES' ? 'e.g. Annamayya Circle, Nellore Railway Station' : 'Not applicable'}
                   disabled={cabRequired === 'NO'}
                   value={pickupLocation}
                   onChange={(e) => setPickupLocation(e.target.value)}

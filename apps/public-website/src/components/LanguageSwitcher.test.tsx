@@ -29,6 +29,6 @@ describe('LanguageProvider (English Only)', () => {
     );
 
     expect(screen.getByTestId('current-lang').textContent).toBe('en');
-    expect(screen.getByTestId('translated-title').textContent).toContain('Prime HMDA & DTCP');
+    expect(screen.getByTestId('translated-title').textContent).toContain('Prime NUDA & DTCP');
   });
 });

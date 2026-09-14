@@ -124,7 +124,7 @@ export const VenturesPage: FC = () => {
                 onChange={(e) => setAuthorityFilter(e.target.value)}
               >
                 <MenuItem value="ALL">All Approvals</MenuItem>
-                <MenuItem value="HMDA">HMDA Approved</MenuItem>
+                <MenuItem value="NUDA">NUDA Approved</MenuItem>
                 <MenuItem value="DTCP">DTCP Approved</MenuItem>
               </TextField>
             </Grid>
@@ -159,11 +159,11 @@ export const VenturesPage: FC = () => {
               onClick={() => setAuthorityFilter('ALL')}
             />
             <Chip
-              label="HMDA Approved (Urban)"
+              label="NUDA Approved (Nellore Urban)"
               clickable
-              color={authorityFilter === 'HMDA' ? 'primary' : 'default'}
+              color={authorityFilter === 'NUDA' ? 'primary' : 'default'}
               size="small"
-              onClick={() => setAuthorityFilter('HMDA')}
+              onClick={() => setAuthorityFilter('NUDA')}
             />
             <Chip
               label="DTCP Approved (High Growth)"
@@ -177,7 +177,7 @@ export const VenturesPage: FC = () => {
 
         {/* Results Counter */}
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3, fontWeight: 500 }}>
-          Showing <strong>{filteredVentures.length}</strong> active ventures in Telangana & Hyderabad corridors
+          Showing <strong>{filteredVentures.length}</strong> active ventures in Nellore & Andhra Pradesh corridors
         </Typography>
 
         {/* Ventures Grid */}

@@ -51,17 +51,17 @@ export async function fetchPublicVentures(): Promise<PublicVenture[]> {
           name: data.name || 'Venture Name',
           tagline: data.tagline || data.description || 'Premium Layout',
           location: data.location?.mandal
-            ? `${data.location.mandal}, ${data.location.district || 'Hyderabad'}`
-            : data.location?.district || 'Hyderabad',
-          city: data.location?.district || 'Hyderabad',
-          state: data.location?.state || 'Telangana',
-          approvalAuthority: data.approvalAuthority || 'HMDA',
-          approvalNumber: data.approvalNumber || 'HMDA/2024/01',
-          reraId: data.reraId || 'P02400007891',
+            ? `${data.location.mandal}, ${data.location.district || 'Nellore'}`
+            : data.location?.district || 'Nellore',
+          city: data.location?.district || 'Nellore',
+          state: data.location?.state || 'Andhra Pradesh',
+          approvalAuthority: data.approvalAuthority || 'NUDA',
+          approvalNumber: data.approvalNumber || 'NUDA/2024/01',
+          reraId: data.reraId || 'P02260007891',
           totalAreaAcres: data.totalAreaAcres || 25,
           totalPlots: data.totalPlotsCount || 150,
           availablePlots: data.availablePlots || 30,
-          basePricePerSqYd: data.pricing?.basePrice || 25000,
+          basePricePerSqYd: data.pricing?.basePrice || 18500,
           heroImage: data.media?.photos?.[0] || 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80',
           galleryImages: data.media?.photos || [
             'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80',
@@ -75,8 +75,8 @@ export async function fetchPublicVentures(): Promise<PublicVenture[]> {
             : ['40 & 33ft Roads', 'Underground Drainage', '24/7 Water', 'Solar Street Lights'],
           highlights: ['Clear legal title', 'Immediate Registration', 'Bank Loan Approved'],
           connectivity: [
-            { label: 'Outer Ring Road (ORR)', time: '10 Mins' },
-            { label: 'Financial District', time: '20 Mins' },
+            { label: 'Mini Bypass Road', time: '10 Mins' },
+            { label: 'Nellore Railway Station', time: '15 Mins' },
           ],
         };
       });
@@ -101,11 +101,11 @@ export async function fetchPublicPlots(projectId?: string): Promise<PublicPlot[]
       plots = snap.docs.map((docSnap) => {
         const d = docSnap.data();
         const areaSqYds = d.area ? (d.areaUnit === 'SQ_YARDS' ? d.area : Math.round(d.area / 9)) : 200;
-        const pricePerSqYd = d.price ? Math.round(d.price / (areaSqYds || 1)) : 25000;
+        const pricePerSqYd = d.price ? Math.round(d.price / (areaSqYds || 1)) : 18500;
         return {
           id: docSnap.id,
           projectId: d.projectId || 'proj-1',
-          projectName: d.projectName || 'Sunrise Enclave',
+          projectName: d.projectName || 'ISKON City - 2',
           plotNumber: d.plotNumber || 'P-1',
           facing: (d.facing || 'EAST') as PublicPlot['facing'],
           areaSqYds,

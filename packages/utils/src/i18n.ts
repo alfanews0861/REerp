@@ -24,13 +24,14 @@ export const TRANSLATIONS: Record<string, Record<string, string>> = {
     call_support: 'Call: +91 98765 43210',
 
     // Hero
-    hero_title: 'Prime HMDA & DTCP Approved Gated Community Plots',
-    hero_subtitle: "Secure your future with clear-title, 100% Vaastu compliant residential villa plots across Hyderabad's fastest growing corridors.",
+    hero_title: 'Prime NUDA & DTCP Approved Gated Community Plots',
+    hero_subtitle: "Secure your future with clear-title, 100% Vaastu compliant residential villa plots across Nellore's fastest growing corridors.",
     explore_ventures: 'Explore Approved Ventures',
     live_inventory: 'Live Plot Inventory',
 
     // Approvals
-    hmda_approved: 'HMDA Approved',
+    nuda_approved: 'NUDA Approved',
+    hmda_approved: 'NUDA Approved',
     dtcp_approved: 'DTCP Approved',
     rera_approved: 'RERA Registered',
     clear_title: '100% Clear Title',
@@ -100,12 +101,12 @@ export const TRANSLATIONS: Record<string, Record<string, string>> = {
 
     // Gemini AI Assistant
     ai_advisor_title: 'Gemini AI Real Estate Advisor',
-    ai_advisor_subtitle: 'Ask anything about Hyderabad corridors, HMDA vs DTCP rules, or budget plot recommendations.',
-    ai_placeholder: "Ask Gemini AI (e.g., 'Show East facing plots under ₹50 Lakhs')...",
+    ai_advisor_subtitle: 'Ask anything about Nellore corridors, NUDA vs DTCP rules, or budget plot recommendations.',
+    ai_placeholder: "Ask Gemini AI (e.g., 'Show East facing plots under ₹30 Lakhs')...",
     ai_ask_button: 'Send',
-    ai_quick_prompt_1: 'Plots under ₹50 Lakhs',
-    ai_quick_prompt_2: 'HMDA vs DTCP differences',
-    ai_quick_prompt_3: 'Why invest in Mokila / Shankarpally?',
+    ai_quick_prompt_1: 'Plots under ₹30 Lakhs',
+    ai_quick_prompt_2: 'NUDA vs DTCP differences',
+    ai_quick_prompt_3: 'Why invest in Podalakur Road / Bombay Highway?',
     ai_quick_prompt_4: 'How does 48-Hour hold work?',
   },
 };

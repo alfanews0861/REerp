@@ -47,7 +47,7 @@ export const SEED_PLOTS: PlotItem[] = [
   {
     id: 'plot-101',
     projectId: 'proj-1',
-    projectName: 'Sunrise Enclave',
+    projectName: 'ISKON City - 2',
     plotNumber: 'P-01',
     facing: 'EAST',
     length: 50,
@@ -63,7 +63,7 @@ export const SEED_PLOTS: PlotItem[] = [
   {
     id: 'plot-102',
     projectId: 'proj-1',
-    projectName: 'Sunrise Enclave',
+    projectName: 'ISKON City - 2',
     plotNumber: 'P-02',
     facing: 'NORTH',
     length: 50,
@@ -80,7 +80,7 @@ export const SEED_PLOTS: PlotItem[] = [
   {
     id: 'plot-103',
     projectId: 'proj-1',
-    projectName: 'Sunrise Enclave',
+    projectName: 'ISKON City - 2',
     plotNumber: 'P-03',
     facing: 'EAST',
     length: 60,
@@ -96,7 +96,7 @@ export const SEED_PLOTS: PlotItem[] = [
   {
     id: 'plot-104',
     projectId: 'proj-1',
-    projectName: 'Sunrise Enclave',
+    projectName: 'ISKON City - 2',
     plotNumber: 'P-04',
     facing: 'WEST',
     length: 50,
@@ -112,7 +112,7 @@ export const SEED_PLOTS: PlotItem[] = [
   {
     id: 'plot-201',
     projectId: 'proj-2',
-    projectName: 'Green Valley Phase 2',
+    projectName: 'Dream City',
     plotNumber: 'GV-11',
     facing: 'NORTH_EAST',
     length: 60,
@@ -128,7 +128,7 @@ export const SEED_PLOTS: PlotItem[] = [
   {
     id: 'plot-202',
     projectId: 'proj-2',
-    projectName: 'Green Valley Phase 2',
+    projectName: 'Dream City',
     plotNumber: 'GV-12',
     facing: 'EAST',
     length: 50,
@@ -144,7 +144,7 @@ export const SEED_PLOTS: PlotItem[] = [
   {
     id: 'plot-301',
     projectId: 'proj-3',
-    projectName: 'Palm County Villa Plots',
+    projectName: 'ISKON Brundhavanam',
     plotNumber: 'PC-05',
     facing: 'NORTH',
     length: 60,
@@ -229,9 +229,9 @@ export const PlotInventory = () => {
       }
     });
     // Add default known seed projects if not present
-    map.set('proj-1', 'Sunrise Enclave');
-    map.set('proj-2', 'Green Valley Phase 2');
-    map.set('proj-3', 'Palm County Villa Plots');
+    map.set('proj-1', 'ISKON City - 2');
+    map.set('proj-2', 'Dream City');
+    map.set('proj-3', 'ISKON Brundhavanam');
     return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
   }, [plots]);
 
@@ -284,12 +284,12 @@ export const PlotInventory = () => {
         </Box>
       )
     },
-    {
-      id: 'projectName',
-      label: 'Venture / Project',
+    { 
+      id: 'projectName', 
+      label: 'Venture / Project', 
       render: (row: PlotItem) => (
         <Typography variant="body2" color="text.secondary">
-          {row.projectName || 'Sunrise Enclave'}
+          {row.projectName || 'ISKON City - 2'}
         </Typography>
       )
     },

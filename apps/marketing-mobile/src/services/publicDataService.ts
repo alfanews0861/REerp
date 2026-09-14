@@ -76,19 +76,19 @@ export async function fetchLiveVentures(): Promise<PublicVenture[]> {
           return {
             id: docSnap.id,
             name: data.name || 'Venture Name',
-            tagline: data.tagline || data.description || 'Premium HMDA/DTCP Layout',
+            tagline: data.tagline || data.description || 'Premium NUDA & DTCP Layout',
             location: data.location?.mandal
-              ? `${data.location.mandal}, ${data.location.district || 'Hyderabad'}`
-              : data.location?.district || data.location || 'Hyderabad',
-            city: data.location?.district || 'Hyderabad',
-            state: data.location?.state || 'Telangana',
-            approvalAuthority: data.approvalAuthority || 'HMDA',
-            approvalNumber: data.approvalNumber || 'HMDA/2024/01',
-            reraId: data.reraId || 'P02400007891',
-            totalAreaAcres: data.totalAreaAcres || 25,
-            totalPlots: data.totalPlotsCount || 150,
-            availablePlots: data.availablePlots || 30,
-            basePricePerSqYd: data.pricing?.basePrice || 25000,
+              ? `${data.location.mandal}, ${data.location.district || 'Nellore'}`
+              : data.location?.district || data.location || 'Nellore',
+            city: data.location?.district || 'Nellore',
+            state: data.location?.state || 'Andhra Pradesh',
+            approvalAuthority: data.approvalAuthority || 'NUDA',
+            approvalNumber: data.approvalNumber || 'NUDA/2024/01',
+            reraId: data.reraId || 'P02260007891',
+            totalAreaAcres: data.totalAreaAcres || 120,
+            totalPlots: data.totalPlotsCount || 450,
+            availablePlots: data.availablePlots || 78,
+            basePricePerSqYd: data.pricing?.basePrice || 18500,
             heroImage:
               data.media?.photos?.[0] ||
               'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80',
@@ -108,8 +108,8 @@ export async function fetchLiveVentures(): Promise<PublicVenture[]> {
               : ['40 & 33ft Roads', 'Underground Drainage', '24/7 Water', 'Solar Street Lights'],
             highlights: ['Clear legal title', 'Immediate Registration', 'Bank Loan Approved'],
             connectivity: [
-              { label: 'Outer Ring Road (ORR)', time: '10 Mins' },
-              { label: 'Financial District', time: '20 Mins' },
+              { label: 'Annamayya Circle / Mini Bypass', time: '10 Mins' },
+              { label: 'Nellore Railway Station', time: '15 Mins' },
             ],
           };
         });
@@ -137,11 +137,11 @@ export async function fetchLivePlots(projectId?: string): Promise<PublicPlot[]> 
         const livePlots: PublicPlot[] = snap.docs.map((docSnap) => {
           const data = docSnap.data();
           const area = data.areaSqYds || data.area || 200;
-          const price = data.pricePerSqYd || data.basePrice || 25000;
+          const price = data.pricePerSqYd || data.basePrice || 18500;
           return {
             id: docSnap.id,
             projectId: data.projectId || 'proj-1',
-            projectName: data.projectName || 'Sunrise Enclave',
+            projectName: data.projectName || 'ISKON City - 2',
             plotNumber: data.plotNumber || `P-${docSnap.id.substring(0, 3)}`,
             facing: data.facing || 'EAST',
             areaSqYds: area,
@@ -258,7 +258,7 @@ export async function createLiveSiteVisitRequest(
   const driverName = 'Ramesh Goud';
   const driverPhone = '+91 98480 22338';
   const vehicleModel = 'Toyota Innova Crysta (White)';
-  const vehiclePlate = 'TS-08-ER-1234';
+  const vehiclePlate = 'AP-26-TH-1234';
 
   try {
     const { db } = getFirebaseInstance();

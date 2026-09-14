@@ -28,14 +28,14 @@ interface LiveVehicleTrackingMapProps {
   trips: OdometerLog[];
 }
 
-// Hyderabad Region Hubs & Ventures Coordinates
-export const HYDERABAD_HUBS = {
-  HEAD_OFFICE: { name: 'Jubilee Hills Main Office', lat: 17.4325, lng: 78.4072 },
+// Nellore Region Hubs & Ventures Coordinates
+export const NELLORE_HUBS = {
+  HEAD_OFFICE: { name: 'RKRI Towers Head Office (Annamayya Circle, Nellore)', lat: 14.4426, lng: 79.9865 },
   VENTURES: [
-    { id: 'v-mokila', name: 'Sunrise Enclave (Mokila)', lat: 17.4215, lng: 78.1882 },
-    { id: 'v-shadnagar', name: 'Green Valley Phase 2 (Shadnagar)', lat: 17.0722, lng: 78.2091 },
-    { id: 'v-kollur', name: 'Palm County Villa Plots (Kollur)', lat: 17.4891, lng: 78.2315 },
-    { id: 'v-shankarpally', name: 'Royal Meadows (Shankarpally)', lat: 17.4589, lng: 78.1324 },
+    { id: 'v-iskon-city-2', name: 'ISKON City - 2 (Podalakur Road)', lat: 14.4100, lng: 79.8800 },
+    { id: 'v-dream-city', name: 'Dream City (Nellore-Bombay Hwy / Kovuru)', lat: 14.5000, lng: 79.9800 },
+    { id: 'v-brundhavanam', name: 'ISKON Brundhavanam (Chinthareddypalem)', lat: 14.4280, lng: 79.9700 },
+    { id: 'v-elite-township', name: 'ISKON Elite Township (Annamayya Extn)', lat: 14.4380, lng: 79.9650 },
   ],
 };
 
@@ -46,22 +46,22 @@ const INITIAL_LOCATIONS: Record<string, VehicleLocation> = {
     driverId: 'drv-2',
     driverName: 'Suresh Kumar',
     driverPhone: '+91 94412 33445',
-    registrationNumber: 'TS 08 EX 4050',
+    registrationNumber: 'AP 26 TH 4050',
     makeModel: 'Force Tempo Traveller 17 Seater',
     vehicleType: 'MINI_BUS',
-    latitude: 17.4285,
-    longitude: 78.2850, // Moving towards Mokila on Shankarpally road
+    latitude: 14.4250,
+    longitude: 79.9200, // Moving towards ISKON City - 2 on Podalakur road
     speedKmH: 52,
     headingDegrees: 260,
     status: 'IN_TRANSIT',
     currentTripId: 'trip-1',
-    destinationVenture: 'Sunrise Enclave (Mokila)',
+    destinationVenture: 'ISKON City - 2 (Podalakur Road)',
     customerPickup: {
       customerName: 'NRI Investors Delegation (12 Pax)',
       phone: '+91 98490 99887',
-      latitude: 17.4385,
-      longitude: 78.3610, // Gachibowli Junction
-      address: 'Gachibowli Junction, Hyderabad',
+      latitude: 14.4426,
+      longitude: 79.9865, // Annamayya Circle
+      address: 'Annamayya Circle, Mini Bypass Road, Nellore',
       status: 'PICKED_UP',
     },
     batteryLevelPercent: 94,
@@ -72,22 +72,22 @@ const INITIAL_LOCATIONS: Record<string, VehicleLocation> = {
     driverId: 'drv-4',
     driverName: 'Prakash Rao',
     driverPhone: '+91 99887 76655',
-    registrationNumber: 'TS 09 Z 8899',
+    registrationNumber: 'AP 26 Z 8899',
     makeModel: 'Mahindra Scorpio-N Z8',
     vehicleType: 'SUV',
-    latitude: 17.2250,
-    longitude: 78.3180, // On Bangalore Highway NH44 towards Shadnagar
+    latitude: 14.4750,
+    longitude: 79.9800, // Towards Kovuru / Dream City
     speedKmH: 64,
     headingDegrees: 195,
     status: 'IN_TRANSIT',
     currentTripId: 'trip-2',
-    destinationVenture: 'Green Valley Phase 2 (Shadnagar)',
+    destinationVenture: 'Dream City (Kovuru)',
     customerPickup: {
       customerName: 'Mr. Rajasekhar & Family',
       phone: '+91 91234 11223',
-      latitude: 17.2410,
-      longitude: 78.4280, // Shamshabad Airport approach
-      address: 'Shamshabad Bus Stop, Airport Road',
+      latitude: 14.4450,
+      longitude: 79.9800, // Nellore RTC Complex
+      address: 'RTC Complex, Nellore City',
       status: 'PICKED_UP',
     },
     batteryLevelPercent: 88,
@@ -98,22 +98,22 @@ const INITIAL_LOCATIONS: Record<string, VehicleLocation> = {
     driverId: 'drv-6',
     driverName: 'K. Mallesh',
     driverPhone: '+91 98665 44332',
-    registrationNumber: 'TS 09 WL 7788',
+    registrationNumber: 'AP 26 WL 7788',
     makeModel: 'Tata Winger Platinum 12 Seater',
     vehicleType: 'MINI_BUS',
-    latitude: 17.4720,
-    longitude: 78.2980, // Kollur ORR service road
+    latitude: 14.4320,
+    longitude: 79.9750, // Towards Chinthareddypalem
     speedKmH: 46,
     headingDegrees: 310,
     status: 'IN_TRANSIT',
     currentTripId: 'trip-3',
-    destinationVenture: 'Palm County Villa Plots (Kollur)',
+    destinationVenture: 'ISKON Brundhavanam (Chinthareddypalem)',
     customerPickup: {
-      customerName: 'Gachibowli IT Corridor Group (8 Pax)',
+      customerName: 'Narayana Hospital Doctors Group (8 Pax)',
       phone: '+91 97001 88990',
-      latitude: 17.4440,
-      longitude: 78.3490, // Wipro Circle
-      address: 'Wipro Circle, Financial District',
+      latitude: 14.4350,
+      longitude: 79.9820,
+      address: 'Narayana Medical College, Nellore',
       status: 'PICKED_UP',
     },
     batteryLevelPercent: 91,
@@ -124,11 +124,11 @@ const INITIAL_LOCATIONS: Record<string, VehicleLocation> = {
     driverId: 'drv-1',
     driverName: 'Ramesh Goud',
     driverPhone: '+91 98490 11223',
-    registrationNumber: 'TS 09 UB 1001',
+    registrationNumber: 'AP 26 UB 1001',
     makeModel: 'Toyota Innova Crysta',
     vehicleType: 'SUV',
-    latitude: 17.4325,
-    longitude: 78.4072, // Parked at Head Office
+    latitude: 14.4426,
+    longitude: 79.9865, // Parked at RKRI Towers Head Office
     speedKmH: 0,
     headingDegrees: 0,
     status: 'AVAILABLE',
@@ -139,11 +139,11 @@ const INITIAL_LOCATIONS: Record<string, VehicleLocation> = {
     driverId: 'drv-3',
     driverName: 'Venu Madhav',
     driverPhone: '+91 91234 56780',
-    registrationNumber: 'TS 07 HK 2020',
+    registrationNumber: 'AP 26 HK 2020',
     makeModel: 'Maruti Suzuki Ertiga ZXi',
     vehicleType: 'CAB',
-    latitude: 17.4340,
-    longitude: 78.4090, // Near Jubilee Hills Base
+    latitude: 14.4430,
+    longitude: 79.9870, // Near Annamayya Circle
     speedKmH: 0,
     headingDegrees: 0,
     status: 'AVAILABLE',
@@ -154,11 +154,11 @@ const INITIAL_LOCATIONS: Record<string, VehicleLocation> = {
     driverId: 'drv-5',
     driverName: 'Naresh Reddy',
     driverPhone: '+91 97001 22334',
-    registrationNumber: 'TS 08 FA 3311',
+    registrationNumber: 'AP 26 FA 3311',
     makeModel: 'Toyota Innova Hycross Hybrid',
     vehicleType: 'SUV',
-    latitude: 17.4310,
-    longitude: 78.4055,
+    latitude: 14.4420,
+    longitude: 79.9860,
     speedKmH: 0,
     headingDegrees: 0,
     status: 'AVAILABLE',
@@ -169,11 +169,11 @@ const INITIAL_LOCATIONS: Record<string, VehicleLocation> = {
     driverId: 'drv-7',
     driverName: 'B. Appa Rao',
     driverPhone: '+91 94901 88776',
-    registrationNumber: 'TS 07 TH 4400',
+    registrationNumber: 'AP 26 TH 4400',
     makeModel: 'Mahindra Thar 4x4',
     vehicleType: 'SUV',
-    latitude: 17.4335,
-    longitude: 78.4060,
+    latitude: 14.4425,
+    longitude: 79.9868,
     speedKmH: 0,
     headingDegrees: 0,
     status: 'AVAILABLE',
@@ -184,11 +184,11 @@ const INITIAL_LOCATIONS: Record<string, VehicleLocation> = {
     driverId: 'drv-8',
     driverName: 'Chandra Sekhar',
     driverPhone: '+91 91002 33445',
-    registrationNumber: 'TS 09 TF 9900',
+    registrationNumber: 'AP 26 TF 9900',
     makeModel: 'Toyota Fortuner 4x4 Legender',
     vehicleType: 'SUV',
-    latitude: 17.4315,
-    longitude: 78.4085,
+    latitude: 14.4428,
+    longitude: 79.9862,
     speedKmH: 0,
     headingDegrees: 0,
     status: 'AVAILABLE',
@@ -224,8 +224,8 @@ export const LiveVehicleTrackingMap: React.FC<LiveVehicleTrackingMapProps> = ({
           registrationNumber: v.registrationNumber,
           makeModel: v.makeModel,
           vehicleType: v.vehicleType,
-          latitude: HYDERABAD_HUBS.HEAD_OFFICE.lat + (Math.random() - 0.5) * 0.01,
-          longitude: HYDERABAD_HUBS.HEAD_OFFICE.lng + (Math.random() - 0.5) * 0.01,
+          latitude: NELLORE_HUBS.HEAD_OFFICE.lat + (Math.random() - 0.5) * 0.01,
+          longitude: NELLORE_HUBS.HEAD_OFFICE.lng + (Math.random() - 0.5) * 0.01,
           speedKmH: 0,
           headingDegrees: 0,
           status: v.status,
@@ -282,12 +282,12 @@ export const LiveVehicleTrackingMap: React.FC<LiveVehicleTrackingMapProps> = ({
       setLiveLocations((prev) => {
         const next = { ...prev };
 
-        // 1. veh-2 moving towards Mokila (West)
+        // 1. veh-2 moving towards ISKON City - 2 on Podalakur Road (West)
         if (next['veh-2']) {
           const v = next['veh-2'];
           const deltaLat = (Math.random() - 0.48) * 0.0006;
-          const deltaLng = -0.0012; // Westward towards Mokila
-          const newLng = v.longitude + deltaLng < 78.1882 ? 78.2950 : v.longitude + deltaLng;
+          const deltaLng = -0.0012; // Westward towards Podalakur Road
+          const newLng = v.longitude + deltaLng < 79.8800 ? 79.9500 : v.longitude + deltaLng;
           next['veh-2'] = {
             ...v,
             latitude: v.latitude + deltaLat,
@@ -298,35 +298,35 @@ export const LiveVehicleTrackingMap: React.FC<LiveVehicleTrackingMapProps> = ({
           };
         }
 
-        // 2. veh-4 moving towards Shadnagar (South)
+        // 2. veh-4 moving towards Dream City (Kovuru / North)
         if (next['veh-4']) {
           const v = next['veh-4'];
-          const deltaLat = -0.0015; // Southward towards Shadnagar
+          const deltaLat = 0.0015; // Northward towards Kovuru
           const deltaLng = (Math.random() - 0.5) * 0.0004;
-          const newLat = v.latitude + deltaLat < 17.0722 ? 17.2600 : v.latitude + deltaLat;
+          const newLat = v.latitude + deltaLat > 14.5000 ? 14.4450 : v.latitude + deltaLat;
           next['veh-4'] = {
             ...v,
             latitude: newLat,
             longitude: v.longitude + deltaLng,
             speedKmH: Math.floor(55 + Math.random() * 20),
-            headingDegrees: 190 + Math.floor(Math.random() * 10),
+            headingDegrees: 15 + Math.floor(Math.random() * 10),
             timestamp: new Date().toISOString(),
           };
         }
 
-        // 3. veh-6 moving towards Kollur (North-West)
+        // 3. veh-6 moving towards ISKON Brundhavanam (Chinthareddypalem)
         if (next['veh-6']) {
           const v = next['veh-6'];
-          const deltaLat = 0.0008;
-          const deltaLng = -0.0009;
-          const newLat = v.latitude + deltaLat > 17.4891 ? 17.4500 : v.latitude + deltaLat;
-          const newLng = v.longitude + deltaLng < 78.2315 ? 78.3100 : v.longitude + deltaLng;
+          const deltaLat = -0.0006;
+          const deltaLng = -0.0008;
+          const newLat = v.latitude + deltaLat < 14.4200 ? 14.4400 : v.latitude + deltaLat;
+          const newLng = v.longitude + deltaLng < 79.9600 ? 79.9850 : v.longitude + deltaLng;
           next['veh-6'] = {
             ...v,
             latitude: newLat,
             longitude: newLng,
             speedKmH: Math.floor(40 + Math.random() * 18),
-            headingDegrees: 315 + Math.floor(Math.random() * 10),
+            headingDegrees: 215 + Math.floor(Math.random() * 10),
             timestamp: new Date().toISOString(),
           };
         }
@@ -358,13 +358,13 @@ export const LiveVehicleTrackingMap: React.FC<LiveVehicleTrackingMapProps> = ({
 
     if (!mapInstanceRef.current) {
       const map = L.map(mapContainerRef.current, {
-        center: [17.3850, 78.3500],
-        zoom: 11,
+        center: [14.4426, 79.9865],
+        zoom: 12,
         zoomControl: true,
       });
 
       L.tileLayer(getTileUrl(mapTileType), {
-        attribution: '&copy; OpenStreetMap contributors | RealEstateERP Fleet GPS',
+        attribution: '&copy; OpenStreetMap contributors | ISKON Developers Fleet GPS',
         maxZoom: 19,
       }).addTo(map);
 
@@ -390,7 +390,7 @@ export const LiveVehicleTrackingMap: React.FC<LiveVehicleTrackingMapProps> = ({
       });
 
       L.tileLayer(getTileUrl(mapTileType), {
-        attribution: '&copy; OpenStreetMap contributors | RealEstateERP Fleet GPS',
+        attribution: '&copy; OpenStreetMap contributors | ISKON Developers Fleet GPS',
         maxZoom: 19,
       }).addTo(mapInstanceRef.current);
     }
@@ -582,19 +582,19 @@ export const LiveVehicleTrackingMap: React.FC<LiveVehicleTrackingMapProps> = ({
     routesLayerRef.current.clearLayers();
 
     // 1. Add Main Office HQ Marker
-    const officeMarker = L.marker([HYDERABAD_HUBS.HEAD_OFFICE.lat, HYDERABAD_HUBS.HEAD_OFFICE.lng], {
+    const officeMarker = L.marker([NELLORE_HUBS.HEAD_OFFICE.lat, NELLORE_HUBS.HEAD_OFFICE.lng], {
       icon: createOfficeIcon(),
-      title: HYDERABAD_HUBS.HEAD_OFFICE.name,
+      title: NELLORE_HUBS.HEAD_OFFICE.name,
     }).bindPopup(`
       <div style="font-family: sans-serif; font-size: 12px; line-height: 1.4;">
-        <strong style="color: #0f172a; font-size: 13px;">🏢 ${HYDERABAD_HUBS.HEAD_OFFICE.name}</strong><br/>
+        <strong style="color: #0f172a; font-size: 13px;">🏢 ${NELLORE_HUBS.HEAD_OFFICE.name}</strong><br/>
         <span style="color: #64748b;">Central Fleet Dispatch & Executive HQ</span>
       </div>
     `);
     markersLayerRef.current.addLayer(officeMarker);
 
     // 2. Add Venture Destination Pins
-    HYDERABAD_HUBS.VENTURES.forEach((ven) => {
+    NELLORE_HUBS.VENTURES.forEach((ven) => {
       const vMarker = L.marker([ven.lat, ven.lng], {
         icon: createVentureIcon(ven.name),
         title: ven.name,
@@ -696,14 +696,14 @@ export const LiveVehicleTrackingMap: React.FC<LiveVehicleTrackingMapProps> = ({
         markersLayerRef.current?.addLayer(custMarker);
 
         // Find venture destination coords
-        const ventureObj = HYDERABAD_HUBS.VENTURES.find((v) => v.name === loc.destinationVenture);
+        const ventureObj = NELLORE_HUBS.VENTURES.find((v) => v.name === loc.destinationVenture);
         const destinationCoords = ventureObj
           ? [ventureObj.lat, ventureObj.lng]
           : [loc.latitude, loc.longitude];
 
         // Draw Polyline Route
         const routePoints: [number, number][] = [
-          [HYDERABAD_HUBS.HEAD_OFFICE.lat, HYDERABAD_HUBS.HEAD_OFFICE.lng],
+          [NELLORE_HUBS.HEAD_OFFICE.lat, NELLORE_HUBS.HEAD_OFFICE.lng],
           [loc.customerPickup.latitude, loc.customerPickup.longitude],
           [loc.latitude, loc.longitude],
           destinationCoords as [number, number],

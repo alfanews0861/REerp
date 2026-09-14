@@ -20,9 +20,10 @@ export function generateReportHtml(options: ReportPrintOptions): string {
 
   const projectLabels: { [key: string]: string } = {
     ALL: 'All Townships & Ventures',
-    MOKILA: 'Sunrise Enclave (Mokila)',
-    SHADNAGAR: 'Green Meadows (Shadnagar)',
-    JADCHERLA: 'Palm Meadows (Jadcherla)',
+    ISKON_CITY_2: 'ISKON City - 2 (Podalakur Road)',
+    DREAM_CITY: 'Dream City (Kovuru Highway)',
+    BRUNDHAVANAM: 'ISKON Brundhavanam (Chinthareddypalem)',
+    ELITE: 'ISKON Elite Township (Annamayya Circle Extn)',
   };
 
   const periodLabels: { [key: string]: string } = {
@@ -266,13 +267,13 @@ export function generateReportHtml(options: ReportPrintOptions): string {
       <div class="brand-left">
         <div class="logo-badge">🏢</div>
         <div class="brand-text">
-          <h1>SRI CITY DEVELOPERS &amp; INFRA PVT. LTD.</h1>
+          <h1>ISKON DEVELOPERS &amp; INFRA PVT. LTD.</h1>
           <p>Real Estate Enterprise Management &bull; Corporate Audit Reports</p>
         </div>
       </div>
       <div class="meta-right">
-        <div><strong>CIN:</strong> U70102TG2020PTC145678</div>
-        <div><strong>Corporate HQ:</strong> Financial District, Hyderabad</div>
+        <div><strong>CIN:</strong> U70102AP2020PTC145678</div>
+        <div><strong>Corporate HQ:</strong> RKRI Towers, Annamayya Circle, Mini Byepass Road, Nellore - 524 004, AP</div>
         <div><strong>Generated:</strong> ${generatedAt}</div>
       </div>
     </div>
@@ -336,7 +337,7 @@ export function generateReportHtml(options: ReportPrintOptions): string {
       <div class="sign-block">
         <div class="sign-line"></div>
         <div class="sign-title">Executive Director</div>
-        <div class="sign-sub">Sri City Developers &amp; Infra</div>
+        <div class="sign-sub">ISKON Developers &amp; Infra</div>
       </div>
     </div>
 

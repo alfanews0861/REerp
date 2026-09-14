@@ -76,7 +76,7 @@ const DEFAULT_PLOT_GEOMETRIES: PlotGeometry[] = [
 
 export const MasterLayoutMap: FC<MasterLayoutMapProps> = ({
   plots,
-  projectName = 'Sreekanth Reddy Gated Layout',
+  projectName = 'ISKON City - 2',
   onHoldPlot,
   onVisitPlot,
 }) => {

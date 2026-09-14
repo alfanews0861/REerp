@@ -95,7 +95,7 @@ const initialRules: CommissionRule[] = [
   {
     id: 'RUL-006',
     position: 'Associate Field Agent',
-    project: 'Sunrise Enclave Plots',
+    project: 'ISKON City - 2 Plots',
     type: 'FIXED_PER_SQYD',
     value: '₹150 / Sq. Yd',
     payoutTrigger: 'On Plot Allotment Token',
@@ -265,9 +265,9 @@ export const CommissionRulesPage: React.FC = () => {
             >
               <MenuItem value="ALL">All Projects</MenuItem>
               <MenuItem value="All Projects">Enterprise Default</MenuItem>
-              <MenuItem value="Green Meadows Luxury Plots">Green Meadows</MenuItem>
-              <MenuItem value="Cyber Meadows Phase II">Cyber Meadows</MenuItem>
-              <MenuItem value="Sunrise Enclave Plots">Sunrise Enclave</MenuItem>
+              <MenuItem value="ISKON City - 2 Plots">ISKON City - 2</MenuItem>
+              <MenuItem value="Dream City Township">Dream City</MenuItem>
+              <MenuItem value="ISKON Brundhavanam Plots">ISKON Brundhavanam</MenuItem>
             </Select>
           </FormControl>
         </Stack>
@@ -377,9 +377,9 @@ export const CommissionRulesPage: React.FC = () => {
                 onChange={(e) => setNewRule({ ...newRule, project: e.target.value })}
               >
                 <MenuItem value="All Projects">All Projects (Global Policy)</MenuItem>
-                <MenuItem value="Green Meadows Luxury Plots">Green Meadows Luxury Plots</MenuItem>
-                <MenuItem value="Cyber Meadows Phase II">Cyber Meadows Phase II</MenuItem>
-                <MenuItem value="Sunrise Enclave Plots">Sunrise Enclave Plots</MenuItem>
+                <MenuItem value="ISKON City - 2 Plots">ISKON City - 2 Plots</MenuItem>
+                <MenuItem value="Dream City Township">Dream City Township</MenuItem>
+                <MenuItem value="ISKON Brundhavanam Plots">ISKON Brundhavanam Plots</MenuItem>
               </Select>
             </FormControl>
 

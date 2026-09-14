@@ -153,10 +153,10 @@ export const PublicSiteVisitScreen: React.FC<PublicSiteVisitScreenProps> = ({
           />
 
           {/* Pickup Address */}
-          <Text style={styles.label}>Pickup Address in Hyderabad</Text>
+          <Text style={styles.label}>Pickup Address in Nellore</Text>
           <TextInput
             style={styles.input}
-            placeholder="e.g. Flat 302, Cyber Heights, Gachibowli"
+            placeholder="e.g. Near Annamayya Circle, Mini Bypass Road"
             value={pickupAddress}
             onChangeText={setPickupAddress}
           />
@@ -253,7 +253,7 @@ export const PublicSiteVisitScreen: React.FC<PublicSiteVisitScreenProps> = ({
               <View style={styles.driverDetails}>
                 <Text style={styles.driverName}>Ramesh Goud (Driver)</Text>
                 <Text style={styles.vehicleModel}>White Toyota Innova Crysta</Text>
-                <Text style={styles.vehiclePlate}>TS-08-ER-1234 • ⭐ 4.9 Rated</Text>
+                <Text style={styles.vehiclePlate}>AP-26-TH-1234 • ⭐ 4.9 Rated</Text>
               </View>
               <TouchableOpacity
                 style={styles.callBtn}

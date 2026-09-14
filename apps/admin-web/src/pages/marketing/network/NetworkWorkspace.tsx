@@ -136,36 +136,36 @@ const PositionsView: FC = () => {
 const TeamsView: FC = () => {
   const teams = [
     {
-      teamName: 'North Zone Titans',
+      teamName: 'Podalakur Highway Titans',
       leader: 'Kavitha Reddy (CGM)',
-      territory: 'Hyderabad North / Cyberabad / Medchal',
+      territory: 'Nellore Town / Podalakur Road / Mattempadu',
       totalAgents: 22,
       totalVolume: '₹7.2 Cr',
-      activeProjects: 'Green Meadows Luxury Plots',
+      activeProjects: 'ISKON City - 2',
     },
     {
-      teamName: 'South Zone Eagles',
+      teamName: 'Bombay Highway Eagles',
       leader: 'Suresh Babu (CGM)',
-      territory: 'Shamshabad / Airport Highway / Maheshwaram',
+      territory: 'Kovuru / Kodavaluru / National Highway',
       totalAgents: 24,
       totalVolume: '₹7.6 Cr',
-      activeProjects: 'Cyber Meadows Phase II',
+      activeProjects: 'Dream City',
     },
     {
-      teamName: 'Capital Central Force',
+      teamName: 'Nellore Urban Central Force',
       leader: 'Vikram Rao (GM)',
-      territory: 'Gachibowli / Financial District / Kokapet',
+      territory: 'Annamayya Circle / Mini Bypass / Magunta Layout',
       totalAgents: 10,
       totalVolume: '₹3.6 Cr',
-      activeProjects: 'All Projects',
+      activeProjects: 'ISKON Elite Township',
     },
     {
-      teamName: 'Eastern Highway Warriors',
+      teamName: 'Coastal Corridor Warriors',
       leader: 'Sunita Patel (GM)',
-      territory: 'Warangal Highway / Ghatkesar / Yadadri',
+      territory: 'Chinthareddypalem / Krishnapatnam Road',
       totalAgents: 12,
       totalVolume: '₹4.2 Cr',
-      activeProjects: 'Sunrise Enclave Plots',
+      activeProjects: 'ISKON Brundhavanam',
     },
   ];
 

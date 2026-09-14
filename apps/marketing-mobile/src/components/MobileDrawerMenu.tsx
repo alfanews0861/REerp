@@ -325,9 +325,9 @@ export const MobileDrawerMenu: React.FC<MobileDrawerMenuProps> = ({ visible, onC
               </View>
               <View style={styles.brandInfo}>
                 <Text style={[styles.companyName, { color: colors.textPrimary }]}>
-                  SREEKANTH REDDY
+                  ISKON DEVELOPERS
                 </Text>
-                <Text style={styles.companySubtitle}>REALTY • TOWNSHIPS</Text>
+                <Text style={styles.companySubtitle}>NELLORE • TOWNSHIPS</Text>
               </View>
             </View>
 
@@ -356,7 +356,7 @@ export const MobileDrawerMenu: React.FC<MobileDrawerMenuProps> = ({ visible, onC
             </View>
             <View style={styles.profileDetails}>
               <Text style={styles.profileName} numberOfLines={1}>
-                {user?.displayName || 'Active Staff Associate'}
+                {user?.displayName || user?.email?.split('@')[0] || 'Associate Partner'}
               </Text>
               <View style={styles.profileBadgeRow}>
                 <Badge

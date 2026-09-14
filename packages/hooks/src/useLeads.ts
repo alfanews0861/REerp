@@ -11,8 +11,8 @@ const REALISTIC_NAMES = [
   'Padmavathi K', 'Karthik Raja', 'Sunil Narayana', 'Shravan Reddy'
 ];
 
-const CITIES = ['Hyderabad', 'Hyderabad', 'Hyderabad', 'Bangalore', 'Vijayawada', 'Visakhapatnam', 'NRI (Dallas, USA)', 'NRI (Dubai, UAE)'];
-const VENTURE_PREFERENCES = ['Sunrise Enclave (Mokila)', 'Green Valley Phase 2 (Shadnagar)', 'Palm County (Kollur)', 'Royal Meadows (Shankarpally)'];
+const CITIES = ['Nellore', 'Nellore', 'Kavali', 'Gudur', 'Tirupati', 'Vijayawada', 'Chennai', 'Bangalore', 'NRI (Dallas, USA)', 'NRI (Dubai, UAE)'];
+const VENTURE_PREFERENCES = ['ISKON City - 2 (Podalakur Road)', 'Dream City (Nellore-Bombay Highway)', 'ISKON Brundhavanam', 'ISKON Elite Township'];
 
 // Mock data generator for leads
 const generateMockLeads = (page: number, limit: number): Lead[] => {

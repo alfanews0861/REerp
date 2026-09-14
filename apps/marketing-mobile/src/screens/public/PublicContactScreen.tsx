@@ -41,12 +41,12 @@ export const PublicContactScreen: React.FC<PublicContactScreenProps> = ({
         <View style={styles.brandBadge}>
           <ShieldCheck size={28} color="#FFFFFF" />
         </View>
-        <Text style={styles.brandTitle}>REOS Real Estate Developers</Text>
+        <Text style={styles.brandTitle}>ISKON Developers</Text>
         <Text style={styles.brandSubtitle}>
           ప్రభుత్వ ఆమోదం పొందిన ఓపెన్ ప్లాట్లు • 100% క్లియర్ టైటిల్ • స్పాట్ రిజిస్ట్రేషన్
         </Text>
         <View style={styles.reraPill}>
-          <Text style={styles.reraPillText}>RERA REG: TS/RERA/2024/HYD01</Text>
+          <Text style={styles.reraPillText}>AP RERA REG: P02260007891 • NUDA & DTCP</Text>
         </View>
       </View>
 
@@ -73,7 +73,7 @@ export const PublicContactScreen: React.FC<PublicContactScreenProps> = ({
         {/* WhatsApp Chat */}
         <TouchableOpacity
           style={[styles.channelCard, { borderColor: '#10B981' }]}
-          onPress={() => Linking.openURL('https://wa.me/919848012345?text=Hello%20REOS,%20I%20am%20interested%20in%20open%20plots')}
+          onPress={() => Linking.openURL('https://wa.me/919848012345?text=Hello%20ISKON%20Developers,%20I%20am%20interested%20in%20open%20plots%20in%20Nellore')}
         >
           <View style={[styles.channelIcon, { backgroundColor: '#ECFDF5' }]}>
             <MessageSquare size={22} color="#059669" />
@@ -89,9 +89,9 @@ export const PublicContactScreen: React.FC<PublicContactScreenProps> = ({
         <View style={styles.officeRow}>
           <MapPin size={24} color="#1E40AF" />
           <View style={styles.officeTextCol}>
-            <Text style={styles.officeHeading}>Corporate Headquarters</Text>
+            <Text style={styles.officeHeading}>Corporate Head Office</Text>
             <Text style={styles.officeAddress}>
-              Level 4, Financial District Boulevard, Beside Waverock, Nanakramguda, Gachibowli, Hyderabad - 500032
+              RKRI Towers, Annamayya Circle, Mini Byepass Road, Nellore - 524 004, AP
             </Text>
             <Text style={styles.officeHours}>Office Hours: Mon - Sun (9:00 AM to 7:30 PM)</Text>
           </View>

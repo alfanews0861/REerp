@@ -8,11 +8,11 @@ import { Input } from '../../src/components/Input';
 import { queueOfflineMutation } from '../../src/services/backgroundSync';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Site Geofence coordinates (e.g. Mokila Site Office)
+// Site Geofence coordinates (e.g. ISKON City - 2 Site Office, Podalakur Road, Nellore)
 const SITE_OFFICE = {
-  name: 'Sunrise Enclave Site Office (Mokila)',
-  latitude: 17.4375,
-  longitude: 78.1884,
+  name: 'ISKON City - 2 Site Office (Podalakur Road, Nellore)',
+  latitude: 14.4100,
+  longitude: 79.8800,
   radiusKm: 2.5,
 };
 
@@ -232,7 +232,7 @@ export default function AttendanceScreen() {
       <Card title="Work Notes" style={styles.card}>
         <Input
           label="Today's Activity / Site Summary"
-          placeholder="E.g. Scheduled 2 client visits at Mokila Phase 1..."
+          placeholder="E.g. Scheduled 2 client visits at ISKON City - 2..."
           value={workSummary}
           onChangeText={setWorkSummary}
         />

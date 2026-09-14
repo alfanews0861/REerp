@@ -112,7 +112,7 @@ describe('PlotExplorerPage & Online Plot Hold Booking Flow', () => {
       plotId: 'test-plot-1',
       plotNumber: 'P-999',
       projectId: 'proj-1',
-      projectName: 'Sunrise Enclave',
+      projectName: 'ISKON City - 2',
       customerName: 'Test Buyer',
       customerPhone: '9876543210',
       tokenAmount: 50000,

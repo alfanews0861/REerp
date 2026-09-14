@@ -23,10 +23,10 @@ describe('Project Validators', () => {
       status: 'PLANNING',
       location: {
         country: 'India',
-        state: 'Telangana',
-        district: 'Hyderabad',
-        mandal: 'Serilingampally',
-        village: 'Gachibowli',
+        state: 'Andhra Pradesh',
+        district: 'Nellore',
+        mandal: 'Nellore Rural',
+        village: 'Podalakur Road',
         surveyNumbers: ['123', '456']
       },
       members: {

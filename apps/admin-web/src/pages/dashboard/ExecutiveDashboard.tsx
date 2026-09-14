@@ -323,7 +323,7 @@ const ExecutiveDashboard: React.FC = () => {
                 title="Site Visits Today"
                 value={3}
                 unit="Tours"
-                subtitle="Mokila & Shadnagar"
+                subtitle="Podalakur & Kovuru Corridors"
                 icon={<DirectionsWalkIcon />}
                 gradient="linear-gradient(135deg, #16a34a 0%, #15803d 100%)"
                 onClick={() => navigate('/crm/site-visits')}
@@ -358,8 +358,8 @@ const ExecutiveDashboard: React.FC = () => {
                 </Typography>
                 <Stack spacing={2} sx={{ mt: 2 }}>
                   {[
-                    { client: 'Rajesh Goud', phone: '+91 98480 12345', project: 'Sunrise Enclave (Mokila)', time: '10:30 AM', cab: 'TS 09 UB 1001' },
-                    { client: 'Venkata Rao', phone: '+91 99887 66554', project: 'Green Meadows (Shadnagar)', time: '02:00 PM', cab: 'TS 08 EX 4050' },
+                    { client: 'Rajesh Goud', phone: '+91 98480 12345', project: 'ISKON City - 2 (Podalakur Road)', time: '10:30 AM', cab: 'AP 26 UB 1001' },
+                    { client: 'Venkata Rao', phone: '+91 99887 66554', project: 'Dream City (Kovuru Highway)', time: '02:00 PM', cab: 'AP 26 EX 4050' },
                   ].map((v, i) => (
                     <Box key={i} sx={{ p: 2, bgcolor: '#f8fafc', borderRadius: 2, border: '1px solid #e2e8f0' }}>
                       <Stack direction="row" justifyContent="space-between" alignItems="center">

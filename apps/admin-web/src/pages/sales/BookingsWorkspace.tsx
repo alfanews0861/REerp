@@ -57,7 +57,7 @@ export const SEED_BOOKINGS: BookingItem[] = [
     id: 'bkg-1',
     bookingNumber: 'BKG-2026-001',
     projectId: 'proj-1',
-    projectName: 'Sunrise Enclave (Mokila)',
+    projectName: 'ISKON City - 2',
     plotId: 'plot-12',
     plotNumber: 'P-12',
     customerId: 'cust-1',
@@ -77,7 +77,7 @@ export const SEED_BOOKINGS: BookingItem[] = [
     id: 'bkg-2',
     bookingNumber: 'BKG-2026-002',
     projectId: 'proj-1',
-    projectName: 'Sunrise Enclave (Mokila)',
+    projectName: 'ISKON City - 2',
     plotId: 'plot-45',
     plotNumber: 'P-45',
     customerId: 'cust-2',
@@ -96,7 +96,7 @@ export const SEED_BOOKINGS: BookingItem[] = [
     id: 'bkg-3',
     bookingNumber: 'BKG-2026-003',
     projectId: 'proj-2',
-    projectName: 'Green Valley Phase 2 (Shadnagar)',
+    projectName: 'Dream City',
     plotId: 'plot-78',
     plotNumber: 'P-78',
     customerId: 'cust-3',
@@ -116,9 +116,9 @@ export const SEED_BOOKINGS: BookingItem[] = [
     id: 'bkg-4',
     bookingNumber: 'BKG-2026-004',
     projectId: 'proj-3',
-    projectName: 'Palm County (Kollur)',
+    projectName: 'ISKON Brundhavanam',
     plotId: 'plot-pc15',
-    plotNumber: 'PC-15',
+    plotNumber: 'IB-15',
     customerId: 'cust-4',
     customerName: 'Kalyan Chakravarthy',
     customerPhone: '+91 98480 33441',
@@ -136,7 +136,7 @@ export const SEED_BOOKINGS: BookingItem[] = [
     id: 'bkg-5',
     bookingNumber: 'BKG-2026-005',
     projectId: 'proj-1',
-    projectName: 'Sunrise Enclave (Mokila)',
+    projectName: 'ISKON City - 2',
     plotId: 'plot-06',
     plotNumber: 'P-06',
     customerId: 'cust-5',
@@ -156,9 +156,9 @@ export const SEED_BOOKINGS: BookingItem[] = [
     id: 'bkg-6',
     bookingNumber: 'BKG-2026-006',
     projectId: 'proj-4',
-    projectName: 'Royal Meadows (Shankarpally)',
+    projectName: 'ISKON Elite Township',
     plotId: 'plot-rm22',
-    plotNumber: 'RM-22',
+    plotNumber: 'ET-22',
     customerId: 'cust-6',
     customerName: 'Satyanarayana Murthy',
     customerPhone: '+91 98480 55663',
@@ -175,9 +175,9 @@ export const SEED_BOOKINGS: BookingItem[] = [
     id: 'bkg-7',
     bookingNumber: 'BKG-2026-007',
     projectId: 'proj-2',
-    projectName: 'Green Valley Phase 2 (Shadnagar)',
+    projectName: 'Dream City',
     plotId: 'plot-gv33',
-    plotNumber: 'GV-33',
+    plotNumber: 'DC-33',
     customerId: 'cust-7',
     customerName: 'Venkat Raman',
     customerPhone: '+91 98480 66774',
@@ -194,7 +194,7 @@ export const SEED_BOOKINGS: BookingItem[] = [
     id: 'bkg-8',
     bookingNumber: 'BKG-2026-008',
     projectId: 'proj-1',
-    projectName: 'Sunrise Enclave (Mokila)',
+    projectName: 'ISKON City - 2',
     plotId: 'plot-88',
     plotNumber: 'P-88',
     customerId: 'cust-8',
@@ -213,9 +213,9 @@ export const SEED_BOOKINGS: BookingItem[] = [
     id: 'bkg-9',
     bookingNumber: 'BKG-2026-009',
     projectId: 'proj-3',
-    projectName: 'Palm County (Kollur)',
+    projectName: 'ISKON Brundhavanam',
     plotId: 'plot-pc40',
-    plotNumber: 'PC-40',
+    plotNumber: 'IB-40',
     customerId: 'cust-9',
     customerName: 'Lakshmi Prasanna',
     customerPhone: '+91 98480 88996',
@@ -233,9 +233,9 @@ export const SEED_BOOKINGS: BookingItem[] = [
     id: 'bkg-10',
     bookingNumber: 'BKG-2026-010',
     projectId: 'proj-3',
-    projectName: 'Palm County (Kollur)',
+    projectName: 'ISKON Brundhavanam',
     plotId: 'plot-pc01',
-    plotNumber: 'PC-01 (Corner Villa Plot)',
+    plotNumber: 'IB-01 (Corner Villa Plot)',
     customerId: 'cust-10',
     customerName: 'Dr. Ashok Varma (NRI)',
     customerPhone: '+1 469 555 0192',
@@ -252,7 +252,7 @@ export const SEED_BOOKINGS: BookingItem[] = [
     id: 'bkg-11',
     bookingNumber: 'BKG-2026-011',
     projectId: 'proj-1',
-    projectName: 'Sunrise Enclave (Mokila)',
+    projectName: 'ISKON City - 2',
     plotId: 'plot-15',
     plotNumber: 'P-15',
     customerId: 'cust-11',
@@ -272,9 +272,9 @@ export const SEED_BOOKINGS: BookingItem[] = [
     id: 'bkg-12',
     bookingNumber: 'BKG-2026-012',
     projectId: 'proj-4',
-    projectName: 'Royal Meadows (Shankarpally)',
+    projectName: 'ISKON Elite Township',
     plotId: 'plot-rm08',
-    plotNumber: 'RM-08',
+    plotNumber: 'ET-08',
     customerId: 'cust-12',
     customerName: 'Anitha Chowdary',
     customerPhone: '+91 98480 22339',
@@ -304,7 +304,7 @@ export const BookingsWorkspace: React.FC = () => {
 
   // Form states for new booking
   const [newBookingData, setNewBookingData] = useState({
-    projectName: 'Sunrise Enclave',
+    projectName: 'ISKON City - 2',
     plotNumber: '',
     customerName: '',
     customerPhone: '',
@@ -421,7 +421,7 @@ export const BookingsWorkspace: React.FC = () => {
     setBookings([created, ...bookings]);
     setCreateDialogOpen(false);
     setNewBookingData({
-      projectName: 'Sunrise Enclave',
+      projectName: 'ISKON City - 2',
       plotNumber: '',
       customerName: '',
       customerPhone: '',
@@ -693,9 +693,10 @@ export const BookingsWorkspace: React.FC = () => {
               onChange={e => setNewBookingData({ ...newBookingData, projectName: e.target.value })}
               fullWidth
             >
-              <MenuItem value="Sunrise Enclave">Sunrise Enclave</MenuItem>
-              <MenuItem value="Green Valley Phase 2">Green Valley Phase 2</MenuItem>
-              <MenuItem value="Lakeview Heights">Lakeview Heights</MenuItem>
+              <MenuItem value="ISKON City - 2">ISKON City - 2</MenuItem>
+              <MenuItem value="Dream City">Dream City</MenuItem>
+              <MenuItem value="ISKON Brundhavanam">ISKON Brundhavanam</MenuItem>
+              <MenuItem value="ISKON Elite Township">ISKON Elite Township</MenuItem>
             </TextField>
             <TextField
               label="Plot Number (e.g. P-15)"

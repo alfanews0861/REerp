@@ -57,7 +57,7 @@ export const OfficialReceiptModal: React.FC<OfficialReceiptModalProps> = ({
       `Receipt No: ${receipt.receiptNumber}\n` +
       `Payment Mode: ${receipt.paymentMethod}\n` +
       `Ref: ${receipt.transactionRef || 'N/A'}\n\n` +
-      `Thank you for choosing Sri City Developers & Infra Pvt Ltd.`
+      `Thank you for choosing ISKON Developers & Infra Pvt Ltd.`
     );
     window.open(`https://wa.me/?text=${text}`, '_blank');
   };
@@ -142,20 +142,20 @@ export const OfficialReceiptModal: React.FC<OfficialReceiptModalProps> = ({
                 </Box>
                 <Box>
                   <Typography variant="h6" fontWeight={800} color="#0f172a">
-                    SRI CITY DEVELOPERS & INFRA PVT. LTD.
+                    ISKON DEVELOPERS & INFRA PVT. LTD.
                   </Typography>
                   <Typography variant="caption" color="text.secondary" fontWeight={600} letterSpacing={0.5}>
-                    HMDA &bull; DTCP &bull; RERA APPROVED PREMIUM TOWNSHIPS
+                    NUDA &bull; DTCP &bull; AP RERA APPROVED PREMIUM TOWNSHIPS
                   </Typography>
                 </Box>
               </Stack>
 
               <Box sx={{ textAlign: { xs: 'left', sm: 'right' } }}>
                 <Typography variant="caption" display="block" color="text.secondary">
-                  <strong>CIN:</strong> U70102TG2020PTC145678 | <strong>GSTIN:</strong> 36AABCS1429M1ZX
+                  <strong>CIN:</strong> U70102AP2020PTC145678 | <strong>GSTIN:</strong> 37AABCI1429M1ZX
                 </Typography>
                 <Typography variant="caption" display="block" color="text.secondary">
-                  Financial District, Hyderabad - 500032 | <strong>RERA:</strong> P02400007891
+                  RKRI Towers, Annamayya Circle, Mini Byepass Road, Nellore - 524 004, AP | <strong>RERA:</strong> AP RERA Approved
                 </Typography>
               </Box>
             </Box>
@@ -323,7 +323,7 @@ export const OfficialReceiptModal: React.FC<OfficialReceiptModalProps> = ({
                     fontWeight: 800,
                   }}
                 >
-                  SRI CITY<br />
+                  ISKON<br />
                   ★ SEAL ★<br />
                   ACCOUNTS
                 </Box>

@@ -297,7 +297,7 @@ export function generateIdCardHtml(user: UserProfile | any): string {
 </head>
 <body>
   <div class="print-header">
-    <h1>SRI CITY DEVELOPERS &amp; INFRA PVT. LTD.</h1>
+    <h1>ISKON DEVELOPERS &amp; INFRA PVT. LTD.</h1>
     <p>Official Enterprise Associate Identification Card &bull; Verification Identifier: ${referralCode}</p>
   </div>
 
@@ -307,7 +307,7 @@ export function generateIdCardHtml(user: UserProfile | any): string {
       <div class="card-label">Front Side</div>
       <div class="id-card">
         <div class="card-front-header">
-          <div class="company-name">SRI CITY INFRA</div>
+          <div class="company-name">ISKON DEVELOPERS</div>
           <div class="company-sub">Townships &bull; Ventures &bull; Real Estate</div>
         </div>
 
@@ -335,7 +335,7 @@ export function generateIdCardHtml(user: UserProfile | any): string {
             </div>
             <div class="meta-row">
               <span class="meta-key">Branch Hub:</span>
-              <span class="meta-val">Hyderabad HQ</span>
+              <span class="meta-val">${user?.kycDetails?.branch || 'Nellore Main Hub'}</span>
             </div>
           </div>
         </div>
@@ -371,17 +371,17 @@ export function generateIdCardHtml(user: UserProfile | any): string {
           <div class="instructions-box">
             <strong>Terms &amp; Emergency Instructions:</strong>
             <ol style="padding-left: 14px; margin-top: 3px;">
-              <li>This card remains the property of Sri City Developers &amp; Infra.</li>
+              <li>This card remains the property of ISKON Developers &amp; Infra.</li>
               <li>Must be produced upon demand during site visits and client meetings.</li>
-              <li>If found, please return to Corporate Office: Financial District, Hyderabad.</li>
+              <li>If found, please return to Corporate Office: RKRI Towers, Nellore.</li>
               <li>Emergency Helpline: <strong>${emergencyPhone}</strong></li>
             </ol>
           </div>
         </div>
 
         <div class="card-back-footer">
-          Corporate Office: Financial District, Nanakramguda, Hyderabad - 500032<br/>
-          CIN: U70102TG2020PTC145678 &bull; Helpline: +91 40 4859 9000
+          Corporate Office: RKRI Towers, Annamayya Circle, Mini Byepass Road, Nellore - 524 004, AP<br/>
+          CIN: U70102AP2020PTC145678 &bull; Helpline: +91 98480 12345
         </div>
       </div>
     </div>

@@ -23,8 +23,8 @@ const REALISTIC_NAMES = [
   'Padmavathi K', 'Karthik Raja', 'Sunil Narayana', 'Shravan Reddy'
 ];
 
-const CITIES = ['Hyderabad', 'Hyderabad', 'Bangalore', 'Vijayawada', 'Visakhapatnam', 'NRI (Dallas, USA)', 'NRI (Dubai, UAE)'];
-const VENTURES = ['Sunrise Enclave (Mokila)', 'Green Valley Phase 2 (Shadnagar)', 'Palm County (Kollur)', 'Royal Meadows (Shankarpally)'];
+const CITIES = ['Nellore', 'Nellore', 'Tirupati', 'Chennai', 'Vijayawada', 'NRI (Dallas, USA)', 'NRI (Dubai, UAE)'];
+const VENTURES = ['ISKON City - 2', 'Dream City', 'ISKON Brundhavanam', 'ISKON Elite Township'];
 const SOURCES = ['PUBLIC_WEBSITE', 'FACEBOOK_ADS', 'INSTAGRAM_ADS', 'GOOGLE_SEARCH', '99ACRES', 'MAGICBRICKS', 'WALK_IN', 'REFERRAL'];
 const STATUSES = ['NEW', 'CONTACTED', 'QUALIFIED', 'SITE_VISIT_SCHEDULED', 'SITE_VISIT_COMPLETED', 'NEGOTIATING', 'BOOKED'];
 

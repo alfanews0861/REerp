@@ -35,12 +35,12 @@ describe('PlotLayoutMapView Component in Admin Portal', () => {
     render(
       <PlotLayoutMapView
         plots={MOCK_PLOTS}
-        projectName="Sunrise Enclave"
+        projectName="ISKON City - 2"
         onSelectPlot={vi.fn()}
       />
     );
 
-    expect(screen.getByText(/Layout Map View: Sunrise Enclave/i)).toBeInTheDocument();
+    expect(screen.getByText(/Layout Map View: ISKON City - 2/i)).toBeInTheDocument();
     expect(screen.getByText(/40-FT MAIN ACCESS ROAD/i)).toBeInTheDocument();
     expect(screen.getByText(/CENTRAL LANDSCAPED PARK/i)).toBeInTheDocument();
   });
@@ -50,7 +50,7 @@ describe('PlotLayoutMapView Component in Admin Portal', () => {
     render(
       <PlotLayoutMapView
         plots={MOCK_PLOTS}
-        projectName="Sunrise Enclave"
+        projectName="ISKON City - 2"
         onSelectPlot={selectMock}
       />
     );

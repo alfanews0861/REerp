@@ -149,7 +149,7 @@ export const AddExpenseDialog: React.FC<AddExpenseDialogProps> = ({
 
             <TextField
               label="Claim / Bill Title *"
-              placeholder="e.g. Fuel for Innova (Mokila Site Visit) or Customer Lunch"
+              placeholder="e.g. Fuel for Innova (ISKON City - 2 Site Visit) or Customer Lunch"
               fullWidth
               size="small"
               value={title}
@@ -232,9 +232,9 @@ export const AddExpenseDialog: React.FC<AddExpenseDialogProps> = ({
               }
               placeholder={
                 category === 'VEHICLE_FUEL'
-                  ? 'e.g. TS 09 UB 1001 (Innova Crysta)'
+                  ? 'e.g. AP 26 UB 1001 (Innova Crysta)'
                   : category === 'SITE_VISIT'
-                  ? 'e.g. Sunrise Enclave Site Visit'
+                  ? 'e.g. ISKON City - 2 Site Visit'
                   : category === 'MARKETING_CAMPAIGN'
                   ? 'e.g. Meta Ads August Drive'
                   : 'Optional reference notes'

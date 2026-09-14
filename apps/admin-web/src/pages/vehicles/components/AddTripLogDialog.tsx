@@ -43,7 +43,7 @@ export const AddTripLogDialog: React.FC<AddTripLogDialogProps> = ({
   const [driverId, setDriverId] = useState(drivers[0]?.id || '');
   const [tripType, setTripType] = useState<OdometerLog['tripType']>('SITE_VISIT');
   const [customerName, setCustomerName] = useState('');
-  const [siteVisitProjectName, setSiteVisitProjectName] = useState('Sunrise Enclave (Mokila)');
+  const [siteVisitProjectName, setSiteVisitProjectName] = useState('ISKON City - 2 (Podalakur Road)');
   const [startOdometerKm, setStartOdometerKm] = useState<number | ''>(
     vehicles[0]?.currentOdometerKm || 45000
   );
@@ -192,7 +192,7 @@ export const AddTripLogDialog: React.FC<AddTripLogDialogProps> = ({
               <Grid item xs={12} sm={6}>
                 <TextField
                   label="Destination Venture Project *"
-                  placeholder="e.g. Sunrise Enclave (Mokila)"
+                  placeholder="e.g. ISKON City - 2 (Podalakur Road)"
                   fullWidth
                   size="small"
                   value={siteVisitProjectName}
@@ -230,7 +230,7 @@ export const AddTripLogDialog: React.FC<AddTripLogDialogProps> = ({
 
             <TextField
               label="Pickup Location & Trip Notes"
-              placeholder="e.g. Pickup at Gachibowli Circle at 10:30 AM, lunch stop at Shankarpally"
+              placeholder="e.g. Pickup at Annamayya Circle at 10:30 AM, lunch stop near Podalakur Road"
               multiline
               rows={3}
               fullWidth

@@ -158,7 +158,7 @@ export const LeadTimelineView: React.FC<LeadTimelineViewProps> = ({ leads }) => 
                           )}
                         </Box>
                         <Typography variant="caption" color="text.secondary">
-                          Captured via {lead.source || 'Digital Ads'} • {lead.city || 'Hyderabad'}
+                          Captured via {lead.source || 'Digital Ads'} • {lead.city || 'Nellore'}
                         </Typography>
                       </Box>
 

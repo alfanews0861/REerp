@@ -168,15 +168,15 @@ describe('Marketing Mobile - RBAC (Role-Based Access Control) Drawer Guard Logic
 
 describe('Marketing Mobile - Company Branding & Clean Header Specifications', () => {
   const companyBranding = {
-    name: 'SREEKANTH REDDY REALTY',
-    tagline: 'DTCP & HMDA APPROVED TOWNSHIPS',
-    supportNumber: '+91 98765 43210',
+    name: 'ISKON DEVELOPERS',
+    tagline: 'NUDA & DTCP APPROVED TOWNSHIPS',
+    supportNumber: '+91 98480 12345',
   };
 
   it('verifies corporate entity name and approval taglines', () => {
-    expect(companyBranding.name).toBe('SREEKANTH REDDY REALTY');
-    expect(companyBranding.tagline).toContain('DTCP & HMDA');
-    expect(companyBranding.supportNumber).toBe('+91 98765 43210');
+    expect(companyBranding.name).toBe('ISKON DEVELOPERS');
+    expect(companyBranding.tagline).toContain('NUDA & DTCP');
+    expect(companyBranding.supportNumber).toBe('+91 98480 12345');
   });
 
   it('formats staff roles correctly for drawer and header badges', () => {

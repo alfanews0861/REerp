@@ -32,7 +32,7 @@ export const AboutPage: FC = () => {
             Pioneering Transparent Real Estate & Gated Community Excellence
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ fontSize: '1.1rem', lineHeight: 1.8 }}>
-            Sreekanth Reddy Realty is a premier land development enterprise headquartered in Hyderabad, dedicated to creating RERA, HMDA, and DTCP approved gated layouts that deliver unmatched lifestyle infrastructure and superior investment returns.
+            ISKON Developers is a premier land development enterprise headquartered at RKRI Towers, Nellore, dedicated to creating AP RERA, NUDA, and DTCP approved gated layouts that deliver unmatched lifestyle infrastructure and superior investment returns.
           </Typography>
         </Box>
 
@@ -60,7 +60,7 @@ export const AboutPage: FC = () => {
                   Prime Locations
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Direct corridor connectivity to Outer Ring Road, RRR, Tech Parks, and airport corridors.
+                  Direct corridor connectivity to Podalakur Road, Bombay Highway, Mini Bypass, and NH-16.
                 </Typography>
               </CardContent>
             </Card>
@@ -106,7 +106,7 @@ export const AboutPage: FC = () => {
                 Over 15 Years of Enriching Lives Through Land Ownership
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ mb: 2, lineHeight: 1.8 }}>
-                Founded with a vision to democratize gated community land ownership with total transparency, Sreekanth Reddy Realty has transformed over 550 acres of agricultural land into thriving, master-planned residential townships across Telangana and Andhra Pradesh.
+                Founded with a vision to democratize gated community land ownership with total transparency, ISKON Developers has transformed over 550 acres of agricultural land into thriving, master-planned residential townships across Nellore and Andhra Pradesh.
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ mb: 3, lineHeight: 1.8 }}>
                 Today, more than 4,500 families have secured their financial future and built their dream homes in our ventures.

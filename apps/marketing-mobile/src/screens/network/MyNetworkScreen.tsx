@@ -167,7 +167,7 @@ export const MyNetworkScreen: React.FC = () => {
           cadre: data.cadre,
           phone: data.phoneNumber || data.phone,
           email: data.email,
-          branch: data.branch || 'Hyderabad',
+          branch: data.branch || 'Nellore',
         });
       });
 
@@ -210,7 +210,7 @@ export const MyNetworkScreen: React.FC = () => {
         <View style={styles.profileHeader}>
           <View>
             <Text style={[styles.profileName, { color: colors.textPrimary }]}>{user?.displayName || 'Active Agent'}</Text>
-            <Text style={[styles.email, { color: colors.textSecondary }]}>{user?.email || 'agent@reerp.com'}</Text>
+            <Text style={[styles.email, { color: colors.textSecondary }]}>{user?.email || 'agent@iskondevelopers.com'}</Text>
           </View>
           <Badge
             label={(user?.cadre || user?.role || 'Sales Executive').replace(/_/g, ' ').toUpperCase()}
@@ -242,7 +242,7 @@ export const MyNetworkScreen: React.FC = () => {
 
         <View style={[styles.divider, { backgroundColor: colors.border }]} />
         <Text style={[styles.label, { color: colors.textSecondary }]}>
-          Assigned Branch: <Text style={[styles.value, { color: colors.textPrimary }]}>{user?.branch || 'Hyderabad Main Office'}</Text>
+          Assigned Branch: <Text style={[styles.value, { color: colors.textPrimary }]}>{user?.branch || 'Nellore Main Hub'}</Text>
         </Text>
         <Text style={[styles.label, { color: colors.textSecondary }]}>
           Team Members / Recruits: <Text style={[styles.value, { color: colors.textPrimary }]}>{teamMembers.length} Active</Text>

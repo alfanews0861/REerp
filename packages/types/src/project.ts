@@ -57,7 +57,7 @@ export interface ProjectMedia {
   masterPlanPdf?: string;
 }
 
-export type ApprovalAuthority = 'DTCP' | 'HMDA' | 'RERA' | 'GHMC' | 'YTDA' | 'GRAM_PANCHAYAT' | 'OTHER';
+export type ApprovalAuthority = 'NUDA' | 'DTCP' | 'HMDA' | 'RERA' | 'GHMC' | 'YTDA' | 'GRAM_PANCHAYAT' | 'OTHER';
 
 export interface Project {
   id: string;

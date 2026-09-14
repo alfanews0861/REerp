@@ -44,7 +44,7 @@ export const DEMO_REFERRAL_DIRECTORY: Record<string, Omit<ReferralLookupResult, 
     sponsorCadre: 'cgm',
     sponsorRole: 'branch_manager',
     sponsorPhone: '+91 98480 12345',
-    sponsorBranch: 'Hyderabad Main Hub',
+    sponsorBranch: 'Nellore Main Hub',
   },
   'REF-GM-102': {
     sponsorUid: 'usr-gm-102',
@@ -52,7 +52,7 @@ export const DEMO_REFERRAL_DIRECTORY: Record<string, Omit<ReferralLookupResult, 
     sponsorCadre: 'gm',
     sponsorRole: 'branch_manager',
     sponsorPhone: '+91 98480 34567',
-    sponsorBranch: 'Madhapur Branch',
+    sponsorBranch: 'Mini Bypass Branch',
   },
   'REF-SM-103': {
     sponsorUid: 'usr-sm-103',
@@ -60,7 +60,7 @@ export const DEMO_REFERRAL_DIRECTORY: Record<string, Omit<ReferralLookupResult, 
     sponsorCadre: 'sales_manager',
     sponsorRole: 'sales_manager',
     sponsorPhone: '+91 98480 56789',
-    sponsorBranch: 'Gachibowli Branch',
+    sponsorBranch: 'Podalakur Road Branch',
   },
   'REF-TL-104': {
     sponsorUid: 'usr-tl-104',
@@ -118,19 +118,19 @@ export function subscribeToAuthChanges(callback: (user: UserProfile | null) => v
         // Check demo credentials mapping if still unassigned
         if (!role || (role as string) === 'client') {
           const emailLower = (firebaseUser.email || '').toLowerCase();
-          if (emailLower === 'admin@reerp.com') {
+          if (emailLower === 'admin@iskondevelopers.com' || emailLower === 'admin@reerp.com') {
             role = 'super_admin';
             cadre = 'director';
             isProfileCompleted = true;
-          } else if (emailLower === 'manager@reerp.com') {
+          } else if (emailLower === 'manager@iskondevelopers.com' || emailLower === 'manager@reerp.com') {
             role = 'branch_manager';
             cadre = 'gm';
             isProfileCompleted = true;
-          } else if (emailLower === 'telecaller@reerp.com') {
+          } else if (emailLower === 'telecaller@iskondevelopers.com' || emailLower === 'telecaller@reerp.com') {
             role = 'telecaller';
             cadre = 'office_staff';
             isProfileCompleted = true;
-          } else if (emailLower === 'agent@reerp.com') {
+          } else if (emailLower === 'agent@iskondevelopers.com' || emailLower === 'agent@reerp.com') {
             role = 'sales_executive';
             cadre = 'sales_executive';
             isProfileCompleted = true;
@@ -305,8 +305,8 @@ export async function completeUserProfile(
     ? {
         panNumber: profileData.kycDetails.panNumber || null,
         aadharNumber: profileData.kycDetails.aadharNumber || null,
-        city: profileData.kycDetails.city || 'Hyderabad',
-        branch: profileData.kycDetails.branch || 'Hyderabad Main Hub',
+        city: profileData.kycDetails.city || 'Nellore',
+        branch: profileData.kycDetails.branch || 'Nellore Main Hub',
         bankAccount: profileData.kycDetails.bankAccount || null,
         ifscCode: profileData.kycDetails.ifscCode || null,
       }

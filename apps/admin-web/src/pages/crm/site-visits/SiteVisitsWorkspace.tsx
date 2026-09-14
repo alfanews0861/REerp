@@ -84,10 +84,10 @@ export const SiteVisitsWorkspace: React.FC = () => {
           </Typography>
           <Stack spacing={1}>
             <Chip label="All Ventures" color="primary" variant="filled" size="small" />
-            <Chip label="Sunrise Enclave (Mokila)" variant="outlined" size="small" />
-            <Chip label="Green Valley (Shadnagar)" variant="outlined" size="small" />
-            <Chip label="Palm County (Kollur)" variant="outlined" size="small" />
-            <Chip label="Royal Meadows (Shankarpally)" variant="outlined" size="small" />
+            <Chip label="ISKON City - 2 (Podalakur Road)" variant="outlined" size="small" />
+            <Chip label="Dream City (Kovuru Highway)" variant="outlined" size="small" />
+            <Chip label="ISKON Brundhavanam (Chinthareddypalem)" variant="outlined" size="small" />
+            <Chip label="ISKON Elite Township (Annamayya Circle Extn)" variant="outlined" size="small" />
           </Stack>
 
           <Divider sx={{ my: 2.5 }} />

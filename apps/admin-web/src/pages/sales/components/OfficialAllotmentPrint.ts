@@ -160,14 +160,14 @@ export function generateAllotmentLetterHtml(booking: BookingItem): string {
     <div class="header">
       <div>
         <div class="company-title">
-          <h1>SRI CITY DEVELOPERS &amp; INFRA PVT. LTD.</h1>
-          <p>Real Estate &bull; HMDA / DTCP Approved Gated Townships</p>
+          <h1>ISKON DEVELOPERS &amp; INFRA PVT. LTD.</h1>
+          <p>Real Estate &bull; NUDA / DTCP Approved Gated Townships</p>
         </div>
       </div>
       <div class="company-meta">
-        <div><strong>Corporate Office:</strong> Financial District, Hyderabad - 500032</div>
-        <div><strong>CIN:</strong> U70102TG2020PTC145678 | <strong>GST:</strong> 36AABCS1429M1ZX</div>
-        <div><strong>RERA Registration:</strong> P02400007891</div>
+        <div><strong>Corporate Office:</strong> RKRI Towers, Annamayya Circle, Mini Byepass Road, Nellore - 524 004, AP</div>
+        <div><strong>CIN:</strong> U70102AP2020PTC145678 | <strong>GST:</strong> 37AABCI1429M1ZX</div>
+        <div><strong>RERA Registration:</strong> AP RERA Approved</div>
       </div>
     </div>
 
@@ -231,7 +231,7 @@ export function generateAllotmentLetterHtml(booking: BookingItem): string {
         <li>This provisional allotment is subject to execution of the standard Agreement of Sale within 15 days of this letter.</li>
         <li>The balance consideration must be paid as per the agreed payment schedule or bank loan disbursement.</li>
         <li>Registration of the sale deed will be executed upon 100% receipt and clearance of the full sale value and applicable statutory charges.</li>
-        <li>All infrastructure developments, electricity lines, underground drainage, and water supply will be delivered in accordance with HMDA/DTCP sanctioned plans.</li>
+        <li>All infrastructure developments, electricity lines, underground drainage, and water supply will be delivered in accordance with NUDA/DTCP sanctioned plans.</li>
       </ol>
     </div>
 
@@ -244,12 +244,12 @@ export function generateAllotmentLetterHtml(booking: BookingItem): string {
 
       <div class="sig-box">
         <div class="seal-box">
-          SRI CITY<br/>
+          ISKON<br/>
           ★ SEAL ★<br/>
           ALLOTMENT
         </div>
         <strong>Authorized Signatory</strong><br/>
-        <span style="font-size: 10px; color: #64748b;">Sri City Developers &amp; Infra Pvt Ltd</span>
+        <span style="font-size: 10px; color: #64748b;">ISKON Developers &amp; Infra Pvt Ltd</span>
       </div>
     </div>
   </div>

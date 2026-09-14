@@ -66,23 +66,23 @@ export const LeadsPreviewPanel: React.FC<LeadsPreviewPanelProps> = ({ leads }) =
 
       setAiPitch({
         persona: isWestern
-          ? 'Tech Executive / NRI Investor seeking high capital appreciation in Western Corridor'
-          : 'Value Plot Investor seeking long-term growth near industrial highway corridor',
-        recommendedProject: isWestern ? 'Sunrise Enclave - Mokila' : 'Greenfield Meadows - Shadnagar',
+          ? 'HNI / NRI Investor seeking high capital appreciation in Nellore Urban Growth Corridors'
+          : 'Value Plot Buyer seeking long-term growth near Highway Corridors',
+        recommendedProject: isWestern ? 'ISKON City - 2 (Podalakur Road)' : 'Dream City (Kovuru Highway)',
         keyPoints: isWestern
           ? [
-              'Transit: 20 Mins drive to Financial District & Neopolis Kokapet via Shankarpally Highway',
-              'Infrastructure: 40ft & 33ft BT roads, underground cabling, drainage & STP',
-              'Approvals: 100% HMDA & RERA Approved with spot registration and bank loan approvals',
+              'Transit: 15 Mins drive to Nellore Town / Mini Bypass / Annamayya Circle via Podalakur 4-lane road',
+              'Infrastructure: 170ft Entrance Road, 40ft & 33ft BT roads, underground drainage & grand arch',
+              'Approvals: 100% NUDA & AP RERA Approved with spot registration and bank loan facility',
               'Action Hook: Offer 48-Hour Price Freeze Hold or free AC cab doorstep pickup',
             ]
           : [
-              'Strategic Hub: 15 Mins to proposed 19,000-acre Hyderabad Pharma City',
-              'Attractive Entry: Starting from ₹13,500/sq.yd with high appreciation potential',
-              'Approvals: DTCP & RERA Approved gated township with overhead water tank',
+              'Strategic Hub: Nellore-Bombay Highway corridor near Kovuru with massive growth potential',
+              'Attractive Entry: Starting with flexible plot sizes and clear title deeds',
+              'Approvals: 100% DTCP AP & AP RERA Approved gated plotted township',
               'Action Hook: Schedule complimentary weekend site visit in sanitized AC cab',
             ],
-        script: `Hello ${lead?.fullName || 'Customer'}, this is calling from Sreekanth Reddy Realty. Based on your enquiry, our flagship project ${isWestern ? 'Sunrise Enclave in Mokila' : 'Greenfield Meadows in Shadnagar'} matches your preferred budget and facing. All plots come with 100% clear legal title and statutory HMDA/DTCP approvals. We can arrange a complimentary AC cab pickup for your family this weekend for a physical site inspection. Would morning 10 AM suit you?`,
+        script: `Hello ${lead?.fullName || 'Customer'}, this is calling from ISKON Developers. Based on your enquiry, our flagship project ${isWestern ? 'ISKON City - 2 on Podalakur Road' : 'Dream City on Kovuru Highway'} matches your preferred budget and facing. All plots come with 100% clear legal title and statutory NUDA/DTCP approvals. We can arrange a complimentary AC cab pickup for your family this weekend for a physical site inspection. Would morning 10 AM suit you?`,
       });
       setGeneratingPitch(false);
     }, 300);
@@ -131,7 +131,7 @@ export const LeadsPreviewPanel: React.FC<LeadsPreviewPanelProps> = ({ leads }) =
       setNotes([
         {
           id: 'note-init-1',
-          text: `Inquired regarding 200 sq.yd east-facing villa plot in Mokila. Budget ~₹50L.`,
+          text: `Inquired regarding 200 sq.yd east-facing villa plot in ISKON City - 2 (Podalakur Road). Budget ~₹50L.`,
           author: 'Telecaller Team',
           createdAt: lead.createdAt || new Date().toISOString(),
         },
@@ -217,7 +217,7 @@ export const LeadsPreviewPanel: React.FC<LeadsPreviewPanelProps> = ({ leads }) =
               </Box>
               <Box>
                 <Typography variant="caption" color="text.secondary">City</Typography>
-                <Typography variant="body2">{lead.city || 'Hyderabad'}</Typography>
+                <Typography variant="body2">{lead.city || 'Nellore'}</Typography>
               </Box>
               <Box>
                 <Typography variant="caption" color="text.secondary">Budget Range</Typography>

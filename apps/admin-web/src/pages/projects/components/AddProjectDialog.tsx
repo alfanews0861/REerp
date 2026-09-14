@@ -47,7 +47,7 @@ export const AddProjectDialog: React.FC<AddProjectDialogProps> = ({
   const [status, setStatus] = useState<ProjectStatus>('ACTIVE');
   
   // Approvals & Legal
-  const [approvalAuthority, setApprovalAuthority] = useState<ApprovalAuthority>('HMDA');
+  const [approvalAuthority, setApprovalAuthority] = useState<ApprovalAuthority>('NUDA');
   const [approvalNumber, setApprovalNumber] = useState('');
   const [reraId, setReraId] = useState('');
   const [surveyNumbers, setSurveyNumbers] = useState('');
@@ -55,8 +55,8 @@ export const AddProjectDialog: React.FC<AddProjectDialogProps> = ({
   // Location
   const [village, setVillage] = useState('');
   const [mandal, setMandal] = useState('');
-  const [district, setDistrict] = useState('Ranga Reddy');
-  const [state, setState] = useState('Telangana');
+  const [district, setDistrict] = useState('SPSR Nellore');
+  const [state, setState] = useState('Andhra Pradesh');
   const [googleMapsUrl, setGoogleMapsUrl] = useState('');
 
   // Area & Inventory
@@ -275,9 +275,10 @@ export const AddProjectDialog: React.FC<AddProjectDialogProps> = ({
                     value={approvalAuthority}
                     onChange={(e) => setApprovalAuthority(e.target.value as ApprovalAuthority)}
                   >
+                    <MenuItem value="NUDA">NUDA Approved (Nellore)</MenuItem>
+                    <MenuItem value="DTCP">DTCP Approved (AP)</MenuItem>
+                    <MenuItem value="RERA">AP RERA Registered</MenuItem>
                     <MenuItem value="HMDA">HMDA Approved</MenuItem>
-                    <MenuItem value="DTCP">DTCP Approved</MenuItem>
-                    <MenuItem value="RERA">RERA Registered</MenuItem>
                     <MenuItem value="GHMC">GHMC Approved</MenuItem>
                     <MenuItem value="YTDA">YTDA Approved</MenuItem>
                     <MenuItem value="GRAM_PANCHAYAT">Gram Panchayat</MenuItem>
@@ -287,7 +288,7 @@ export const AddProjectDialog: React.FC<AddProjectDialogProps> = ({
                 <Grid item xs={12} sm={4}>
                   <TextField
                     label="LP / Permit Number"
-                    placeholder="e.g. 000124/LO/Plg/HMDA/2025"
+                    placeholder="e.g. 000045/LO/Plg/NUDA/2025"
                     fullWidth
                     size="small"
                     value={approvalNumber}
@@ -297,7 +298,7 @@ export const AddProjectDialog: React.FC<AddProjectDialogProps> = ({
                 <Grid item xs={12} sm={4}>
                   <TextField
                     label="RERA Registration ID"
-                    placeholder="e.g. P02400008921"
+                    placeholder="e.g. P02260001234"
                     fullWidth
                     size="small"
                     value={reraId}
@@ -328,7 +329,7 @@ export const AddProjectDialog: React.FC<AddProjectDialogProps> = ({
                 <Grid item xs={12} sm={6}>
                   <TextField
                     label="Village / Locality *"
-                    placeholder="e.g. Mokila / Shankarpally Road"
+                    placeholder="e.g. Podalakur Road / Mattempadu"
                     fullWidth
                     size="small"
                     value={village}
@@ -339,7 +340,7 @@ export const AddProjectDialog: React.FC<AddProjectDialogProps> = ({
                 <Grid item xs={12} sm={6}>
                   <TextField
                     label="Mandal"
-                    placeholder="e.g. Shankarpally"
+                    placeholder="e.g. Nellore Rural / Kovuru"
                     fullWidth
                     size="small"
                     value={mandal}

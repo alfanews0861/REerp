@@ -51,10 +51,10 @@ const REPORTS_CATALOG: ReportDefinition[] = [
     summary: 'Comprehensive breakdown of booked plots, square yardage, gross revenue and collection percentage by project.',
     columns: ['Project / Venture Name', 'Plots Sold', 'Total Sq. Yds', 'Gross Revenue', 'Collected Amount', 'Recovery %'],
     data: [
-      { col0: 'Sunrise Enclave (Mokila)', col1: '64 Plots', col2: '14,200 sq.yds', col3: '₹ 22.40 Cr', col4: '₹ 14.80 Cr', col5: '66.1%' },
-      { col0: 'Green Meadows (Shadnagar)', col1: '48 Plots', col2: '10,800 sq.yds', col3: '₹ 14.50 Cr', col4: '₹ 8.90 Cr', col5: '61.4%' },
-      { col0: 'Palm Meadows (Jadcherla)', col1: '32 Plots', col2: '7,200 sq.yds', col3: '₹ 8.60 Cr', col4: '₹ 4.50 Cr', col5: '52.3%' },
-      { col0: 'Emerald City (Maheshwaram)', col1: '18 Plots', col2: '4,100 sq.yds', col3: '₹ 3.15 Cr', col4: '₹ 1.60 Cr', col5: '50.8%' },
+      { col0: 'ISKON City - 2 (Podalakur Road)', col1: '64 Plots', col2: '14,200 sq.yds', col3: '₹ 22.40 Cr', col4: '₹ 14.80 Cr', col5: '66.1%' },
+      { col0: 'Dream City (Kovuru Highway)', col1: '48 Plots', col2: '10,800 sq.yds', col3: '₹ 14.50 Cr', col4: '₹ 8.90 Cr', col5: '61.4%' },
+      { col0: 'ISKON Brundhavanam (Chinthareddypalem)', col1: '32 Plots', col2: '7,200 sq.yds', col3: '₹ 8.60 Cr', col4: '₹ 4.50 Cr', col5: '52.3%' },
+      { col0: 'ISKON Elite Township (Annamayya Circle)', col1: '18 Plots', col2: '4,100 sq.yds', col3: '₹ 3.15 Cr', col4: '₹ 1.60 Cr', col5: '50.8%' },
     ],
   },
   {
@@ -90,9 +90,9 @@ const REPORTS_CATALOG: ReportDefinition[] = [
     summary: 'Site visit frequency, vehicle distance traveled, driver efficiency, and client purchase intention outcome.',
     columns: ['Vehicle / Driver', 'Venture Location', 'Trips Completed', 'Total KM Run', 'Fuel Logged', 'Visit Outcome (Hot/Warm)'],
     data: [
-      { col0: 'Innova Crysta (TS 09 UB 1001) / Ramesh', col1: 'Mokila (Sunrise Enclave)', col2: '42 Trips', col3: '3,150 KM', col4: '₹ 22,400', col5: '28 Hot (66.7%)' },
-      { col0: 'Tempo Traveller (TS 08 EX 4050) / Suresh', col1: 'Shadnagar (Green Meadows)', col2: '36 Trips', col3: '4,200 KM', col4: '₹ 31,500', col5: '24 Hot (66.7%)' },
-      { col0: 'Scorpio-N (TS 07 HK 9922) / Raju', col1: 'Jadcherla (Palm Meadows)', col2: '28 Trips', col3: '3,600 KM', col4: '₹ 26,000', col5: '16 Hot (57.1%)' },
+      { col0: 'Innova Crysta (AP 26 UB 1001) / Ramesh', col1: 'ISKON City - 2 (Podalakur Road)', col2: '42 Trips', col3: '3,150 KM', col4: '₹ 22,400', col5: '28 Hot (66.7%)' },
+      { col0: 'Tempo Traveller (AP 26 EX 4050) / Suresh', col1: 'Dream City (Kovuru Highway)', col2: '36 Trips', col3: '4,200 KM', col4: '₹ 31,500', col5: '24 Hot (66.7%)' },
+      { col0: 'Scorpio-N (AP 26 HK 9922) / Raju', col1: 'ISKON Brundhavanam (Chinthareddypalem)', col2: '28 Trips', col3: '3,600 KM', col4: '₹ 26,000', col5: '16 Hot (57.1%)' },
     ],
   },
   {
@@ -247,9 +247,10 @@ export const MarketingReports: React.FC = () => {
           <FormControl size="small" sx={{ minWidth: 150, bgcolor: '#ffffff', borderRadius: 1.5 }}>
             <Select value={selectedProject} onChange={(e) => setSelectedProject(e.target.value)}>
               <MenuItem value="ALL">All Ventures</MenuItem>
-              <MenuItem value="MOKILA">Sunrise Enclave (Mokila)</MenuItem>
-              <MenuItem value="SHADNAGAR">Green Meadows (Shadnagar)</MenuItem>
-              <MenuItem value="JADCHERLA">Palm Meadows (Jadcherla)</MenuItem>
+              <MenuItem value="ISKON_CITY_2">ISKON City - 2 (Podalakur Road)</MenuItem>
+              <MenuItem value="DREAM_CITY">Dream City (Kovuru Highway)</MenuItem>
+              <MenuItem value="BRUNDHAVANAM">ISKON Brundhavanam (Chinthareddypalem)</MenuItem>
+              <MenuItem value="ELITE">ISKON Elite Township (Annamayya Circle)</MenuItem>
             </Select>
           </FormControl>
 

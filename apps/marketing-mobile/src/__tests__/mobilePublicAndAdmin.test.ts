@@ -16,7 +16,7 @@ describe('Marketing Mobile - Public Website Live Data Services', () => {
     ventures.forEach((venture) => {
       expect(venture.id).toBeDefined();
       expect(venture.name).toBeTruthy();
-      expect(['HMDA', 'DTCP', 'RERA']).toContain(venture.approvalAuthority);
+      expect(['NUDA', 'DTCP', 'RERA']).toContain(venture.approvalAuthority);
       expect(venture.basePricePerSqYd).toBeGreaterThan(5000);
       expect(venture.amenities.length).toBeGreaterThan(0);
       expect(venture.connectivity.length).toBeGreaterThan(0);
@@ -47,7 +47,7 @@ describe('Marketing Mobile - Public Website Live Data Services', () => {
       plotId: 'plot-101',
       plotNumber: 'P-01',
       projectId: 'proj-1',
-      projectName: 'Sunrise Enclave - Mokila',
+      projectName: 'ISKON City - 2 (Podalakur Road)',
       customerName: 'Kishore Kumar',
       customerPhone: '+91 9848011223',
       tokenAmount: 25000,
@@ -62,10 +62,10 @@ describe('Marketing Mobile - Public Website Live Data Services', () => {
   it('creates live site visit request with assigned fleet driver and vehicle details', async () => {
     const result = await createLiveSiteVisitRequest({
       ventureId: 'proj-1',
-      ventureName: 'Sunrise Enclave - Mokila',
+      ventureName: 'ISKON City - 2 (Podalakur Road)',
       customerName: 'Anil Reddy',
       customerPhone: '+91 9988776655',
-      pickupAddress: 'Hitec City, Hyderabad',
+      pickupAddress: 'Annamayya Circle, Nellore',
       timeSlot: '10:00 AM (Morning)',
       passengerCount: 3,
     });
@@ -88,17 +88,17 @@ describe('Marketing Mobile - Gemini AI Bilingual Advisor', () => {
     });
   });
 
-  it('answers HMDA vs DTCP regulatory queries with structured advice', async () => {
-    const response = await queryMobileRealEstateAssistant('HMDA vs DTCP differences enti?');
-    expect(response.replyText).toContain('HMDA');
+  it('answers NUDA vs DTCP regulatory queries with structured advice', async () => {
+    const response = await queryMobileRealEstateAssistant('NUDA vs DTCP differences enti?');
+    expect(response.replyText).toContain('NUDA');
     expect(response.replyText).toContain('DTCP');
     expect(response.replyText).toContain('RERA');
   });
 
-  it('answers Mokila growth inquiries', async () => {
-    const response = await queryMobileRealEstateAssistant('Tell me about Mokila corridor investment');
-    expect(response.replyText).toContain('మోకిల');
-    expect(response.replyText).toContain('ఫైనాన్షియల్ డిస్ట్రిక్ట్');
+  it('answers Podalakur Road growth inquiries', async () => {
+    const response = await queryMobileRealEstateAssistant('Tell me about Podalakur Road corridor investment');
+    expect(response.replyText).toContain('పొదలకూరు');
+    expect(response.replyText).toContain('నెల్లూరు');
   });
 
   it('provides Free Cab site visit guidance', async () => {

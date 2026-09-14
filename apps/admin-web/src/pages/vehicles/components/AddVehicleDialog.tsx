@@ -128,7 +128,7 @@ export const AddVehicleDialog: React.FC<AddVehicleDialogProps> = ({
               <Grid item xs={12} sm={6}>
                 <TextField
                   label="Registration Number *"
-                  placeholder="e.g. TS 09 UB 1001"
+                  placeholder="e.g. AP 26 UB 1001"
                   fullWidth
                   size="small"
                   value={registrationNumber}

@@ -146,8 +146,8 @@ export const TokenBookingModal: React.FC<TokenBookingModalProps> = ({
         <body>
           <div class="box">
             <div class="header">
-              <h1>SRI CITY DEVELOPERS & INFRA PVT. LTD.</h1>
-              <p>HMDA & RERA Approved Townships | Hyderabad, Telangana</p>
+              <h1>ISKON DEVELOPERS</h1>
+              <p>NUDA & DTCP Approved Townships | RKRI Towers, Nellore, AP</p>
               <div class="badge">48-HOUR INSTANT PLOT HOLD CONFIRMED</div>
             </div>
             <div class="row"><strong>Booking No:</strong> <span>${bookingResult.bookingNumber}</span></div>
@@ -191,7 +191,7 @@ export const TokenBookingModal: React.FC<TokenBookingModalProps> = ({
       `Booking ID: ${bookingResult.bookingNumber}\n` +
       `Token Advance: ₹${bookingResult.tokenAmount.toLocaleString('en-IN')}\n` +
       `48H Hold Expiry: ${new Date(bookingResult.expiryDate).toLocaleString()}\n\n` +
-      `Sri City Developers & Infra Pvt Ltd`
+      `ISKON Developers & Infra Pvt Ltd`
     );
     window.open(`https://wa.me/?text=${msg}`, '_blank');
   };

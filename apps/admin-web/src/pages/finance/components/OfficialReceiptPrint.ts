@@ -279,15 +279,15 @@ export function generateReceiptHtml(receipt: PaymentRecord): string {
       <div class="company-logo">
         <div class="logo-badge">🏢</div>
         <div class="company-title">
-          <h1>SRI CITY DEVELOPERS &amp; INFRA PVT. LTD.</h1>
-          <p>Real Estate Enterprise &bull; HMDA &bull; DTCP &bull; RERA Approved Townships</p>
+          <h1>ISKON DEVELOPERS &amp; INFRA PVT. LTD.</h1>
+          <p>Real Estate Enterprise &bull; NUDA &bull; DTCP &bull; AP RERA Approved Townships</p>
         </div>
       </div>
       <div class="company-meta">
-        <div><strong>Corporate Office:</strong> Financial District, Hyderabad - 500032</div>
-        <div><strong>CIN:</strong> U70102TG2020PTC145678 | <strong>GSTIN:</strong> 36AABCS1429M1ZX</div>
-        <div><strong>Helpline:</strong> +91 40 4859 9000 | <strong>Email:</strong> accounts@sricityinfra.com</div>
-        <div><strong>RERA Registration:</strong> P02400007891</div>
+        <div><strong>Corporate Office:</strong> RKRI Towers, Annamayya Circle, Mini Byepass Road, Nellore - 524 004, AP</div>
+        <div><strong>CIN:</strong> U70102AP2020PTC145678 | <strong>GSTIN:</strong> 37AABCI1429M1ZX</div>
+        <div><strong>Helpline:</strong> +91 98480 12345 | <strong>Email:</strong> accounts@iskondevelopers.com</div>
+        <div><strong>RERA Registration:</strong> AP RERA Approved</div>
       </div>
     </div>
 
@@ -384,12 +384,12 @@ export function generateReceiptHtml(receipt: PaymentRecord): string {
 
       <div class="sig-block">
         <div class="seal-box">
-          SRI CITY<br/>
+          ISKON<br/>
           ★ SEAL ★<br/>
           ACCOUNTS
         </div>
         <div class="sig-title">Authorized Signatory</div>
-        <div class="sig-sub">Sri City Developers &amp; Infra Pvt Ltd</div>
+        <div class="sig-sub">ISKON Developers &amp; Infra Pvt Ltd</div>
       </div>
     </div>
 

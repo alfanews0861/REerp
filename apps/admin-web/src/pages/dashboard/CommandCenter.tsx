@@ -99,9 +99,9 @@ export const CommandCenter: React.FC = () => {
           <FormControl size="small" sx={{ minWidth: 140 }}>
             <Select value={projectFilter} onChange={(e) => setProjectFilter(e.target.value)}>
               <MenuItem value="ALL">All Projects</MenuItem>
-              <MenuItem value="SUNRISE">Sunrise Enclave</MenuItem>
-              <MenuItem value="GREEN">Green Meadows</MenuItem>
-              <MenuItem value="ROYAL">Royal Palms</MenuItem>
+              <MenuItem value="ISKON_CITY_2">ISKON City - 2</MenuItem>
+              <MenuItem value="DREAM_CITY">Dream City</MenuItem>
+              <MenuItem value="BRUNDHAVANAM">ISKON Brundhavanam</MenuItem>
             </Select>
           </FormControl>
           <FormControl size="small" sx={{ minWidth: 130 }}>

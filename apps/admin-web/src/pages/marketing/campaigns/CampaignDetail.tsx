@@ -51,7 +51,7 @@ export const CampaignDetail: React.FC = () => {
               <Chip label="Active" color="success" size="small" sx={{ fontWeight: 600 }} />
             </Box>
             <Typography variant="body2" color="text.secondary">
-              Facebook & Instagram Meta Ads • Target: Hyderabad & NRI Segment
+              Facebook & Instagram Meta Ads • Target: Nellore & NRI Segment
             </Typography>
           </Box>
         </Box>

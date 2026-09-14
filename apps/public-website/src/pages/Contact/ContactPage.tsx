@@ -96,7 +96,7 @@ export const ContactPage: FC = () => {
             We Are Here to Help You Invest Right
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Have questions about DTCP/HMDA layouts, title approvals, or want to schedule a free doorstep cab site visit? Fill in the form or call our office.
+            Have questions about NUDA/DTCP layouts, title approvals, or want to schedule a free doorstep cab site visit? Fill in the form or call our office.
           </Typography>
         </Box>
 
@@ -112,19 +112,19 @@ export const ContactPage: FC = () => {
                   <Box sx={{ display: 'flex', gap: 1.5, mt: 2 }}>
                     <LocationOnIcon color="primary" />
                     <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7 }}>
-                      Tower 4, Level 9, Financial District, Nanakramguda, Hyderabad, Telangana 500032.
+                      RKRI Towers, Annamayya Circle, Mini Byepass Road, Nellore - 524 004, AP.
                     </Typography>
                   </Box>
                   <Box sx={{ display: 'flex', gap: 1.5, mt: 2 }}>
                     <PhoneIcon color="primary" />
                     <Typography variant="body2" fontWeight={600}>
-                      +91 98765 43210 / 040-67890000
+                      +91 98480 22334 / 0861-2345678
                     </Typography>
                   </Box>
                   <Box sx={{ display: 'flex', gap: 1.5, mt: 2 }}>
                     <EmailIcon color="primary" />
                     <Typography variant="body2" color="text.secondary">
-                      sales@sreekanthreddyrealty.com
+                      sales@iskondevelopers.com
                     </Typography>
                   </Box>
                 </CardContent>
@@ -133,18 +133,18 @@ export const ContactPage: FC = () => {
               <Card sx={{ borderRadius: 3, border: '1px solid #e5e7eb' }}>
                 <CardContent sx={{ p: 3 }}>
                   <Typography variant="h6" fontWeight={700} gutterBottom>
-                    Shadnagar Regional Branch
+                    Podalakur Road Site Office
                   </Typography>
                   <Box sx={{ display: 'flex', gap: 1.5, mt: 2 }}>
                     <LocationOnIcon color="primary" />
                     <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7 }}>
-                      Opposite Sub-Registrar Office, Bangalore Highway (NH-44), Shadnagar, Telangana 509216.
+                      ISKON City - 2 Main Entrance, Near Mattempadu, Podalakur Road, Nellore - 524004, AP.
                     </Typography>
                   </Box>
                   <Box sx={{ display: 'flex', gap: 1.5, mt: 2 }}>
                     <PhoneIcon color="primary" />
                     <Typography variant="body2" fontWeight={600}>
-                      +91 98765 43219
+                      +91 98480 22335
                     </Typography>
                   </Box>
                 </CardContent>

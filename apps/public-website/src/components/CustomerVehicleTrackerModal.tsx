@@ -41,27 +41,27 @@ export const CustomerVehicleTrackerModal: FC<CustomerVehicleTrackerModalProps> =
 }) => {
   const [customerName, setCustomerName] = useState('Valued Customer');
   const [customerPhone, setCustomerPhone] = useState(defaultCustomerPhone || '+91 98490 99887');
-  const [customerAddress, setCustomerAddress] = useState('Gachibowli Junction / Bio-Diversity Park');
+  const [customerAddress, setCustomerAddress] = useState('Annamayya Circle, Mini Bypass Road, Nellore');
   const [isLocating, setIsLocating] = useState(false);
   const [locationShared, setLocationShared] = useState(false);
   const [customerCoords, setCustomerCoords] = useState<{ lat: number; lng: number }>({
-    lat: 17.4385,
-    lng: 78.3610,
+    lat: 14.4426,
+    lng: 79.9865,
   });
 
 
   const [vehicleTelemetry, setVehicleTelemetry] = useState<any>({
     vehicleId: 'veh-2',
-    registrationNumber: 'TS 08 EX 4050',
+    registrationNumber: 'AP 26 TH 4050',
     makeModel: 'Force Tempo Traveller 17 Seater (AC Luxury)',
     driverName: 'Suresh Kumar',
     driverPhone: '+91 94412 33445',
-    latitude: 17.4285,
-    longitude: 78.2850,
+    latitude: 14.4250,
+    longitude: 79.9200,
     speedKmH: 48,
     headingDegrees: 260,
     status: 'IN_TRANSIT',
-    destinationVenture: 'Sunrise Enclave (Mokila)',
+    destinationVenture: 'ISKON City - 2 (Podalakur Road)',
   });
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -100,7 +100,7 @@ export const CustomerVehicleTrackerModal: FC<CustomerVehicleTrackerModalProps> =
     const interval = setInterval(() => {
       setVehicleTelemetry((prev: any) => {
         const deltaLng = -0.0008;
-        const newLng = prev.longitude + deltaLng < 78.1882 ? 78.3300 : prev.longitude + deltaLng;
+        const newLng = prev.longitude + deltaLng < 79.8800 ? 79.9800 : prev.longitude + deltaLng;
         return {
           ...prev,
           longitude: newLng,
@@ -126,7 +126,7 @@ export const CustomerVehicleTrackerModal: FC<CustomerVehicleTrackerModalProps> =
         });
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; OpenStreetMap | RealEstateERP GPS',
+          attribution: '&copy; OpenStreetMap | ISKON Developers GPS',
           maxZoom: 19,
         }).addTo(map);
 

@@ -49,8 +49,8 @@ export const ProfileRegistrationPage: React.FC = () => {
   // KYC State
   const [panNumber, setPanNumber] = useState('');
   const [aadharNumber, setAadharNumber] = useState('');
-  const [city, setCity] = useState('Hyderabad');
-  const [branch, setBranch] = useState('Hyderabad Main Hub');
+  const [city, setCity] = useState('Nellore');
+  const [branch, setBranch] = useState('Nellore Main Hub');
   const [bankAccount, setBankAccount] = useState('');
   const [ifscCode, setIfscCode] = useState('');
 
@@ -131,8 +131,8 @@ export const ProfileRegistrationPage: React.FC = () => {
         kycDetails: {
           panNumber: panNumber.trim().toUpperCase() || undefined,
           aadharNumber: aadharNumber.trim() || undefined,
-          city: city.trim() || 'Hyderabad',
-          branch: branch.trim() || 'Hyderabad Main Hub',
+          city: city.trim() || 'Nellore',
+          branch: branch.trim() || 'Nellore Main Hub',
           bankAccount: bankAccount.trim() || undefined,
           ifscCode: ifscCode.trim().toUpperCase() || undefined,
         },

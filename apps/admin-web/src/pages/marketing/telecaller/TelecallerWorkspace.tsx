@@ -65,7 +65,7 @@ export const TelecallerWorkspace: React.FC = () => {
   const [callNotes, setCallNotes] = useState('');
   const [followUpDate, setFollowUpDate] = useState<string>('');
   const [siteVisitDate, setSiteVisitDate] = useState<string>('');
-  const [siteVisitVenture, setSiteVisitVenture] = useState('Sunrise Enclave (Mokila)');
+  const [siteVisitVenture, setSiteVisitVenture] = useState('ISKON City - 2 (Podalakur Road)');
   const [snackbarMsg, setSnackbarMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -364,10 +364,10 @@ export const TelecallerWorkspace: React.FC = () => {
                     value={siteVisitVenture}
                     onChange={(e) => setSiteVisitVenture(e.target.value)}
                   >
-                    <MenuItem value="Sunrise Enclave (Mokila)">Sunrise Enclave (Mokila)</MenuItem>
-                    <MenuItem value="Green Valley Phase 2 (Shadnagar)">Green Valley Phase 2 (Shadnagar)</MenuItem>
-                    <MenuItem value="Palm Meadows (Jadcherla)">Palm Meadows (Jadcherla)</MenuItem>
-                    <MenuItem value="Emerald City (Maheshwaram)">Emerald City (Maheshwaram)</MenuItem>
+                    <MenuItem value="ISKON City - 2 (Podalakur Road)">ISKON City - 2 (Podalakur Road)</MenuItem>
+                    <MenuItem value="Dream City (Kovuru Highway)">Dream City (Kovuru Highway)</MenuItem>
+                    <MenuItem value="ISKON Brundhavanam (Chinthareddypalem)">ISKON Brundhavanam (Chinthareddypalem)</MenuItem>
+                    <MenuItem value="ISKON Elite Township (Annamayya Circle Extn)">ISKON Elite Township (Annamayya Circle Extn)</MenuItem>
                   </TextField>
 
                   <TextField

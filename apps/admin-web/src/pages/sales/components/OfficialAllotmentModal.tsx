@@ -104,18 +104,18 @@ export const OfficialAllotmentModal: React.FC<OfficialAllotmentModalProps> = ({
             <Box sx={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid #0f172a', pb: 2, mb: 2 }}>
               <Box>
                 <Typography variant="h6" fontWeight={800} color="#0f172a">
-                  SRI CITY DEVELOPERS & INFRA PVT. LTD.
+                  ISKON DEVELOPERS & INFRA PVT. LTD.
                 </Typography>
                 <Typography variant="caption" color="text.secondary" fontWeight={600}>
-                  HMDA &bull; DTCP &bull; RERA APPROVED GATED TOWNSHIPS
+                  NUDA &bull; DTCP &bull; AP RERA APPROVED GATED TOWNSHIPS
                 </Typography>
               </Box>
               <Box sx={{ textAlign: 'right' }}>
                 <Typography variant="caption" display="block" color="text.secondary">
-                  CIN: U70102TG2020PTC145678 | GST: 36AABCS1429M1ZX
+                  CIN: U70102AP2020PTC145678 | GST: 37AABCI1429M1ZX
                 </Typography>
                 <Typography variant="caption" display="block" color="text.secondary">
-                  Financial District, Hyderabad - 500032
+                  RKRI Towers, Annamayya Circle, Mini Byepass Road, Nellore - 524 004, AP
                 </Typography>
               </Box>
             </Box>
@@ -220,7 +220,7 @@ export const OfficialAllotmentModal: React.FC<OfficialAllotmentModalProps> = ({
                     fontWeight: 800,
                   }}
                 >
-                  SRI CITY<br />
+                  ISKON<br />
                   ★ SEAL ★<br />
                   ALLOTMENT
                 </Box>

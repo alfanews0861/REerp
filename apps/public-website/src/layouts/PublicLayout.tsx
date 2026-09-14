@@ -72,8 +72,8 @@ export const PublicLayout: FC = () => {
   };
 
   const openWhatsApp = () => {
-    const text = encodeURIComponent('Hello! I would like more information about your DTCP/HMDA approved ventures in Hyderabad.');
-    window.open(`https://wa.me/919876543210?text=${text}`, '_blank');
+    const text = encodeURIComponent('Hello! I would like more information about your NUDA/DTCP approved ventures in Nellore.');
+    window.open(`https://wa.me/919848022334?text=${text}`, '_blank');
   };
 
   return (
@@ -85,11 +85,11 @@ export const PublicLayout: FC = () => {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 2.5 } }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                 <PhoneIcon sx={{ fontSize: 16, color: '#93c5fd' }} />
-                <span style={{ whiteSpace: 'nowrap', fontWeight: 500 }}>+91 98765 43210</span>
+                <span style={{ whiteSpace: 'nowrap', fontWeight: 500 }}>+91 98480 22334</span>
               </Box>
               <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 0.5 }}>
                 <EmailIcon sx={{ fontSize: 16, color: '#93c5fd' }} />
-                <span>sales@sreekanthreddyrealty.com</span>
+                <span>sales@iskondevelopers.com</span>
               </Box>
             </Box>
 
@@ -255,7 +255,7 @@ export const PublicLayout: FC = () => {
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  SREEKANTH REDDY REALTY
+                  ISKON DEVELOPERS
                 </Typography>
                 <Typography
                   variant="caption"
@@ -268,7 +268,7 @@ export const PublicLayout: FC = () => {
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  DTCP & HMDA APPROVED GATED TOWNSHIPS
+                  NUDA & DTCP APPROVED GATED TOWNSHIPS
                 </Typography>
               </Box>
             </Box>
@@ -491,11 +491,11 @@ export const PublicLayout: FC = () => {
                   <LocationCityIcon fontSize="medium" />
                 </Box>
                 <Typography variant="h6" fontWeight={800} color="#ffffff">
-                  SREEKANTH REDDY REALTY
+                  ISKON DEVELOPERS
                 </Typography>
               </Box>
               <Typography variant="body2" sx={{ mb: 2.5, lineHeight: 1.7 }}>
-                South India’s trusted real estate developer specializing in DTCP & HMDA approved gated community open plots with clear legal titles, 100% Vaastu, and strategic connectivity to Hyderabad’s growth corridors.
+                Nellore’s trusted real estate developer specializing in NUDA & DTCP approved gated community open plots with clear legal titles, 100% Vaastu, and strategic connectivity to Nellore’s key growth corridors.
               </Typography>
               <Stack direction="row" spacing={1} alignItems="center">
                 <VerifiedIcon sx={{ color: '#10b981', fontSize: 20 }} />
@@ -566,7 +566,7 @@ export const PublicLayout: FC = () => {
                   variant="body2"
                   sx={{ color: 'inherit', textDecoration: 'none', '&:hover': { color: '#ffffff' } }}
                 >
-                  Sunrise Enclave (Mokila)
+                  ISKON City - 2 (Podalakur Road)
                 </Typography>
                 <Typography
                   component={RouterLink}
@@ -574,7 +574,7 @@ export const PublicLayout: FC = () => {
                   variant="body2"
                   sx={{ color: 'inherit', textDecoration: 'none', '&:hover': { color: '#ffffff' } }}
                 >
-                  Greenfield Meadows (Shadnagar)
+                  Dream City (Nellore-Bombay Hwy)
                 </Typography>
                 <Typography
                   component={RouterLink}
@@ -582,7 +582,7 @@ export const PublicLayout: FC = () => {
                   variant="body2"
                   sx={{ color: 'inherit', textDecoration: 'none', '&:hover': { color: '#ffffff' } }}
                 >
-                  Royal Palms Elite (Kollur ORR)
+                  ISKON Brundhavanam
                 </Typography>
                 <Typography
                   component={RouterLink}
@@ -590,7 +590,7 @@ export const PublicLayout: FC = () => {
                   variant="body2"
                   sx={{ color: 'inherit', textDecoration: 'none', '&:hover': { color: '#ffffff' } }}
                 >
-                  Aerocity Town (Srisailam Hwy)
+                  ISKON Elite Township
                 </Typography>
               </Stack>
             </Box>
@@ -601,10 +601,10 @@ export const PublicLayout: FC = () => {
                 Corporate Office
               </Typography>
               <Typography variant="body2" sx={{ mb: 1, lineHeight: 1.6 }}>
-                Tower 4, Level 9, Financial District, Nanakramguda, Hyderabad, Telangana 500032.
+                RKRI Towers, Annamayya Circle, Mini Byepass Road, Nellore - 524 004, AP.
               </Typography>
               <Typography variant="body2" sx={{ mb: 1 }}>
-                <strong>Phone:</strong> +91 98765 43210
+                <strong>Phone:</strong> +91 98480 22334 / 0861-2345678
               </Typography>
               <Typography variant="body2" sx={{ mb: 2 }}>
                 <strong>Hours:</strong> Mon - Sun: 9:00 AM - 7:30 PM
@@ -631,7 +631,7 @@ export const PublicLayout: FC = () => {
           {/* Copyright */}
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
             <Typography variant="caption" color="#9ca3af">
-              © {new Date().getFullYear()} Sreekanth Reddy Realty Pvt Ltd. All rights reserved.
+              © {new Date().getFullYear()} ISKON Developers. All rights reserved.
             </Typography>
             <Typography variant="caption" color="#9ca3af">
               Powered by Enterprise Real Estate Marketing ERP Platform

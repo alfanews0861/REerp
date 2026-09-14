@@ -14,7 +14,7 @@ describe('MasterLayoutMap Component', () => {
   it('renders layout roads, park, entrance arch, and plots', () => {
     render(
       <LanguageProvider>
-        <MasterLayoutMap plots={PUBLIC_PLOTS} projectName="Sunrise Enclave" />
+        <MasterLayoutMap plots={PUBLIC_PLOTS} projectName="ISKON City - 2" />
       </LanguageProvider>
     );
 
@@ -33,7 +33,7 @@ describe('MasterLayoutMap Component', () => {
       <LanguageProvider>
         <MasterLayoutMap
           plots={PUBLIC_PLOTS}
-          projectName="Sunrise Enclave"
+          projectName="ISKON City - 2"
           onHoldPlot={holdMock}
           onVisitPlot={visitMock}
         />

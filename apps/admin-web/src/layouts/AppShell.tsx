@@ -70,6 +70,7 @@ interface NavigationItem {
   text: string;
   icon: React.ReactNode;
   path?: string;
+  externalUrl?: string;
   roles?: UserRole[];
   children?: NavChildItem[];
 }
@@ -203,6 +204,12 @@ export const AppShell = () => {
     },
     { text: 'Settings', icon: <Settings />, path: '/settings', roles: ['super_admin', 'director'] },
     { text: 'Administration', icon: <AdminPanelSettings />, path: '/administration', roles: ['super_admin', 'director'] },
+    {
+      text: 'Public Website',
+      icon: <TravelExploreIcon />,
+      externalUrl: 'https://reerp-website.web.app',
+      roles: ['super_admin', 'director', 'branch_manager', 'marketing_manager', 'marketing_executive', 'sales_manager', 'sales_executive', 'telecaller', 'accountant', 'driver', 'customer'],
+    },
   ];
 
   // Filter items based on active user role
@@ -248,6 +255,37 @@ export const AppShell = () => {
 
   const renderNavItems = (items: any[]) => {
     return items.map((item) => {
+      if (item.externalUrl) {
+        return (
+          <ListItem key={item.text} disablePadding sx={{ display: 'block' }}>
+            <ListItemButton
+              component="a"
+              href={item.externalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{
+                minHeight: 48,
+                justifyContent: isCollapsed ? 'center' : 'initial',
+                px: 2.5,
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  minWidth: 0,
+                  mr: isCollapsed ? 0 : 3,
+                  justifyContent: 'center',
+                  color: 'primary.main',
+                }}
+              >
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText primary={item.text} sx={{ opacity: isCollapsed ? 0 : 1 }} />
+              {!isCollapsed && <OpenInNewIcon sx={{ fontSize: '0.85rem', color: 'text.secondary' }} />}
+            </ListItemButton>
+          </ListItem>
+        );
+      }
+
       const isItemActive = item.children
         ? item.children.some((c: any) => isPathActive(c.path))
         : isPathActive(item.path);
@@ -320,7 +358,7 @@ export const AppShell = () => {
   const drawerContent = (
     <div>
       <Toolbar sx={{ display: 'flex', alignItems: 'center', justifyContent: isCollapsed ? 'center' : 'space-between', px: [1] }}>
-        {!isCollapsed && <Typography variant="h6" noWrap component="div" sx={{ ml: 2, fontWeight: 700, color: theme.palette.primary.main }}>ERP Admin</Typography>}
+        {!isCollapsed && <Typography variant="h6" noWrap component="div" sx={{ ml: 2, fontWeight: 700, color: theme.palette.primary.main }}>ISKON Developers</Typography>}
         <IconButton onClick={handleCollapseToggle} sx={{ display: { xs: 'none', sm: 'block' } }}>
           <MenuIcon />
         </IconButton>
@@ -397,38 +435,6 @@ export const AppShell = () => {
 
           {/* Right Header Actions & User Profile Card (All in ONE neat row!) */}
           <Stack direction="row" spacing={1.5} alignItems="center" sx={{ ml: 'auto' }}>
-            {/* Direct Link to Public Customer Website */}
-            <Tooltip title="Open Public Customer & Investor Website">
-              <Button
-                component="a"
-                href="https://reerp-website.web.app"
-                target="_blank"
-                rel="noopener noreferrer"
-                size="small"
-                variant="outlined"
-                startIcon={<TravelExploreIcon sx={{ fontSize: '1rem !important', color: 'primary.main' }} />}
-                endIcon={<OpenInNewIcon sx={{ fontSize: '0.75rem !important' }} />}
-                sx={{
-                  textTransform: 'none',
-                  fontWeight: 700,
-                  fontSize: '0.8rem',
-                  borderRadius: 2,
-                  px: 1.75,
-                  py: 0.6,
-                  whiteSpace: 'nowrap',
-                  display: { xs: 'none', md: 'inline-flex' },
-                  borderColor: theme.palette.divider,
-                  color: 'text.primary',
-                  '&:hover': {
-                    borderColor: theme.palette.primary.main,
-                    bgcolor: 'action.hover',
-                  },
-                }}
-              >
-                Public Website
-              </Button>
-            </Tooltip>
-
             {/* Notifications & Communications Bell */}
             <Tooltip title="Notifications & Messages">
               <IconButton

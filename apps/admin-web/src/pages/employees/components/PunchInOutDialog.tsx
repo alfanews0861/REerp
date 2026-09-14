@@ -38,7 +38,7 @@ export const PunchInOutDialog: React.FC<PunchInOutDialogProps> = ({
   const [userName, setUserName] = useState('');
   const [userRole, setUserRole] = useState('Sales Executive');
   const [staffType, setStaffType] = useState<'FIELD_STAFF' | 'OFFICE_STAFF'>('FIELD_STAFF');
-  const [assignedLocationName, setAssignedLocationName] = useState('Sunrise Enclave Site Office (Mokila)');
+  const [assignedLocationName, setAssignedLocationName] = useState('ISKON City - 2 Site Office (Podalakur Road)');
   const [status, setStatus] = useState<AttendanceStatus>('PRESENT');
   const [punchInTime, setPunchInTime] = useState('09:15');
   const [isGeoFenceVerified, setIsGeoFenceVerified] = useState(true);
@@ -182,7 +182,7 @@ export const PunchInOutDialog: React.FC<PunchInOutDialogProps> = ({
               <Grid item xs={12} sm={7}>
                 <TextField
                   label="Assigned Site / Office Location"
-                  placeholder="e.g. Sunrise Enclave Site Office (Mokila)"
+                  placeholder="e.g. ISKON City - 2 Site Office (Podalakur Road)"
                   fullWidth
                   size="small"
                   value={assignedLocationName}

@@ -13,9 +13,9 @@ import { useAuth } from '../../src/providers/AuthProvider';
 
 
 const VEHICLES = [
-  { id: 'veh-1', name: 'Toyota Innova Crysta (TS 09 UB 1001)', currentKm: 48250 },
-  { id: 'veh-2', name: 'Force Tempo Traveller (TS 08 EX 4050)', currentKm: 64120 },
-  { id: 'veh-3', name: 'Mahindra Scorpio-N (TS 07 HK 9922)', currentKm: 32400 },
+  { id: 'veh-1', name: 'Toyota Innova Crysta (AP 26 TH 1001)', currentKm: 48250 },
+  { id: 'veh-2', name: 'Force Tempo Traveller (AP 26 TH 4050)', currentKm: 64120 },
+  { id: 'veh-3', name: 'Mahindra Scorpio-N (AP 26 HK 9922)', currentKm: 32400 },
 ];
 
 export default function TripsScreen() {
@@ -24,8 +24,8 @@ export default function TripsScreen() {
   const [isTripActive, setIsTripActive] = useState(false);
   const [startOdometer, setStartOdometer] = useState(VEHICLES[0].currentKm.toString());
   const [endOdometer, setEndOdometer] = useState('');
-  const [clientPickupLocation, setClientPickupLocation] = useState('Gachibowli Junction');
-  const [destinationVenture, setDestinationVenture] = useState('Sunrise Enclave (Mokila)');
+  const [clientPickupLocation, setClientPickupLocation] = useState('Annamayya Circle, Mini Bypass Road');
+  const [destinationVenture, setDestinationVenture] = useState('ISKON City - 2 (Podalakur Road)');
   const [fuelExpenseAmount, setFuelExpenseAmount] = useState('');
   const [fuelLitres, setFuelLitres] = useState('');
   const [tripHistory, setTripHistory] = useState<any[]>([]);

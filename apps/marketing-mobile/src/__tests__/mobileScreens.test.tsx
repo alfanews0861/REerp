@@ -111,10 +111,10 @@ describe('Marketing Mobile - Auth Session Persistence', () => {
   it('saves and retrieves logged-in user session correctly', async () => {
     const userSession = {
       uid: 'user-agt-101',
-      email: 'vamshi@reerp.com',
+      email: 'vamshi@iskondevelopers.com',
       displayName: 'Vamshi Krishna',
       role: 'sales_executive',
-      branch: 'Mokila Branch',
+      branch: 'Nellore Main Hub',
     };
 
     await AsyncStorage.setItem('mobile_auth_user_session', JSON.stringify(userSession));

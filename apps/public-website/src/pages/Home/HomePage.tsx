@@ -44,7 +44,7 @@ export const HomePage: FC = () => {
   // ROI Calculator State
   const [investAmount, setInvestAmount] = useState<number>(2500000); // 25 Lakhs
   const [years, setYears] = useState<number>(5);
-  const expectedCagr = 0.18; // 18% historical land appreciation in Hyderabad suburban growth corridors
+  const expectedCagr = 0.18; // 18% historical land appreciation in Nellore suburban growth corridors
   const projectedValue = Math.round(investAmount * Math.pow(1 + expectedCagr, years));
   const totalGain = projectedValue - investAmount;
 
@@ -78,7 +78,7 @@ export const HomePage: FC = () => {
           <Box sx={{ maxWidth: 960, mx: 'auto', textAlign: 'center' }}>
             <Chip
               icon={<VerifiedIcon sx={{ color: '#ffb74d !important' }} />}
-              label="100% DTCP & HMDA APPROVED GATED PLOTS"
+              label="100% NUDA & DTCP APPROVED GATED PLOTS"
               sx={{
                 bgcolor: 'rgba(255, 255, 255, 0.12)',
                 color: '#ffecb3',
@@ -99,7 +99,7 @@ export const HomePage: FC = () => {
                 textShadow: '0 2px 10px rgba(0,0,0,0.5)',
               }}
             >
-              Own Premium Open Plots in Hyderabad’s Fastest Growing Corridors
+              Own Premium Open Plots in Nellore’s Fastest Growing Corridors
             </Typography>
             <Typography
               variant="h6"
@@ -111,7 +111,7 @@ export const HomePage: FC = () => {
                 lineHeight: 1.6,
               }}
             >
-              100% Clear Titles, Spot Registration, Bank Loans & World-Class Gated Infrastructure in Mokila, Shadnagar, Kollur & Srisailam Highway.
+              100% Clear Titles, Spot Registration, Bank Loans & World-Class Gated Infrastructure in Podalakur Road, Bombay Highway & Mini Bypass Corridors.
             </Typography>
 
             {/* Quick Filter / Search Box */}
@@ -288,7 +288,7 @@ export const HomePage: FC = () => {
                 Featured Ventures for High Appreciation
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5 }}>
-                DTCP & HMDA layouts offering immediate spot registration and modern amenities.
+                NUDA & DTCP layouts offering immediate spot registration and modern amenities.
               </Typography>
             </Box>
             <Button
@@ -317,7 +317,7 @@ export const HomePage: FC = () => {
         <Container maxWidth="lg">
           <Box sx={{ textAlign: 'center', maxWidth: 700, mx: 'auto', mb: 6 }}>
             <Typography variant="overline" color="primary.main" fontWeight={700} sx={{ letterSpacing: 1.5 }}>
-              THE SREEKANTH REDDY ADVANTAGE
+              THE ISKON DEVELOPERS ADVANTAGE
             </Typography>
             <Typography variant="h4" fontWeight={800} gutterBottom>
               Why Hundreds of Investors Trust Us
@@ -413,7 +413,7 @@ export const HomePage: FC = () => {
                 Plot Appreciation & ROI Calculator
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Estimate the future wealth potential of open plot investments based on historical 18% CAGR growth in Hyderabad corridors.
+                Estimate the future wealth potential of open plot investments based on historical 18% CAGR growth in Nellore growth corridors.
               </Typography>
             </Box>
 
@@ -576,7 +576,7 @@ export const HomePage: FC = () => {
                 Experience the Layout in Person with Complimentary Cab Service
               </Typography>
               <Typography variant="body1" sx={{ color: '#e5e7eb', maxWidth: 650 }}>
-                Don't decide based on brochures alone. We provide free doorstep AC cab pickup from your home anywhere in Hyderabad so you and your family can inspect the ground reality, roads, and surrounding landmarks.
+                Don't decide based on brochures alone. We provide free doorstep AC cab pickup from your home anywhere in Nellore so you and your family can inspect the ground reality, roads, and surrounding landmarks.
               </Typography>
             </Grid>
             <Grid item xs={12} md={4} sx={{ textAlign: { xs: 'left', md: 'right' } }}>

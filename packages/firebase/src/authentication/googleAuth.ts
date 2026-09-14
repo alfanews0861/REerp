@@ -32,7 +32,7 @@ export async function signInWithGoogle(): Promise<UserCredential> {
       await setDoc(userRef, {
         uid: user.uid,
         email: user.email || '',
-        displayName: user.displayName || 'Google User',
+        displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'User'),
         photoURL: user.photoURL || undefined,
         role: 'customer',
         status: 'pending',

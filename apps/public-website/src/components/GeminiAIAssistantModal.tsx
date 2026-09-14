@@ -51,7 +51,7 @@ export const GeminiAIAssistantModal: FC<GeminiAIAssistantModalProps> = ({
   const initialGreeting: AIMessage = {
     id: 'msg-init',
     sender: 'assistant',
-    text: `Hello! I am your **Gemini AI Real Estate Advisor**. \n\nI can assist you with Hyderabad growth corridors, HMDA vs DTCP regulatory guidelines, finding plots within your exact budget, and scheduling complimentary AC cab site visits.`,
+    text: `Hello! I am your **Gemini AI Real Estate Advisor** for **ISKON Developers**. \n\nI can assist you with Nellore growth corridors (Podalakur Road, Kovuru, Annamayya Circle), NUDA vs DTCP regulatory guidelines, finding plots in **ISKON City - 2** or **Dream City** within your exact budget, and scheduling complimentary AC cab site visits.`,
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
   };
 

@@ -44,7 +44,7 @@ export const LeadMapView: React.FC<LeadMapViewProps> = ({ leads }) => {
     const map = new Map<string, Lead[]>();
 
     leads.forEach((lead) => {
-      const region = lead.city?.trim() || 'Hyderabad (General)';
+      const region = lead.city?.trim() || 'Nellore (General)';
       if (!map.has(region)) {
         map.set(region, []);
       }
@@ -59,7 +59,7 @@ export const LeadMapView: React.FC<LeadMapViewProps> = ({ leads }) => {
         count: regionLeads.length,
         hotCount: hot,
         leads: regionLeads,
-        coordinates: '17.3850° N, 78.4867° E',
+        coordinates: '14.4426° N, 79.9865° E',
       });
     });
 
@@ -68,7 +68,7 @@ export const LeadMapView: React.FC<LeadMapViewProps> = ({ leads }) => {
 
   const activeLeads = useMemo(() => {
     if (selectedRegion === 'ALL') return leads;
-    return leads.filter((l) => (l.city?.trim() || 'Hyderabad (General)') === selectedRegion);
+    return leads.filter((l) => (l.city?.trim() || 'Nellore (General)') === selectedRegion);
   }, [leads, selectedRegion]);
 
   const totalHotLeads = useMemo(() => {
@@ -184,7 +184,7 @@ export const LeadMapView: React.FC<LeadMapViewProps> = ({ leads }) => {
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.25 }}>
                         <LocationOnIcon fontSize="small" color="action" sx={{ fontSize: 16 }} />
                         <Typography variant="caption" color="text.secondary">
-                          {lead.city || 'Hyderabad'}
+                          {lead.city || 'Nellore'}
                         </Typography>
                       </Box>
                     </Box>

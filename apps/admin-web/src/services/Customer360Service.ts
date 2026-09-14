@@ -26,10 +26,10 @@ const SEED_CUSTOMER_PROFILES: Record<string, Customer360Profile> = {
     addresses: [
       {
         type: 'CURRENT',
-        street: 'Plot 48, Road No. 36, Jubilee Hills',
-        city: 'Hyderabad',
-        state: 'Telangana',
-        zipCode: '500033',
+        street: 'Plot 48, Magunta Layout',
+        city: 'Nellore',
+        state: 'Andhra Pradesh',
+        zipCode: '524003',
         country: 'India',
       }
     ],
@@ -75,10 +75,10 @@ const SEED_CUSTOMER_PROFILES: Record<string, Customer360Profile> = {
     addresses: [
       {
         type: 'CURRENT',
-        street: 'Flat 1204, My Home Bhooja, Hitec City',
-        city: 'Hyderabad',
-        state: 'Telangana',
-        zipCode: '500081',
+        street: 'Flat 402, Royal Residency, Mini Bypass Road',
+        city: 'Nellore',
+        state: 'Andhra Pradesh',
+        zipCode: '524004',
         country: 'India',
       }
     ],
@@ -124,10 +124,10 @@ const SEED_CUSTOMER_PROFILES: Record<string, Customer360Profile> = {
     addresses: [
       {
         type: 'CURRENT',
-        street: 'Villa 8, Financial District',
-        city: 'Hyderabad',
-        state: 'Telangana',
-        zipCode: '500032',
+        street: 'Villa 8, Annamayya Enclave',
+        city: 'Nellore',
+        state: 'Andhra Pradesh',
+        zipCode: '524004',
         country: 'India',
       }
     ],
@@ -297,7 +297,7 @@ export class Customer360Service {
           timestamp: '2026-09-01T10:35:00Z',
           type: 'BOOKING',
           title: 'Booking Confirmed - Plot P-12',
-          description: 'Sunrise Enclave (Mokila) - Token Advance ₹2,00,000 received via UPI',
+          description: 'ISKON City - 2 (Podalakur Road) - Token Advance ₹2,00,000 received via UPI',
           actor: 'Anand Naidu (Sales Executive)',
         },
         {
@@ -305,7 +305,7 @@ export class Customer360Service {
           timestamp: '2026-08-28T11:00:00Z',
           type: 'SITE_VISIT',
           title: 'Site Visit Completed',
-          description: 'Conducted physical site inspection with client family in Innova Crysta TS 09 UB 1001',
+          description: 'Conducted physical site inspection with client family in Innova Crysta AP 26 UB 1001',
           actor: 'Ramesh Goud (Driver) & Anand Naidu',
         },
         {
@@ -313,7 +313,7 @@ export class Customer360Service {
           timestamp: '2026-08-20T10:15:00Z',
           type: 'INTERACTION',
           title: 'Telephonic Qualification Call',
-          description: 'Client confirmed budget of ₹25L - ₹35L for East-facing residential plots in Mokila corridor.',
+          description: 'Client confirmed budget of ₹25L - ₹35L for East-facing residential plots in Podalakur Road corridor.',
           actor: 'Sunita Reddy (Telecaller Lead)',
         }
       );

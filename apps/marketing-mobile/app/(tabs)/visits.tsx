@@ -44,7 +44,7 @@ export default function VisitsScreen() {
         const data = docSnap.data();
         list.push({
           id: docSnap.id,
-          propertyName: data.projectName || data.propertyName || data.ventureName || 'Sunrise Enclave',
+          propertyName: data.projectName || data.propertyName || data.ventureName || 'ISKON City - 2',
           clientName: data.clientName || data.leadName,
           scheduledTime: data.scheduledTime || data.visitDate || '10:30 AM',
           status: (data.status || 'SCHEDULED').toUpperCase(),

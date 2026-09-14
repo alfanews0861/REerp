@@ -1,0 +1,63 @@
+﻿name: CI Test & Web Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test-and-build:
+    name: Test & Build Monorepo
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node 24.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.1.0
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run All Tests
+        run: pnpm test
+
+      - name: Build Web Apps
+        run: |
+          pnpm --filter @real-estate-erp/public-website build
+          pnpm --filter @real-estate-erp/admin-web build
+
+      - name: Upload Public Website Dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-website-dist
+          path: apps/public-website/dist
+          retention-days: 7
+
+      - name: Upload Admin Web Dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: admin-web-dist
+          path: apps/admin-web/dist
+          retention-days: 7
+
+      - name: CI Summary
+        if: always()
+        run: |
+          echo "## RealEstateERP CI Status" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ${{ job.status == 'success' && '✅ PASSED' || '❌ FAILED' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY

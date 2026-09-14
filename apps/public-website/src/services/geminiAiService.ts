@@ -15,7 +15,7 @@ export interface AssistantResponse {
 }
 
 /**
- * Intelligent Real Estate Domain Engine for Hyderabad & Telangana (English Only)
+ * Intelligent Real Estate Domain Engine for Nellore & Andhra Pradesh (English Only)
  */
 export async function queryGeminiRealEstateAssistant(
   userQuery: string,
@@ -70,33 +70,35 @@ export async function queryGeminiRealEstateAssistant(
     }
   }
 
-  // 2. HMDA vs DTCP Inquiry
-  if (queryLower.includes('hmda') || queryLower.includes('dtcp') || queryLower.includes('difference')) {
+  // 2. NUDA / HMDA vs DTCP Inquiry
+  if (queryLower.includes('nuda') || queryLower.includes('hmda') || queryLower.includes('dtcp') || queryLower.includes('difference')) {
     return {
-      replyText: `### HMDA vs DTCP Layout Approvals:
+      replyText: `### NUDA vs DTCP Layout Approvals in Andhra Pradesh:
 
-1. **HMDA (Hyderabad Metropolitan Development Authority)**:
-   - Governs the 7,257 sq.km metropolitan zone (ORR & adjoining urban clusters like Mokila, Shankarpally, Kollur).
-   - Requires mandatory 40ft & 33ft BT roads, underground drainage, water pipelines, electricity, and dedicated park reservations.
-   - Ideal for immediate villa construction and rapid 20-30% annual appreciation.
+1. **NUDA (Nellore Urban Development Authority)**:
+   - Governs the Nellore urban and metropolitan expansion limits (including Podalakur Road, Mini Bypass, and Chinthareddypalem).
+   - Requires mandatory 60ft, 40ft & 33ft BT roads, underground drainage, water pipelines, electricity, avenue plantation, and dedicated civic park reservations.
+   - Ideal for immediate villa construction and rapid capital appreciation.
 
-2. **DTCP (Directorate of Town & Country Planning)**:
-   - Governs expanding corridors outside HMDA limits (such as Shadnagar, Srisailam Highway, Regional Ring Road nodes).
-   - Lower entry ticket size (starting from ₹11,000/sq.yd) with massive upside from industrial and highway infrastructure.
+2. **DTCP (Directorate of Town & Country Planning - AP)**:
+   - Governs expanding regional corridors (such as Nellore-Bombay Highway, Kovuru, and national highway nodes).
+   - Attractive entry ticket size (starting from ₹12,500/sq.yd) with high ROI driven by highway expansion and industrial connectivity.
 
-All our layouts are **100% RERA Registered** with spot registration and SBI/HDFC bank loan pre-approvals!`,
+All our layouts are **100% AP RERA Registered** with spot registration and SBI/HDFC bank loan approvals!`,
     };
   }
 
-  // 3. Mokila / Shankarpally Corridor Inquiry
-  if (queryLower.includes('mokila') || queryLower.includes('shankarpally') || queryLower.includes('west')) {
+  // 3. Podalakur Road / Bombay Highway / Nellore Corridor Inquiry
+  if (queryLower.includes('podalakur') || queryLower.includes('bombay') || queryLower.includes('kovur') || queryLower.includes('nellore')) {
     return {
-      replyText: `### Why Invest in Mokila & Shankarpally Corridor?
+      replyText: `### Why Invest in Podalakur Road & Nellore Corridors?
 
-- **Direct Proximity to IT Hubs**: Only 18-22 minutes drive from Financial District, Gachibowli, and Neopolis Kokapet via Shankarpally Highway.
-- **Education & Lifestyle**: Surrounded by top international schools (Indus International, The Gaudium) and luxury villa communities.
-- **Proven Appreciation**: Land values in Mokila have surged over 40% in the last 3 years due to rapid westward infrastructure expansion.
-- **Featured Project**: *Sunrise Enclave - Mokila* features 25.5 acres of HMDA-approved villa plots starting at ₹26,500/sq.yd.`,
+- **Strategic Infrastructure Growth**: Fast-track 4-lane road expansion and direct connectivity to Nellore city center (10-15 mins from Annamayya Circle).
+- **Educational & Commercial Hub**: Surrounded by reputed schools, engineering colleges (Narayana, Rao's) and medical institutions.
+- **Proven Appreciation**: Land values along Podalakur Road have grown consistently at 18-25% CAGR over the last 3 years.
+- **Featured Flagship Projects**: 
+  - *ISKON City - 2* on Podalakur Road (120-acre mega township with 170ft entrance road).
+  - *Dream City* near Nellore-Bombay Highway (DTCP approved gated venture).`,
     };
   }
 
@@ -108,21 +110,21 @@ All our layouts are **100% RERA Registered** with spot registration and SBI/HDFC
 1. **Select Your Ideal Plot**: Browse the interactive layout map or plot explorer.
 2. **Pay Fully Refundable Token**: Choose ₹10,000, ₹25,000, or ₹50,000 token advance via instant UPI / QR Code.
 3. **Instant Price Freeze**: The plot is immediately locked under your name for 48 hours, freezing the rate and blocking rival buyers.
-4. **Site Visit in Free AC Cab**: Visit the layout with our specialist to inspect physical boundary stones and 30-year link deeds.
+4. **Site Visit in Free AC Cab**: Visit the layout with our specialist in Nellore to inspect physical boundary stones and 30-year link deeds.
 5. **100% Money-Back Guarantee**: If you decide not to proceed for any reason, the entire token advance is refunded to your account within 24 hours.`,
     };
   }
 
   // Default Guidance Response
   return {
-    replyText: `Hello! I am your **Gemini AI Real Estate Advisor**. 
+    replyText: `Hello! I am your **Gemini AI Real Estate Advisor** for **ISKON Developers**. 
 
-I can assist you with Hyderabad growth corridors, HMDA vs DTCP regulatory guidelines, finding plots within your exact budget, and scheduling complimentary AC cab site visits.
+I can assist you with Nellore growth corridors, NUDA vs DTCP regulatory guidelines, finding plots within your exact budget, and scheduling complimentary AC cab site visits in Nellore.
 
 Try asking:
-• *"Show me East facing plots under ₹50 Lakhs"*
-• *"Explain the differences between HMDA and DTCP"*
-• *"Why should I invest in Mokila / Shankarpally?"*
+• *"Show me East facing plots under ₹40 Lakhs"*
+• *"Explain the differences between NUDA and DTCP"*
+• *"Why should I invest in Podalakur Road / Bombay Highway?"*
 • *"How does the 48-Hour price freeze hold work?"*`,
   };
 }

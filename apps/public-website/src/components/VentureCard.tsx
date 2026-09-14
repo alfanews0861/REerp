@@ -30,6 +30,7 @@ export const VentureCard: FC<VentureCardProps> = ({ venture, onBookVisit }) => {
 
   const getBadgeColor = (auth: string) => {
     switch (auth) {
+      case 'NUDA':
       case 'HMDA':
         return 'primary';
       case 'DTCP':

@@ -82,7 +82,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             let role = 'sales_executive';
             let displayName = fbUser.displayName || fbUser.email?.split('@')[0] || 'Field Agent';
             let phoneNumber = fbUser.phoneNumber || undefined;
-            let branch = 'Hyderabad Main';
+            let branch = 'Nellore Main Hub';
             let cadre: string | undefined = undefined;
             let referralCode: string | undefined = undefined;
             let referredByCode: string | undefined = undefined;
@@ -149,7 +149,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       let role = 'sales_executive';
       let displayName = fbUser.displayName || fbUser.email?.split('@')[0] || 'Field Agent';
       let phoneNumber = fbUser.phoneNumber || undefined;
-      let branch = 'Hyderabad Main';
+      let branch = 'Nellore Main Hub';
 
       try {
         if (db) {
@@ -193,9 +193,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const credential = await signInWithPopup(auth, provider);
           const fbUser = credential.user;
 
-          let displayName = fbUser.displayName || fbUser.email?.split('@')[0] || 'Google User';
+          let displayName = fbUser.displayName || fbUser.email?.split('@')[0] || 'Associate Partner';
           let role = 'sales_executive';
-          let branch = 'Hyderabad Main';
+          let branch = 'Nellore Main Hub';
           let referralCode = `REF-${fbUser.uid.substring(0, 6).toUpperCase()}`;
 
           if (db) {
@@ -246,12 +246,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Safe native fallback preserving clean naming
       const fallbackUser: MobileUser = {
         uid: 'google-user-account',
-        email: 'associate@reerp.com',
-        displayName: 'Google Associate Account',
+        email: 'associate@iskondevelopers.com',
+        displayName: 'Associate Partner',
         role: 'sales_executive',
         phoneNumber: '+91 98480 12345',
-        branch: 'Hyderabad Main',
-        referralCode: 'REF-GOOGLE',
+        branch: 'Nellore Main Hub',
+        referralCode: 'REF-ISKON',
         isProfileCompleted: true,
       };
       setUser(fallbackUser);
@@ -269,11 +269,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       const phoneUser: MobileUser = {
         uid: `phone-${phone.replace(/\D/g, '')}`,
-        email: `${phone.replace(/\D/g, '')}@reerp.com`,
+        email: `${phone.replace(/\D/g, '')}@iskondevelopers.com`,
         displayName: `Agent (${phone})`,
         role: 'sales_executive',
         phoneNumber: phone,
-        branch: 'Hyderabad Main',
+        branch: 'Nellore Main Hub',
       };
       setUser(phoneUser);
       await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(phoneUser));
@@ -290,53 +290,53 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       case 'admin':
         demoUser = {
           uid: 'demo-admin-1',
-          email: 'admin@reerp.com',
+          email: 'admin@iskondevelopers.com',
           displayName: 'Vikram Aditya (CEO & Admin)',
           role: 'super_admin',
           cadre: 'director',
           phoneNumber: '+91 99999 88888',
-          branch: 'Corporate Headquarters',
+          branch: 'Nellore Headquarters',
           isProfileCompleted: true,
         };
         break;
       case 'agent':
         demoUser = {
           uid: 'demo-agent-1',
-          email: 'agent@reerp.com',
+          email: 'agent@iskondevelopers.com',
           displayName: 'Vamshi Krishna',
           role: 'sales_executive',
           phoneNumber: '+91 9876543210',
-          branch: 'Mokila Branch',
+          branch: 'Podalakur Road Branch',
         };
         break;
       case 'driver':
         demoUser = {
           uid: 'demo-driver-1',
-          email: 'driver@reerp.com',
+          email: 'driver@iskondevelopers.com',
           displayName: 'Ramesh Goud',
           role: 'driver',
           phoneNumber: '+91 9848022338',
-          branch: 'Fleet Logistics',
+          branch: 'Nellore Fleet Logistics',
         };
         break;
       case 'manager':
         demoUser = {
           uid: 'demo-manager-1',
-          email: 'manager@reerp.com',
+          email: 'manager@iskondevelopers.com',
           displayName: 'Rajesh Kumar',
           role: 'sales_manager',
           phoneNumber: '+91 9123456789',
-          branch: 'Headquarters',
+          branch: 'Nellore Headquarters',
         };
         break;
       case 'telecaller':
         demoUser = {
           uid: 'demo-tele-1',
-          email: 'telecaller@reerp.com',
+          email: 'telecaller@iskondevelopers.com',
           displayName: 'Pooja Reddy',
           role: 'telecaller',
           phoneNumber: '+91 9988776655',
-          branch: 'Inbound Sales',
+          branch: 'Inbound Sales (Nellore)',
         };
         break;
     }

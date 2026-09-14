@@ -52,7 +52,7 @@ describe('PaymentsWorkspace & Official Receipt Generator', () => {
 
     // Receipt Modal should be visible
     expect(screen.getAllByText(/Official Payment Receipt/i).length).toBeGreaterThan(0);
-    expect(screen.getByText(/SRI CITY DEVELOPERS & INFRA PVT\. LTD\./i)).toBeInTheDocument();
+    expect(screen.getByText(/ISKON DEVELOPERS & INFRA PVT\. LTD\./i)).toBeInTheDocument();
     expect(screen.getByText(/Rupees Two Lakh Only/i)).toBeInTheDocument();
     expect(screen.getByText(/Print \/ Save PDF/i)).toBeInTheDocument();
     expect(screen.getByText(/Download HTML/i)).toBeInTheDocument();

@@ -47,28 +47,28 @@ try {
 
 // 21 Staff Users across all 10 roles
 const USERS = [
-  { id: 'usr-000', uid: 'usr-000', email: 'satyadev.varma@reerp.com', displayName: 'Satyadev Varma', role: 'super_admin', status: 'active', department: 'Executive Board', reportingManager: 'Board of Directors', phoneNumber: '+91 98480 11223' },
-  { id: 'usr-001', uid: 'usr-001', email: 'rajesh.kumar@reerp.com', displayName: 'Rajesh Kumar (Managing Director)', role: 'director', status: 'active', department: 'Executive Management', reportingManager: 'Satyadev Varma', phoneNumber: '+91 98480 22334' },
-  { id: 'usr-dir2', uid: 'usr-dir2', email: 'raghava.rao@reerp.com', displayName: 'K. Raghava Rao (Executive Director)', role: 'director', status: 'active', department: 'Projects & Infrastructure', reportingManager: 'Rajesh Kumar', phoneNumber: '+91 98480 22335' },
-  { id: 'usr-002', uid: 'usr-002', email: 'srinivas.murthy@reerp.com', displayName: 'Srinivas Murthy', role: 'branch_manager', status: 'active', department: 'Gachibowli Branch', reportingManager: 'Rajesh Kumar', phoneNumber: '+91 98480 33445' },
-  { id: 'usr-bm2', uid: 'usr-bm2', email: 'kavitha.reddy@reerp.com', displayName: 'Kavitha Reddy', role: 'branch_manager', status: 'active', department: 'Jubilee Hills Branch', reportingManager: 'Rajesh Kumar', phoneNumber: '+91 98480 33446' },
-  { id: 'usr-003', uid: 'usr-003', email: 'priya.sharma@reerp.com', displayName: 'Priya Sharma (Zonal Head)', role: 'sales_manager', status: 'active', department: 'Zonal Sales (Hyderabad West)', reportingManager: 'Rajesh Kumar', phoneNumber: '+91 98480 44556' },
-  { id: 'usr-sm2', uid: 'usr-sm2', email: 'praveen.teja@reerp.com', displayName: 'Praveen Teja', role: 'sales_manager', status: 'active', department: 'Venture Sales (Mokila & Shankarpally)', reportingManager: 'Priya Sharma', phoneNumber: '+91 98480 44557' },
-  { id: 'usr-005', uid: 'usr-005', email: 'vikram.varma@reerp.com', displayName: 'Vikram Varma', role: 'marketing_manager', status: 'active', department: 'Digital & Growth Marketing', reportingManager: 'Rajesh Kumar', phoneNumber: '+91 98480 55667' },
-  { id: 'usr-006', uid: 'usr-006', email: 'anand.naidu@reerp.com', displayName: 'Anand Naidu', role: 'sales_executive', status: 'active', department: 'Direct Sales & Closures', reportingManager: 'Praveen Teja', phoneNumber: '+91 98480 66778' },
-  { id: 'usr-se2', uid: 'usr-se2', email: 'vamshi.krishna@reerp.com', displayName: 'Vamshi Krishna', role: 'sales_executive', status: 'active', department: 'Field Sales & Client Visits', reportingManager: 'Priya Sharma', phoneNumber: '+91 98480 66779' },
-  { id: 'usr-se3', uid: 'usr-se3', email: 'sneha.latha@reerp.com', displayName: 'Sneha Latha', role: 'sales_executive', status: 'active', department: 'HNI & Investor Sales', reportingManager: 'Priya Sharma', phoneNumber: '+91 98480 66780' },
-  { id: 'usr-007', uid: 'usr-007', email: 'mahesh.babu@reerp.com', displayName: 'Mahesh Babu M', role: 'marketing_executive', status: 'active', department: 'Ground Marketing & Canvassing', reportingManager: 'Vikram Varma', phoneNumber: '+91 98480 77889' },
-  { id: 'usr-me2', uid: 'usr-me2', email: 'divya.sree@reerp.com', displayName: 'Divya Sree', role: 'marketing_executive', status: 'active', department: 'Marketing & Digital', reportingManager: 'Vikram Varma', phoneNumber: '+91 98480 77890' },
-  { id: 'usr-004', uid: 'usr-004', email: 'telecaller1@reerp.com', displayName: 'Sunita Reddy', role: 'telecaller', status: 'active', department: 'Customer Relationship Desk', reportingManager: 'Priya Sharma', phoneNumber: '+91 98480 88990' },
-  { id: 'usr-tc2', uid: 'usr-tc2', email: 'kiran.rao@reerp.com', displayName: 'Kiran Rao', role: 'telecaller', status: 'active', department: 'Inbound Inquiries & Portals', reportingManager: 'Sunita Reddy', phoneNumber: '+91 98480 88994' },
-  { id: 'usr-tc3', uid: 'usr-tc3', email: 'meena.kumari@reerp.com', displayName: 'Meena Kumari', role: 'telecaller', status: 'active', department: 'Outbound Campaigns', reportingManager: 'Sunita Reddy', phoneNumber: '+91 98480 88995' },
-  { id: 'usr-acc1', uid: 'usr-acc1', email: 'accounts.head@reerp.com', displayName: 'Lakshmi Narayana (Chief Accountant)', role: 'accountant', status: 'active', department: 'Finance & Accounts', reportingManager: 'Rajesh Kumar', phoneNumber: '+91 98480 88991' },
-  { id: 'usr-acc2', uid: 'usr-acc2', email: 'radha.krishna@reerp.com', displayName: 'Radha Krishna (Senior Tax/Audit)', role: 'accountant', status: 'active', department: 'Finance & Accounts', reportingManager: 'Lakshmi Narayana', phoneNumber: '+91 98480 88992' },
-  { id: 'usr-drv1', uid: 'usr-drv1', email: 'driver.ramesh@reerp.com', displayName: 'Ramesh Goud', role: 'driver', status: 'active', department: 'Fleet & Logistics', reportingManager: 'Srinivas Murthy', phoneNumber: '+91 98490 11223' },
-  { id: 'usr-drv2', uid: 'usr-drv2', email: 'driver.suresh@reerp.com', displayName: 'Suresh Kumar', role: 'driver', status: 'active', department: 'Fleet & Logistics', reportingManager: 'Srinivas Murthy', phoneNumber: '+91 94412 33445' },
-  { id: 'usr-drv3', uid: 'usr-drv3', email: 'driver.venu@reerp.com', displayName: 'Venu Madhav', role: 'driver', status: 'active', department: 'Fleet & Logistics', reportingManager: 'Srinivas Murthy', phoneNumber: '+91 91234 56780' },
-  { id: 'usr-drv4', uid: 'usr-drv4', email: 'driver.prakash@reerp.com', displayName: 'Prakash Rao', role: 'driver', status: 'active', department: 'Fleet & Logistics', reportingManager: 'Srinivas Murthy', phoneNumber: '+91 99887 76655' },
+  { id: 'usr-000', uid: 'usr-000', email: 'satyadev.varma@iskondevelopers.com', displayName: 'Satyadev Varma', role: 'super_admin', status: 'active', department: 'Executive Board', reportingManager: 'Board of Directors', phoneNumber: '+91 98480 11223' },
+  { id: 'usr-001', uid: 'usr-001', email: 'rajesh.kumar@iskondevelopers.com', displayName: 'Rajesh Kumar (Managing Director)', role: 'director', status: 'active', department: 'Executive Management', reportingManager: 'Satyadev Varma', phoneNumber: '+91 98480 22334' },
+  { id: 'usr-dir2', uid: 'usr-dir2', email: 'raghava.rao@iskondevelopers.com', displayName: 'K. Raghava Rao (Executive Director)', role: 'director', status: 'active', department: 'Projects & Infrastructure', reportingManager: 'Rajesh Kumar', phoneNumber: '+91 98480 22335' },
+  { id: 'usr-002', uid: 'usr-002', email: 'srinivas.murthy@iskondevelopers.com', displayName: 'Srinivas Murthy', role: 'branch_manager', status: 'active', department: 'Mini Bypass Branch', reportingManager: 'Rajesh Kumar', phoneNumber: '+91 98480 33445' },
+  { id: 'usr-bm2', uid: 'usr-bm2', email: 'kavitha.reddy@iskondevelopers.com', displayName: 'Kavitha Reddy', role: 'branch_manager', status: 'active', department: 'Annamayya Circle Head Office', reportingManager: 'Rajesh Kumar', phoneNumber: '+91 98480 33446' },
+  { id: 'usr-003', uid: 'usr-003', email: 'priya.sharma@iskondevelopers.com', displayName: 'Priya Sharma (Zonal Head)', role: 'sales_manager', status: 'active', department: 'Zonal Sales (Nellore & Coastal AP)', reportingManager: 'Rajesh Kumar', phoneNumber: '+91 98480 44556' },
+  { id: 'usr-sm2', uid: 'usr-sm2', email: 'praveen.teja@iskondevelopers.com', displayName: 'Praveen Teja', role: 'sales_manager', status: 'active', department: 'Venture Sales (Podalakur Road)', reportingManager: 'Priya Sharma', phoneNumber: '+91 98480 44557' },
+  { id: 'usr-005', uid: 'usr-005', email: 'vikram.varma@iskondevelopers.com', displayName: 'Vikram Varma', role: 'marketing_manager', status: 'active', department: 'Digital & Growth Marketing', reportingManager: 'Rajesh Kumar', phoneNumber: '+91 98480 55667' },
+  { id: 'usr-006', uid: 'usr-006', email: 'anand.naidu@iskondevelopers.com', displayName: 'Anand Naidu', role: 'sales_executive', status: 'active', department: 'Direct Sales & Closures', reportingManager: 'Praveen Teja', phoneNumber: '+91 98480 66778' },
+  { id: 'usr-se2', uid: 'usr-se2', email: 'vamshi.krishna@iskondevelopers.com', displayName: 'Vamshi Krishna', role: 'sales_executive', status: 'active', department: 'Field Sales & Client Visits', reportingManager: 'Priya Sharma', phoneNumber: '+91 98480 66779' },
+  { id: 'usr-se3', uid: 'usr-se3', email: 'sneha.latha@iskondevelopers.com', displayName: 'Sneha Latha', role: 'sales_executive', status: 'active', department: 'HNI & Investor Sales', reportingManager: 'Priya Sharma', phoneNumber: '+91 98480 66780' },
+  { id: 'usr-007', uid: 'usr-007', email: 'mahesh.babu@iskondevelopers.com', displayName: 'Mahesh Babu M', role: 'marketing_executive', status: 'active', department: 'Ground Marketing & Canvassing', reportingManager: 'Vikram Varma', phoneNumber: '+91 98480 77889' },
+  { id: 'usr-me2', uid: 'usr-me2', email: 'divya.sree@iskondevelopers.com', displayName: 'Divya Sree', role: 'marketing_executive', status: 'active', department: 'Marketing & Digital', reportingManager: 'Vikram Varma', phoneNumber: '+91 98480 77890' },
+  { id: 'usr-004', uid: 'usr-004', email: 'telecaller1@iskondevelopers.com', displayName: 'Sunita Reddy', role: 'telecaller', status: 'active', department: 'Customer Relationship Desk', reportingManager: 'Priya Sharma', phoneNumber: '+91 98480 88990' },
+  { id: 'usr-tc2', uid: 'usr-tc2', email: 'kiran.rao@iskondevelopers.com', displayName: 'Kiran Rao', role: 'telecaller', status: 'active', department: 'Inbound Inquiries & Portals', reportingManager: 'Sunita Reddy', phoneNumber: '+91 98480 88994' },
+  { id: 'usr-tc3', uid: 'usr-tc3', email: 'meena.kumari@iskondevelopers.com', displayName: 'Meena Kumari', role: 'telecaller', status: 'active', department: 'Outbound Campaigns', reportingManager: 'Sunita Reddy', phoneNumber: '+91 98480 88995' },
+  { id: 'usr-acc1', uid: 'usr-acc1', email: 'accounts.head@iskondevelopers.com', displayName: 'Lakshmi Narayana (Chief Accountant)', role: 'accountant', status: 'active', department: 'Finance & Accounts', reportingManager: 'Rajesh Kumar', phoneNumber: '+91 98480 88991' },
+  { id: 'usr-acc2', uid: 'usr-acc2', email: 'radha.krishna@iskondevelopers.com', displayName: 'Radha Krishna (Senior Tax/Audit)', role: 'accountant', status: 'active', department: 'Finance & Accounts', reportingManager: 'Lakshmi Narayana', phoneNumber: '+91 98480 88992' },
+  { id: 'usr-drv1', uid: 'usr-drv1', email: 'driver.ramesh@iskondevelopers.com', displayName: 'Ramesh Goud', role: 'driver', status: 'active', department: 'Fleet & Logistics', reportingManager: 'Srinivas Murthy', phoneNumber: '+91 98490 11223' },
+  { id: 'usr-drv2', uid: 'usr-drv2', email: 'driver.suresh@iskondevelopers.com', displayName: 'Suresh Kumar', role: 'driver', status: 'active', department: 'Fleet & Logistics', reportingManager: 'Srinivas Murthy', phoneNumber: '+91 94412 33445' },
+  { id: 'usr-drv3', uid: 'usr-drv3', email: 'driver.venu@iskondevelopers.com', displayName: 'Venu Madhav', role: 'driver', status: 'active', department: 'Fleet & Logistics', reportingManager: 'Srinivas Murthy', phoneNumber: '+91 91234 56780' },
+  { id: 'usr-drv4', uid: 'usr-drv4', email: 'driver.prakash@iskondevelopers.com', displayName: 'Prakash Rao', role: 'driver', status: 'active', department: 'Fleet & Logistics', reportingManager: 'Srinivas Murthy', phoneNumber: '+91 99887 76655' },
 ];
 
 // 28 Realistic Leads
@@ -81,8 +81,8 @@ const REALISTIC_NAMES = [
   'Prasad Babu', 'Geetha Rani', 'Deepak Verma', 'Srinivas Goud',
   'Padmavathi K', 'Karthik Raja', 'Sunil Narayana', 'Shravan Reddy'
 ];
-const CITIES = ['Hyderabad', 'Hyderabad', 'Bangalore', 'Vijayawada', 'Visakhapatnam', 'NRI (Dallas, USA)', 'NRI (Dubai, UAE)'];
-const VENTURES = ['Sunrise Enclave (Mokila)', 'Green Valley Phase 2 (Shadnagar)', 'Palm County (Kollur)', 'Royal Meadows (Shankarpally)'];
+const CITIES = ['Nellore', 'Nellore', 'Tirupati', 'Chennai', 'Vijayawada', 'NRI (Dallas, USA)', 'NRI (Dubai, UAE)'];
+const VENTURES = ['ISKON City - 2', 'Dream City', 'ISKON Brundhavanam', 'ISKON Elite Township'];
 const SOURCES = ['PUBLIC_WEBSITE', 'FACEBOOK_ADS', 'INSTAGRAM_ADS', 'GOOGLE_SEARCH', '99ACRES', 'MAGICBRICKS', 'WALK_IN', 'REFERRAL'];
 const STATUSES = ['NEW', 'CONTACTED', 'QUALIFIED', 'SITE_VISIT_SCHEDULED', 'SITE_VISIT_COMPLETED', 'NEGOTIATING', 'BOOKED'];
 
@@ -110,22 +110,22 @@ const LEADS = REALISTIC_NAMES.map((name, i) => {
 
 // 4 Projects
 const PROJECTS = [
-  { id: 'proj-1', name: 'Sunrise Enclave', code: 'SRE-01', projectType: 'RESIDENTIAL', status: 'ACTIVE', approvalAuthority: 'HMDA', reraId: 'P02400004910', totalAreaAcres: 38, location: { village: 'Mokila', mandal: 'Shankarpally', district: 'Ranga Reddy', state: 'Telangana' }, pricing: { basePrice: 24500 } },
-  { id: 'proj-2', name: 'Green Valley Phase 2', code: 'GV-02', projectType: 'RESIDENTIAL', status: 'ACTIVE', approvalAuthority: 'DTCP', reraId: 'P02400005120', totalAreaAcres: 52, location: { village: 'Shadnagar', mandal: 'Farooqnagar', district: 'Ranga Reddy', state: 'Telangana' }, pricing: { basePrice: 13500 } },
-  { id: 'proj-3', name: 'Palm County Villa Plots', code: 'PC-03', projectType: 'VILLA_PLOTS', status: 'ACTIVE', approvalAuthority: 'HMDA', reraId: 'P02400006230', totalAreaAcres: 25, location: { village: 'Kollur', mandal: 'Ramachandrapuram', district: 'Sangareddy', state: 'Telangana' }, pricing: { basePrice: 38000 } },
-  { id: 'proj-4', name: 'Royal Meadows', code: 'RM-04', projectType: 'FARMLAND_RESIDENTIAL', status: 'ACTIVE', approvalAuthority: 'DTCP', reraId: 'P02400007890', totalAreaAcres: 60, location: { village: 'Shankarpally', mandal: 'Shankarpally', district: 'Ranga Reddy', state: 'Telangana' }, pricing: { basePrice: 18000 } },
+  { id: 'proj-1', name: 'ISKON City - 2', code: 'IC2-01', projectType: 'RESIDENTIAL', status: 'ACTIVE', approvalAuthority: 'NUDA', reraId: 'AP-RERA-IC2-2026', totalAreaAcres: 120, location: { village: 'Mattempadu', mandal: 'Podalakur Road', district: 'Nellore', state: 'Andhra Pradesh' }, pricing: { basePrice: 18500 } },
+  { id: 'proj-2', name: 'Dream City', code: 'DC-02', projectType: 'RESIDENTIAL', status: 'ACTIVE', approvalAuthority: 'DTCP', reraId: 'AP-RERA-DC-2026', totalAreaAcres: 52, location: { village: 'Kovuru', mandal: 'Nellore-Bombay Highway', district: 'Nellore', state: 'Andhra Pradesh' }, pricing: { basePrice: 14500 } },
+  { id: 'proj-3', name: 'ISKON Brundhavanam', code: 'IB-03', projectType: 'VILLA_PLOTS', status: 'ACTIVE', approvalAuthority: 'NUDA', reraId: 'AP-RERA-IB-2026', totalAreaAcres: 35, location: { village: 'Chinthareddypalem', mandal: 'Nellore Rural', district: 'Nellore', state: 'Andhra Pradesh' }, pricing: { basePrice: 22000 } },
+  { id: 'proj-4', name: 'ISKON Elite Township', code: 'IET-04', projectType: 'RESIDENTIAL', status: 'ACTIVE', approvalAuthority: 'NUDA', reraId: 'AP-RERA-IET-2026', totalAreaAcres: 45, location: { village: 'Annamayya Circle Extn', mandal: 'Mini Bypass', district: 'Nellore', state: 'Andhra Pradesh' }, pricing: { basePrice: 28000 } },
 ];
 
 // 8 Vehicles
 const VEHICLES = [
-  { id: 'veh-1', registrationNumber: 'TS 09 UB 1001', makeModel: 'Toyota Innova Crysta 2.4 VX', vehicleType: 'SUV', fuelType: 'DIESEL', capacitySeats: 7, currentOdometerKm: 48250, status: 'AVAILABLE', assignedDriverName: 'Ramesh Goud' },
-  { id: 'veh-2', registrationNumber: 'TS 08 EX 4050', makeModel: 'Force Tempo Traveller 17 Seater', vehicleType: 'MINI_BUS', fuelType: 'DIESEL', capacitySeats: 17, currentOdometerKm: 64120, status: 'IN_TRANSIT', assignedDriverName: 'Suresh Kumar' },
-  { id: 'veh-3', registrationNumber: 'TS 07 HK 2020', makeModel: 'Maruti Suzuki Ertiga ZXi', vehicleType: 'CAB', fuelType: 'CNG', capacitySeats: 7, currentOdometerKm: 32400, status: 'AVAILABLE', assignedDriverName: 'Venu Madhav' },
-  { id: 'veh-4', registrationNumber: 'TS 09 Z 8899', makeModel: 'Mahindra Scorpio-N Z8', vehicleType: 'SUV', fuelType: 'DIESEL', capacitySeats: 7, currentOdometerKm: 28900, status: 'IN_TRANSIT', assignedDriverName: 'Prakash Rao' },
-  { id: 'veh-5', registrationNumber: 'TS 08 FA 3311', makeModel: 'Toyota Innova Hycross Hybrid', vehicleType: 'SUV', fuelType: 'PETROL', capacitySeats: 8, currentOdometerKm: 14500, status: 'AVAILABLE', assignedDriverName: 'Naresh Reddy' },
-  { id: 'veh-6', registrationNumber: 'TS 09 WL 7788', makeModel: 'Tata Winger Platinum 12 Seater', vehicleType: 'MINI_BUS', fuelType: 'DIESEL', capacitySeats: 12, currentOdometerKm: 22800, status: 'IN_TRANSIT', assignedDriverName: 'K. Mallesh' },
-  { id: 'veh-7', registrationNumber: 'TS 07 TH 4400', makeModel: 'Mahindra Thar 4x4 (Survey)', vehicleType: 'SUV', fuelType: 'DIESEL', capacitySeats: 4, currentOdometerKm: 19450, status: 'AVAILABLE', assignedDriverName: 'B. Appa Rao' },
-  { id: 'veh-8', registrationNumber: 'TS 09 TF 9900', makeModel: 'Toyota Fortuner 4x4 Legender', vehicleType: 'SUV', fuelType: 'DIESEL', capacitySeats: 7, currentOdometerKm: 12100, status: 'AVAILABLE', assignedDriverName: 'Chandra Sekhar' },
+  { id: 'veh-1', registrationNumber: 'AP 26 UB 1001', makeModel: 'Toyota Innova Crysta 2.4 VX', vehicleType: 'SUV', fuelType: 'DIESEL', capacitySeats: 7, currentOdometerKm: 48250, status: 'AVAILABLE', assignedDriverName: 'Ramesh Goud' },
+  { id: 'veh-2', registrationNumber: 'AP 26 EX 4050', makeModel: 'Force Tempo Traveller 17 Seater', vehicleType: 'MINI_BUS', fuelType: 'DIESEL', capacitySeats: 17, currentOdometerKm: 64120, status: 'IN_TRANSIT', assignedDriverName: 'Suresh Kumar' },
+  { id: 'veh-3', registrationNumber: 'AP 26 HK 2020', makeModel: 'Maruti Suzuki Ertiga ZXi', vehicleType: 'CAB', fuelType: 'CNG', capacitySeats: 7, currentOdometerKm: 32400, status: 'AVAILABLE', assignedDriverName: 'Venu Madhav' },
+  { id: 'veh-4', registrationNumber: 'AP 26 Z 8899', makeModel: 'Mahindra Scorpio-N Z8', vehicleType: 'SUV', fuelType: 'DIESEL', capacitySeats: 7, currentOdometerKm: 28900, status: 'IN_TRANSIT', assignedDriverName: 'Prakash Rao' },
+  { id: 'veh-5', registrationNumber: 'AP 26 FA 3311', makeModel: 'Toyota Innova Hycross Hybrid', vehicleType: 'SUV', fuelType: 'PETROL', capacitySeats: 8, currentOdometerKm: 14500, status: 'AVAILABLE', assignedDriverName: 'Naresh Reddy' },
+  { id: 'veh-6', registrationNumber: 'AP 26 WL 7788', makeModel: 'Tata Winger Platinum 12 Seater', vehicleType: 'MINI_BUS', fuelType: 'DIESEL', capacitySeats: 12, currentOdometerKm: 22800, status: 'IN_TRANSIT', assignedDriverName: 'K. Mallesh' },
+  { id: 'veh-7', registrationNumber: 'AP 26 TH 4400', makeModel: 'Mahindra Thar 4x4 (Survey)', vehicleType: 'SUV', fuelType: 'DIESEL', capacitySeats: 4, currentOdometerKm: 19450, status: 'AVAILABLE', assignedDriverName: 'B. Appa Rao' },
+  { id: 'veh-8', registrationNumber: 'AP 26 TF 9900', makeModel: 'Toyota Fortuner 4x4 Legender', vehicleType: 'SUV', fuelType: 'DIESEL', capacitySeats: 7, currentOdometerKm: 12100, status: 'AVAILABLE', assignedDriverName: 'Chandra Sekhar' },
 ];
 
 async function seedCollection(collectionName, items) {

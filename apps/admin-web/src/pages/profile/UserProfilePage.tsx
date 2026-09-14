@@ -94,8 +94,8 @@ export const UserProfilePage: React.FC = () => {
   const [editName, setEditName] = useState(user?.displayName || '');
   const [editPhone, setEditPhone] = useState(user?.phoneNumber || '');
   const [editPhotoUrl, setEditPhotoUrl] = useState(user?.photoURL || '');
-  const [editCity, setEditCity] = useState(user?.kycDetails?.city || 'Hyderabad');
-  const [editBranch, setEditBranch] = useState(user?.kycDetails?.branch || 'Hyderabad Main Hub');
+  const [editCity, setEditCity] = useState(user?.kycDetails?.city || 'Nellore');
+  const [editBranch, setEditBranch] = useState(user?.kycDetails?.branch || 'Nellore Main Hub');
   const [editAddress, setEditAddress] = useState(user?.kycDetails?.address || '');
   const [editEmergency, setEditEmergency] = useState(user?.kycDetails?.emergencyContact || '');
   const [editPan, setEditPan] = useState(user?.kycDetails?.panNumber || '');
@@ -112,8 +112,8 @@ export const UserProfilePage: React.FC = () => {
       setEditName(user.displayName || '');
       setEditPhone(user.phoneNumber || '');
       setEditPhotoUrl(user.photoURL || '');
-      setEditCity(user.kycDetails?.city || 'Hyderabad');
-      setEditBranch(user.kycDetails?.branch || 'Hyderabad Main Hub');
+      setEditCity(user.kycDetails?.city || 'Nellore');
+      setEditBranch(user.kycDetails?.branch || 'Nellore Main Hub');
       setEditAddress(user.kycDetails?.address || '');
       setEditEmergency(user.kycDetails?.emergencyContact || '');
       setEditPan(user.kycDetails?.panNumber || '');
@@ -166,8 +166,8 @@ export const UserProfilePage: React.FC = () => {
         phoneNumber: editPhone.trim() || undefined,
         photoURL: editPhotoUrl.trim() || undefined,
         kycDetails: {
-          city: editCity.trim() || 'Hyderabad',
-          branch: editBranch.trim() || 'Hyderabad Main Hub',
+          city: editCity.trim() || 'Nellore',
+          branch: editBranch.trim() || 'Nellore Main Hub',
           address: editAddress.trim() || undefined,
           emergencyContact: editEmergency.trim() || undefined,
           panNumber: editPan.trim().toUpperCase() || undefined,
@@ -330,7 +330,7 @@ export const UserProfilePage: React.FC = () => {
                 />
                 <Chip
                   icon={<LocationOnIcon sx={{ color: '#cbd5e1 !important', fontSize: '0.9rem !important' }} />}
-                  label={user?.kycDetails?.city || 'Hyderabad'}
+                  label={user?.kycDetails?.city || 'Nellore'}
                   size="small"
                   sx={{
                     bgcolor: 'rgba(255,255,255,0.1)',
@@ -622,7 +622,7 @@ export const UserProfilePage: React.FC = () => {
                               BRANCH / HUB
                             </Typography>
                             <Typography variant="body2" sx={{ fontWeight: 700, color: '#ffffff', fontSize: '0.75rem' }}>
-                              {user?.kycDetails?.branch || 'Hyderabad Hub'}
+                              {user?.kycDetails?.branch || 'Nellore Main Hub'}
                             </Typography>
                           </Grid>
                           <Grid item xs={6}>
@@ -757,10 +757,10 @@ export const UserProfilePage: React.FC = () => {
                               HEAD OFFICE:
                             </Typography>
                             <Typography variant="caption" sx={{ color: '#e2e8f0', fontSize: '0.58rem', display: 'block' }}>
-                              Financial District, Gachibowli, Hyderabad
+                              RKRI Towers, Annamayya Circle, Mini Byepass Road, Nellore
                             </Typography>
                             <Typography variant="caption" sx={{ color: '#fbbf24', fontSize: '0.58rem' }}>
-                              www.primeestates.com | +91 98480 11111
+                              www.iskondevelopers.com | +91 98480 12345
                             </Typography>
                           </Box>
 
@@ -982,7 +982,7 @@ export const UserProfilePage: React.FC = () => {
                     OPERATING CITY / REGION
                   </Typography>
                   <Typography variant="h6" fontWeight={700} color="#0f172a" sx={{ mt: 0.5 }}>
-                    {user?.kycDetails?.city || 'Hyderabad'}
+                    {user?.kycDetails?.city || 'Nellore'}
                   </Typography>
                 </CardContent>
               </Card>
@@ -995,7 +995,7 @@ export const UserProfilePage: React.FC = () => {
                     PERMANENT ADDRESS
                   </Typography>
                   <Typography variant="body1" fontWeight={600} color="#0f172a" sx={{ mt: 0.5 }}>
-                    {user?.kycDetails?.address || 'Plot No. 12, Sri Nagar Colony, Hyderabad'}
+                    {user?.kycDetails?.address || 'RKRI Towers, Annamayya Circle, Nellore'}
                   </Typography>
                 </CardContent>
               </Card>
@@ -1097,7 +1097,7 @@ export const UserProfilePage: React.FC = () => {
                     ASSIGNED BRANCH HUB
                   </Typography>
                   <Typography variant="h6" fontWeight={700} color="#0f172a" sx={{ mt: 0.5 }}>
-                    {user?.kycDetails?.branch || 'Hyderabad Main Hub'}
+                    {user?.kycDetails?.branch || 'Nellore Main Hub'}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
                     Registered under regional zonal division.
@@ -1152,7 +1152,7 @@ export const UserProfilePage: React.FC = () => {
                     BANK NAME & BRANCH
                   </Typography>
                   <Typography variant="h6" fontWeight={700} color="#0f172a" sx={{ mt: 0.5 }}>
-                    {user?.kycDetails?.bankName || 'HDFC Bank, Gachibowli Branch'}
+                    {user?.kycDetails?.bankName || 'HDFC Bank, Nellore Main Branch'}
                   </Typography>
                 </CardContent>
               </Card>

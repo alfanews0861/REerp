@@ -21,9 +21,9 @@ describe('Gemini Real Estate AI Assistant Service', () => {
     expect(response.recommendedPlots![0].facing).toBe('EAST');
   });
 
-  it('should explain HMDA vs DTCP differences in English', async () => {
-    const enResponse = await queryGeminiRealEstateAssistant('What is the difference between HMDA and DTCP?', 'en');
-    expect(enResponse.replyText).toContain('Hyderabad Metropolitan Development Authority');
+  it('should explain NUDA vs DTCP differences in English', async () => {
+    const enResponse = await queryGeminiRealEstateAssistant('What is the difference between NUDA and DTCP?', 'en');
+    expect(enResponse.replyText).toContain('Nellore Urban Development Authority');
     expect(enResponse.replyText).toContain('Directorate of Town & Country Planning');
   });
 

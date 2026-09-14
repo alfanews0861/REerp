@@ -600,7 +600,7 @@ export default function HomeScreen() {
                 <Building2 size={16} color={colors.textMuted} />
                 <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>Branch:</Text>
                 <Text style={[styles.detailValue, { color: colors.textPrimary }]}>
-                  {user?.branch || 'Hyderabad Headquarters'}
+                  {user?.branch || 'Nellore Headquarters'}
                 </Text>
               </View>
 
