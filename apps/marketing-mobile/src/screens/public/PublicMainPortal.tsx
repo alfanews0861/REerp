@@ -13,13 +13,13 @@ import { PublicSiteVisitScreen } from './PublicSiteVisitScreen';
 import { PublicAiAssistantScreen } from './PublicAiAssistantScreen';
 import { PublicContactScreen } from './PublicContactScreen';
 import { PublicPlot } from '../../data/publicVenturesData';
+import { MobileAppHeader } from '../../components/MobileAppHeader';
 import {
   Building2,
   Layers,
   Car,
   Sparkles,
   PhoneCall,
-  ShieldCheck,
   LogIn,
 } from 'lucide-react-native';
 
@@ -54,35 +54,22 @@ export const PublicMainPortal: React.FC<PublicMainPortalProps> = ({ onOpenLogin 
     <View style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor="#0F172A" />
 
-      {/* Top Main Navigation Header */}
-      <View
-        style={[
-          styles.header,
-          {
-            paddingTop: Math.max(insets.top, 12),
-          },
-        ]}
-      >
-        <View style={styles.brandRow}>
-          <View style={styles.brandLogo}>
-            <ShieldCheck size={20} color="#F59E0B" />
-          </View>
-          <View>
-            <Text style={styles.brandTitle}>ISKON Developers</Text>
-            <Text style={styles.brandSub}>NUDA & DTCP Approved Townships</Text>
-          </View>
-        </View>
-
-        {/* Prominent Admin / Staff Login Gateway */}
-        <TouchableOpacity
-          style={styles.adminLoginBtn}
-          onPress={onOpenLogin}
-          activeOpacity={0.8}
-        >
-          <LogIn size={15} color="#FFFFFF" />
-          <Text style={styles.adminLoginBtnText}>Admin / Staff Login</Text>
-        </TouchableOpacity>
-      </View>
+      {/* Top Main Navigation Header with Logo, Fixed Title & Hamburger Menu */}
+      <MobileAppHeader
+        showLogo={true}
+        showMenu={true}
+        subtitle="NUDA & DTCP APPROVED TOWNSHIPS"
+        rightElement={
+          <TouchableOpacity
+            style={styles.adminLoginBtn}
+            onPress={onOpenLogin}
+            activeOpacity={0.8}
+          >
+            <LogIn size={14} color="#FFFFFF" />
+            <Text style={styles.adminLoginBtnText}>Staff Login</Text>
+          </TouchableOpacity>
+        }
+      />
 
       {/* Screen Content Body */}
       <View style={styles.content}>
@@ -216,42 +203,6 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#0F172A',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#0F172A',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#1E293B',
-  },
-  brandRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  brandLogo: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: '#1E40AF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1.5,
-    borderColor: '#F59E0B',
-  },
-  brandTitle: {
-    fontSize: 16,
-    fontWeight: '900',
-    color: '#FFFFFF',
-    letterSpacing: -0.2,
-  },
-  brandSub: {
-    fontSize: 11,
-    color: '#94A3B8',
-    fontWeight: '500',
   },
   adminLoginBtn: {
     flexDirection: 'row',
