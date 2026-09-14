@@ -37,7 +37,16 @@ export const LeadListScreen: React.FC<LeadListScreenProps> = ({ onSelectLead }) 
   const { user } = useAuth();
   const { colors, isDark } = useMobileTheme();
 
-  const [filter, setFilter] = useState<'MY_LEADS' | 'ALL'>('MY_LEADS');
+  const userRole = (user?.cadre || user?.role || '').toLowerCase();
+  const isAdminOrManager =
+    userRole.includes('admin') ||
+    userRole.includes('director') ||
+    userRole.includes('super_admin') ||
+    userRole.includes('manager') ||
+    userRole.includes('gm') ||
+    userRole.includes('cgm');
+
+  const [filter, setFilter] = useState<'MY_LEADS' | 'ALL'>(isAdminOrManager ? 'ALL' : 'MY_LEADS');
   const [leads, setLeads] = useState<LeadItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -55,7 +64,7 @@ export const LeadListScreen: React.FC<LeadListScreenProps> = ({ onSelectLead }) 
       const leadsRef = collection(db, 'leads');
       let snap;
 
-      const isTelecaller = (user?.cadre || user?.role || '').toLowerCase().includes('telecaller');
+      const isTelecaller = userRole.includes('telecaller');
 
       if (isTelecaller && user?.uid) {
         // Telecaller isolation: Telecallers ONLY see leads assigned directly to them
@@ -65,7 +74,7 @@ export const LeadListScreen: React.FC<LeadListScreenProps> = ({ onSelectLead }) 
         } catch {
           snap = await getDocs(query(leadsRef, limit(50)));
         }
-      } else if (filter === 'MY_LEADS' && user?.uid) {
+      } else if (filter === 'MY_LEADS' && user?.uid && !isAdminOrManager) {
         try {
           const q = query(leadsRef, where('assignedTo', '==', user.uid), limit(50));
           snap = await getDocs(q);
@@ -78,29 +87,30 @@ export const LeadListScreen: React.FC<LeadListScreenProps> = ({ onSelectLead }) 
       }
 
       const loadedLeads: LeadItem[] = [];
-      snap.forEach((docSnap) => {
-        const data = docSnap.data();
-        
-        // Lead isolation verification:
-        // If telecaller, only allow own leads
-        if (isTelecaller && user?.uid) {
-          if (data.assignedTo && data.assignedTo !== user.uid && data.assignedTelecallerId !== user.uid) {
-            return;
+      if (snap && !snap.empty) {
+        snap.forEach((docSnap) => {
+          const data = docSnap.data();
+          
+          // Lead isolation verification:
+          if (isTelecaller && user?.uid) {
+            if (data.assignedTo && data.assignedTo !== user.uid && data.assignedTelecallerId !== user.uid) {
+              return;
+            }
           }
-        }
 
-        loadedLeads.push({
-          id: docSnap.id,
-          name: data.fullName || data.name || 'Unnamed Prospect',
-          phone: data.phone || data.phoneNumber || 'No phone',
-          email: data.email,
-          status: (data.status || 'NEW').toUpperCase(),
-          assignedTo: data.assignedTo || data.agentId,
-          source: data.source || 'Direct',
-          propertyInterest: data.propertyInterest || data.interestedProjectName,
-          createdAt: data.createdAt,
+          loadedLeads.push({
+            id: docSnap.id,
+            name: data.fullName || data.name || data.customerName || 'Unnamed Prospect',
+            phone: data.phone || data.phoneNumber || 'No phone',
+            email: data.email,
+            status: (data.status || 'NEW').toUpperCase(),
+            assignedTo: data.assignedTo || data.agentId,
+            source: data.source || (data.bookingRef ? 'Public Website' : 'Direct CRM'),
+            propertyInterest: data.projectName || data.propertyInterest || data.interestedProjectName || 'Open Venture Enquiry',
+            createdAt: data.createdAt,
+          });
         });
-      });
+      }
 
       setLeads(loadedLeads);
     } catch (err) {
@@ -265,9 +275,17 @@ export const LeadListScreen: React.FC<LeadListScreenProps> = ({ onSelectLead }) 
             {searchQuery
               ? 'No matching leads found for your search query.'
               : filter === 'MY_LEADS'
-              ? 'You do not have any leads assigned currently.'
-              : 'No leads available in this category.'}
+              ? 'You do not have any direct leads assigned currently.'
+              : 'No leads found in this category.'}
           </Text>
+          {filter === 'MY_LEADS' && !isTelecallerUser && (
+            <TouchableOpacity
+              style={[styles.switchBtn, { backgroundColor: colors.primary }]}
+              onPress={() => setFilter('ALL')}
+            >
+              <Text style={styles.switchBtnText}>View All Team & Website Leads</Text>
+            </TouchableOpacity>
+          )}
         </View>
       ) : (
         <FlatList
@@ -376,6 +394,17 @@ const styles = StyleSheet.create({
   loadingText: { marginTop: 12, fontSize: 14, fontWeight: '500' },
   emptyTitle: { fontSize: 16, fontWeight: '800', marginTop: 12 },
   emptySub: { fontSize: 13, textAlign: 'center', marginTop: 4, lineHeight: 18 },
+  switchBtn: {
+    marginTop: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 10,
+  },
+  switchBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '800',
+    fontSize: 13,
+  },
 });
 
 export default LeadListScreen;

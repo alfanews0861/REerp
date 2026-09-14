@@ -3,6 +3,7 @@ import { Tabs } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Home, Users, MapPin, ReceiptText, CalendarCheck, Car } from 'lucide-react-native';
 import { useMobileTheme } from '../../src/theme';
+import { MobileAppHeader } from '../../src/components/MobileAppHeader';
 
 export default function TabLayout() {
   const { colors, isDark } = useMobileTheme();
@@ -31,20 +32,12 @@ export default function TabLayout() {
           fontWeight: '700',
           letterSpacing: 0.2,
         },
-        headerStyle: {
-          backgroundColor: colors.surfaceCard,
-          borderBottomColor: colors.border,
-          borderBottomWidth: 1,
-          elevation: 2,
-          shadowColor: '#000000',
-          shadowOpacity: 0.05,
-        },
-        headerTintColor: colors.textPrimary,
-        headerTitleStyle: {
-          fontWeight: '800',
-          fontSize: 18,
-          letterSpacing: -0.2,
-        },
+        header: ({ options }) => (
+          <MobileAppHeader
+            title={options.title === 'Home' ? undefined : options.title}
+            subtitle={options.title === 'Home' ? 'DTCP & HMDA APPROVED TOWNSHIPS' : undefined}
+          />
+        ),
       }}
       initialRouteName="index"
     >
@@ -52,7 +45,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          headerShown: false,
+          headerShown: true,
           tabBarIcon: ({ color, focused }) => (
             <Home color={color} size={focused ? 24 : 22} strokeWidth={focused ? 2.5 : 2} />
           ),

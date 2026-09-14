@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
+  Modal,
+  Alert,
 } from 'react-native';
 import { Card } from '../../src/components/Card';
 import { Button } from '../../src/components/Button';
@@ -33,6 +35,13 @@ import {
   Globe,
   Crown,
   Layers,
+  ShieldCheck,
+  Phone,
+  Mail,
+  Copy,
+  ChevronRight,
+  X,
+  Building2,
 } from 'lucide-react-native';
 
 export default function HomeScreen() {
@@ -51,6 +60,7 @@ export default function HomeScreen() {
   const [totalRevenue, setTotalRevenue] = useState<string>('₹ 18.5 Cr');
   const [loadingStats, setLoadingStats] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [profileModalVisible, setProfileModalVisible] = useState(false);
 
   const userRole = (user?.cadre || user?.role || 'sales_executive').toLowerCase();
   const isAdmin =
@@ -149,7 +159,7 @@ export default function HomeScreen() {
         styles.container,
         {
           backgroundColor: colors.background,
-          paddingTop: Math.max(insets.top, 16) + 6,
+          paddingTop: 12,
         },
       ]}
       refreshControl={
@@ -164,20 +174,29 @@ export default function HomeScreen() {
       {/* User Header Profile Card with Public Website Switcher */}
       <View style={styles.userProfileCard}>
         <View style={styles.userInfoRow}>
-          <View style={styles.avatar}>
-            {isAdmin ? <Crown size={26} color="#F59E0B" /> : <User size={26} color="#ffffff" />}
-          </View>
-          <View style={styles.userDetails}>
-            <Text style={styles.userName}>{user?.displayName || 'Active Agent'}</Text>
-            <View style={styles.roleRow}>
-              <Badge
-                label={formatRole(user?.cadre || user?.role)}
-                variant={isAdmin ? 'gold' : 'gold'}
-                size="small"
-              />
-              {user?.branch && <Text style={styles.branchText}>• {user.branch}</Text>}
+          <TouchableOpacity
+            style={styles.userProfileClickable}
+            onPress={() => setProfileModalVisible(true)}
+            activeOpacity={0.7}
+          >
+            <View style={styles.avatar}>
+              {isAdmin ? <Crown size={24} color="#F59E0B" /> : <User size={24} color="#ffffff" />}
             </View>
-          </View>
+            <View style={styles.userDetails}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <Text style={styles.userName} numberOfLines={1}>{user?.displayName || 'Active Agent'}</Text>
+                <ChevronRight size={14} color="#94A3B8" />
+              </View>
+              <View style={styles.roleRow}>
+                <Badge
+                  label={formatRole(user?.cadre || user?.role)}
+                  variant={isAdmin ? 'gold' : 'gold'}
+                  size="small"
+                />
+                {user?.branch && <Text style={styles.branchText} numberOfLines={1}>• {user.branch}</Text>}
+              </View>
+            </View>
+          </TouchableOpacity>
 
           {/* Quick Header Actions: Public Site & Logout */}
           <View style={styles.headerBtnGroup}>
@@ -514,6 +533,127 @@ export default function HomeScreen() {
         </View>
       </Card>
 
+      {/* Interactive Employee Profile Modal */}
+      <Modal
+        visible={profileModalVisible}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setProfileModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalCard, { backgroundColor: colors.surfaceCard, borderColor: colors.border }]}>
+            {/* Modal Header */}
+            <View style={styles.modalHeader}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <ShieldCheck size={22} color={colors.primary} />
+                <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>Employee Profile & Badge</Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => setProfileModalVisible(false)}
+                style={styles.closeBtn}
+              >
+                <X size={20} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+
+            {/* Profile Summary */}
+            <View style={styles.modalProfileHeader}>
+              <View style={styles.modalAvatar}>
+                {isAdmin ? <Crown size={32} color="#F59E0B" /> : <User size={32} color="#FFFFFF" />}
+              </View>
+              <Text style={[styles.modalUserName, { color: colors.textPrimary }]}>
+                {user?.displayName || 'Active Staff Associate'}
+              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                <Badge
+                  label={formatRole(user?.cadre || user?.role)}
+                  variant={isAdmin ? 'gold' : 'gold'}
+                  size="small"
+                />
+                {user?.branch && (
+                  <Text style={[styles.modalBranch, { color: colors.textSecondary }]}>
+                    • {user.branch}
+                  </Text>
+                )}
+              </View>
+            </View>
+
+            {/* Profile Details List */}
+            <View style={[styles.detailsSection, { borderColor: colors.border }]}>
+              <View style={styles.detailRow}>
+                <Mail size={16} color={colors.textMuted} />
+                <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>Email:</Text>
+                <Text style={[styles.detailValue, { color: colors.textPrimary }]} numberOfLines={1}>
+                  {user?.email || 'Not configured'}
+                </Text>
+              </View>
+
+              <View style={styles.detailRow}>
+                <Phone size={16} color={colors.textMuted} />
+                <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>Mobile:</Text>
+                <Text style={[styles.detailValue, { color: colors.textPrimary }]}>
+                  {user?.phoneNumber || '+91 98480 12345'}
+                </Text>
+              </View>
+
+              <View style={styles.detailRow}>
+                <Building2 size={16} color={colors.textMuted} />
+                <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>Branch:</Text>
+                <Text style={[styles.detailValue, { color: colors.textPrimary }]}>
+                  {user?.branch || 'Hyderabad Headquarters'}
+                </Text>
+              </View>
+
+              {user?.referralCode && (
+                <View style={styles.detailRow}>
+                  <Award size={16} color="#F59E0B" />
+                  <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>Ref Code:</Text>
+                  <Text style={[styles.detailValue, { color: colors.primary, fontWeight: '800' }]}>
+                    {user.referralCode}
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            {/* Quick Actions */}
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={[styles.modalActionBtn, { backgroundColor: colors.primary }]}
+                onPress={() => {
+                  setProfileModalVisible(false);
+                  router.push('/register-profile');
+                }}
+              >
+                <Text style={styles.modalActionText}>Complete KYC / Update Details</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.modalActionOutlineBtn, { borderColor: colors.border }]}
+                onPress={() => {
+                  setProfileModalVisible(false);
+                  router.push('/public-site');
+                }}
+              >
+                <Globe size={16} color={colors.primary} style={{ marginRight: 6 }} />
+                <Text style={[styles.modalActionOutlineText, { color: colors.primary }]}>View Customer Website</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.modalLogoutBtn}
+                onPress={async () => {
+                  setProfileModalVisible(false);
+                  await logout();
+                  router.replace('/login');
+                }}
+              >
+                <LogOut size={16} color="#EF4444" style={{ marginRight: 6 }} />
+                <Text style={styles.modalLogoutText}>Sign Out</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       <View style={{ height: 35 }} />
     </ScrollView>
   );
@@ -527,7 +667,7 @@ const styles = StyleSheet.create({
   userProfileCard: {
     backgroundColor: '#0F172A',
     borderRadius: 20,
-    padding: 16,
+    padding: 14,
     marginBottom: 16,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
@@ -540,11 +680,17 @@ const styles = StyleSheet.create({
   userInfoRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  userProfileClickable: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   avatar: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: '#1E40AF',
     borderWidth: 2,
     borderColor: '#F59E0B',
@@ -556,7 +702,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   userName: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '800',
     color: '#FFFFFF',
     letterSpacing: -0.2,
@@ -564,7 +710,7 @@ const styles = StyleSheet.create({
   roleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: 3,
   },
   branchText: {
     fontSize: 11,
@@ -576,6 +722,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    marginLeft: 6,
   },
   publicSiteBtn: {
     flexDirection: 'row',
@@ -673,5 +820,120 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.65)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalCard: {
+    width: '100%',
+    maxWidth: 400,
+    borderRadius: 24,
+    padding: 20,
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 10,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  closeBtn: {
+    padding: 4,
+  },
+  modalProfileHeader: {
+    alignItems: 'center',
+    marginBottom: 18,
+  },
+  modalAvatar: {
+    width: 68,
+    height: 68,
+    borderRadius: 34,
+    backgroundColor: '#1E40AF',
+    borderWidth: 3,
+    borderColor: '#F59E0B',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  modalUserName: {
+    fontSize: 18,
+    fontWeight: '900',
+  },
+  modalBranch: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  detailsSection: {
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    paddingVertical: 12,
+    gap: 8,
+    marginBottom: 18,
+  },
+  detailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  detailLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    width: 65,
+  },
+  detailValue: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  modalActions: {
+    gap: 10,
+  },
+  modalActionBtn: {
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalActionText: {
+    color: '#FFFFFF',
+    fontWeight: '800',
+    fontSize: 14,
+  },
+  modalActionOutlineBtn: {
+    flexDirection: 'row',
+    paddingVertical: 11,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+  },
+  modalActionOutlineText: {
+    fontWeight: '800',
+    fontSize: 13,
+  },
+  modalLogoutBtn: {
+    flexDirection: 'row',
+    paddingVertical: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 4,
+  },
+  modalLogoutText: {
+    color: '#EF4444',
+    fontWeight: '700',
+    fontSize: 13,
   },
 });

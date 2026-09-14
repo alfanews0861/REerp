@@ -36,6 +36,9 @@ export {
 // Re-export Auth helpers
 export {
   signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+  updateProfile,
   signOut,
   onAuthStateChanged,
   type User as FirebaseUser,

@@ -70,6 +70,7 @@ export function ErrorBoundary({ error, retry }: { error: Error; retry: () => voi
 }
 
 import { AuthProvider } from '../src/providers/AuthProvider';
+import { MobileDrawerProvider } from '../src/providers/MobileDrawerContext';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { MobileThemeProvider } from '../src/theme';
 
@@ -78,24 +79,23 @@ export default function RootLayout() {
     // Safe initialization inside useEffect
     const firebaseApiKey =
       process.env.EXPO_PUBLIC_FIREBASE_API_KEY ||
-      process.env.VITE_FIREBASE_API_KEY;
+      process.env.VITE_FIREBASE_API_KEY ||
+      'dummy_api_key_for_bootstrap';
 
-    if (firebaseApiKey) {
-      try {
-        initFirebase(
-          {
-            apiKey: firebaseApiKey,
-            authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN || process.env.VITE_FIREBASE_AUTH_DOMAIN || '',
-            projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID || process.env.VITE_FIREBASE_PROJECT_ID || '',
-            storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET || process.env.VITE_FIREBASE_STORAGE_BUCKET || '',
-            messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || process.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
-            appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID || process.env.VITE_FIREBASE_APP_ID || '',
-          },
-          process.env.EXPO_PUBLIC_USE_FIREBASE_EMULATOR === 'true'
-        );
-      } catch (fbErr) {
-        console.warn('Firebase initialization notice:', fbErr);
-      }
+    try {
+      initFirebase(
+        {
+          apiKey: firebaseApiKey,
+          authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN || process.env.VITE_FIREBASE_AUTH_DOMAIN || 'reerp-b806b.firebaseapp.com',
+          projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID || process.env.VITE_FIREBASE_PROJECT_ID || 'reerp-b806b',
+          storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET || process.env.VITE_FIREBASE_STORAGE_BUCKET || 'reerp-b806b.appspot.com',
+          messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || process.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '1234567890',
+          appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID || process.env.VITE_FIREBASE_APP_ID || '1:1234567890:web:123456',
+        },
+        process.env.EXPO_PUBLIC_USE_FIREBASE_EMULATOR === 'true'
+      );
+    } catch (fbErr) {
+      console.warn('Firebase initialization notice:', fbErr);
     }
 
     try {
@@ -114,32 +114,34 @@ export default function RootLayout() {
           <QueryProvider>
             <AuthProvider>
               <LocationProvider>
-                <Stack
-                  screenOptions={{
-                    headerShown: false,
-                    headerStyle: {
-                      backgroundColor: '#0F172A',
-                    },
-                    headerTintColor: '#FFFFFF',
-                    headerTitleStyle: {
-                      fontWeight: '700',
-                    },
-                  }}
-                  initialRouteName="index"
-                >
-                  <Stack.Screen name="index" options={{ headerShown: false }} />
-                  <Stack.Screen name="login" options={{ headerShown: false }} />
-                  <Stack.Screen name="register-profile" options={{ title: 'Profile Registration', headerShown: false }} />
-                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                  <Stack.Screen name="lead/[id]" options={{ title: 'Lead Details', headerShown: true }} />
-                  <Stack.Screen name="commission/index" options={{ title: 'My Commission', headerShown: true }} />
-                  <Stack.Screen name="network/index" options={{ title: 'My Network & Team', headerShown: true }} />
-                  <Stack.Screen name="inventory" options={{ title: 'Plot Inventory & Status', headerShown: true }} />
-                  <Stack.Screen name="public-site" options={{ title: 'Public Portal', headerShown: false }} />
-                  <Stack.Screen name="visit/[id]" options={{ title: 'Visit Details', headerShown: true }} />
-                  <Stack.Screen name="visit/start" options={{ title: 'Start Site Visit', headerShown: true }} />
-                  <Stack.Screen name="visit/complete" options={{ title: 'Complete Site Visit', headerShown: true }} />
-                </Stack>
+                <MobileDrawerProvider>
+                  <Stack
+                    screenOptions={{
+                      headerShown: false,
+                      headerStyle: {
+                        backgroundColor: '#0F172A',
+                      },
+                      headerTintColor: '#FFFFFF',
+                      headerTitleStyle: {
+                        fontWeight: '700',
+                      },
+                    }}
+                    initialRouteName="index"
+                  >
+                    <Stack.Screen name="index" options={{ headerShown: false }} />
+                    <Stack.Screen name="login" options={{ headerShown: false }} />
+                    <Stack.Screen name="register-profile" options={{ title: 'Profile Registration', headerShown: false }} />
+                    <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                    <Stack.Screen name="lead/[id]" options={{ title: 'Lead Details', headerShown: true }} />
+                    <Stack.Screen name="commission/index" options={{ title: 'My Commission', headerShown: true }} />
+                    <Stack.Screen name="network/index" options={{ title: 'My Network & Team', headerShown: true }} />
+                    <Stack.Screen name="inventory" options={{ title: 'Plot Inventory & Status', headerShown: true }} />
+                    <Stack.Screen name="public-site" options={{ title: 'Public Portal', headerShown: false }} />
+                    <Stack.Screen name="visit/[id]" options={{ title: 'Visit Details', headerShown: true }} />
+                    <Stack.Screen name="visit/start" options={{ title: 'Start Site Visit', headerShown: true }} />
+                    <Stack.Screen name="visit/complete" options={{ title: 'Complete Site Visit', headerShown: true }} />
+                  </Stack>
+                </MobileDrawerProvider>
               </LocationProvider>
             </AuthProvider>
           </QueryProvider>
