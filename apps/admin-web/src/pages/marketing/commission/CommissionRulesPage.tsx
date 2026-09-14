@@ -68,7 +68,7 @@ const initialRules: CommissionRule[] = [
   {
     id: 'RUL-003',
     position: 'General Manager (GM)',
-    project: 'Cyber Meadows Phase II',
+    project: 'Dream City Township',
     type: 'PERCENTAGE',
     value: '2.5%',
     payoutTrigger: '50% Advance + Registration',
@@ -77,7 +77,7 @@ const initialRules: CommissionRule[] = [
   {
     id: 'RUL-004',
     position: 'Sales Manager (SM)',
-    project: 'Green Meadows Luxury Plots',
+    project: 'ISKON City - 2 Mega Township',
     type: 'PERCENTAGE',
     value: '3.0%',
     payoutTrigger: 'On Registration (100% Paid)',

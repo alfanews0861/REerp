@@ -39,6 +39,7 @@ import {
   ChevronRight,
   ShieldCheck,
   CheckCircle,
+  UserPlus,
 } from 'lucide-react-native';
 
 interface MobileDrawerMenuProps {
@@ -67,7 +68,7 @@ export interface NavItemConfig {
   title: string;
   subtitle: string;
   route: string;
-  icon: React.ComponentType<{ size: number; color: string }>;
+  icon: any;
   iconBg: string;
   allowedRoles: ('admin' | 'manager' | 'agent' | 'telecaller' | 'driver')[];
 }
@@ -116,11 +117,11 @@ export const MobileDrawerMenu: React.FC<MobileDrawerMenuProps> = ({ visible, onC
     return role.replace(/_/g, ' ').toUpperCase();
   };
 
-  const getRoleBadgeVariant = () => {
+  const getRoleBadgeVariant = (): 'primary' | 'gold' | 'emerald' | 'info' => {
     if (isAdmin) return 'gold';
     if (isManager) return 'primary';
     if (isTelecaller) return 'info';
-    if (isDriver) return 'success';
+    if (isDriver) return 'emerald';
     return 'primary';
   };
 
@@ -177,6 +178,15 @@ export const MobileDrawerMenu: React.FC<MobileDrawerMenuProps> = ({ visible, onC
       route: '/(tabs)/leads',
       icon: Users,
       iconBg: '#7C3AED',
+      allowedRoles: ['admin', 'manager', 'agent', 'telecaller'],
+    },
+    {
+      id: 'add-lead',
+      title: '+ Add Direct Lead',
+      subtitle: 'Self-sourced customer registration',
+      route: '/(tabs)/leads',
+      icon: UserPlus,
+      iconBg: '#1E40AF',
       allowedRoles: ['admin', 'manager', 'agent', 'telecaller'],
     },
     {

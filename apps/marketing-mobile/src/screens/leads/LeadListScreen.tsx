@@ -14,7 +14,8 @@ import { useAuth } from '../../providers/AuthProvider';
 import { useMobileTheme } from '../../theme';
 import { Badge } from '../../components/Badge';
 import { getFirebaseInstance, collection, query, where, getDocs, limit, orderBy } from '../../services/firebase';
-import { Search, UserCheck, Phone, Sparkles } from 'lucide-react-native';
+import { Search, UserCheck, Phone, Sparkles, UserPlus, Plus } from 'lucide-react-native';
+import { AddLeadModal } from './components/AddLeadModal';
 
 export interface LeadItem {
   id: string;
@@ -36,6 +37,8 @@ export const LeadListScreen: React.FC<LeadListScreenProps> = ({ onSelectLead }) 
   const router = useRouter();
   const { user } = useAuth();
   const { colors, isDark } = useMobileTheme();
+
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const userRole = (user?.cadre || user?.role || '').toLowerCase();
   const isAdminOrManager =
@@ -187,16 +190,26 @@ export const LeadListScreen: React.FC<LeadListScreenProps> = ({ onSelectLead }) 
         ]}
       >
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text style={[styles.title, { color: colors.textPrimary }]}>Leads Workspace</Text>
-          <Sparkles size={18} color={colors.secondary} />
+          <View>
+            <Text style={[styles.title, { color: colors.textPrimary }]}>Leads Workspace</Text>
+            <Text style={[styles.subTitle, { color: colors.textSecondary }]}>
+              {isTelecallerUser
+                ? '🔒 Telecaller Private Pool (Strictly Isolated)'
+                : filter === 'MY_LEADS'
+                ? `Assigned to ${user?.displayName || 'You'}`
+                : 'Direct Team & Appointed Telecaller Leads'}
+            </Text>
+          </View>
+
+          <TouchableOpacity
+            style={styles.headerAddBtn}
+            onPress={() => setIsAddModalOpen(true)}
+            activeOpacity={0.8}
+          >
+            <UserPlus size={16} color="#FFFFFF" />
+            <Text style={styles.headerAddBtnText}>+ Add Lead</Text>
+          </TouchableOpacity>
         </View>
-        <Text style={[styles.subTitle, { color: colors.textSecondary }]}>
-          {isTelecallerUser
-            ? '🔒 Telecaller Private Pool (Strictly Isolated)'
-            : filter === 'MY_LEADS'
-            ? `Assigned to ${user?.displayName || 'You'}`
-            : 'Direct Team & Appointed Telecaller Leads'}
-        </Text>
       </View>
 
       {/* Filter Tabs */}
@@ -275,15 +288,23 @@ export const LeadListScreen: React.FC<LeadListScreenProps> = ({ onSelectLead }) 
             {searchQuery
               ? 'No matching leads found for your search query.'
               : filter === 'MY_LEADS'
-              ? 'You do not have any direct leads assigned currently.'
+              ? 'మీరు ఇంకా స్వంత కస్టమర్ లీడ్స్‌ను జోడించలేదు. ఇప్పుడే కొత్త లీడ్‌ను జోడించండి!'
               : 'No leads found in this category.'}
           </Text>
+
+          <TouchableOpacity
+            style={[styles.switchBtn, { backgroundColor: '#1E40AF', marginTop: 14 }]}
+            onPress={() => setIsAddModalOpen(true)}
+          >
+            <Text style={styles.switchBtnText}>+ Add New Customer Lead</Text>
+          </TouchableOpacity>
+
           {filter === 'MY_LEADS' && !isTelecallerUser && (
             <TouchableOpacity
-              style={[styles.switchBtn, { backgroundColor: colors.primary }]}
+              style={[styles.switchBtn, { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.border, marginTop: 8 }]}
               onPress={() => setFilter('ALL')}
             >
-              <Text style={styles.switchBtnText}>View All Team & Website Leads</Text>
+              <Text style={[styles.switchBtnText, { color: colors.textSecondary }]}>View All Team & Website Leads</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -299,7 +320,7 @@ export const LeadListScreen: React.FC<LeadListScreenProps> = ({ onSelectLead }) 
               tintColor={colors.primary}
             />
           }
-          contentContainerStyle={{ paddingBottom: 24 }}
+          contentContainerStyle={{ paddingBottom: 90 }}
           renderItem={({ item }) => {
             const badgeVariant = getStatusBadgeVariant(item.status);
             return (
@@ -338,6 +359,26 @@ export const LeadListScreen: React.FC<LeadListScreenProps> = ({ onSelectLead }) 
           }}
         />
       )}
+
+      {/* Floating Action Button for Instant Lead Creation */}
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => setIsAddModalOpen(true)}
+        activeOpacity={0.85}
+      >
+        <Plus size={22} color="#FFFFFF" />
+        <Text style={styles.fabText}>Add Lead</Text>
+      </TouchableOpacity>
+
+      {/* Add Lead Bottom Sheet / Modal */}
+      <AddLeadModal
+        visible={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onLeadAdded={(newLead) => {
+          setLeads((prev) => [newLead, ...prev]);
+          if (filter !== 'MY_LEADS') setFilter('MY_LEADS');
+        }}
+      />
     </View>
   );
 };
@@ -404,6 +445,50 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '800',
     fontSize: 13,
+  },
+  headerAddBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1E40AF',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    gap: 6,
+    shadowColor: '#1E40AF',
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  headerAddBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '800',
+    fontSize: 12.5,
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 24,
+    right: 20,
+    backgroundColor: '#1E40AF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+    borderRadius: 30,
+    gap: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.35,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 10,
+    elevation: 8,
+    borderWidth: 1.5,
+    borderColor: '#3B82F6',
+  },
+  fabText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '900',
+    letterSpacing: 0.3,
   },
 });
 

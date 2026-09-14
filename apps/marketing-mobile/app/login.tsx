@@ -80,19 +80,19 @@ export default function LoginScreen() {
     setIsSubmitting(true);
     try {
       if (role === 'admin') {
-        setEmail('admin@reerp.com');
+        setEmail('admin@iskondevelopers.com');
         setPassword('Admin@2026');
         await loginDemo('admin');
       } else if (role === 'manager') {
-        setEmail('manager@reerp.com');
+        setEmail('manager@iskondevelopers.com');
         setPassword('Manager@2026');
         await loginDemo('manager');
       } else if (role === 'telecaller') {
-        setEmail('telecaller@reerp.com');
+        setEmail('telecaller@iskondevelopers.com');
         setPassword('Telecaller@2026');
         await loginDemo('telecaller');
       } else {
-        setEmail('agent@reerp.com');
+        setEmail('agent@iskondevelopers.com');
         setPassword('Agent@2026');
         await loginDemo('agent');
       }
@@ -220,7 +220,7 @@ export default function LoginScreen() {
             <>
               <Input
                 label="Corporate Email Address"
-                placeholder="admin@reerp.com / employee@reerp.com"
+                placeholder="admin@iskondevelopers.com / employee@iskondevelopers.com"
                 value={email}
                 onChangeText={(val) => {
                   setEmail(val);

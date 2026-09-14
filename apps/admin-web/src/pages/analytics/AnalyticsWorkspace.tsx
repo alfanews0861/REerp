@@ -44,7 +44,7 @@ const FUNNEL_COLORS = ['#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#d946ef', '#
 
 // --- Types ---
 type TimeRange = '7d' | '30d' | 'quarter' | 'year' | 'all';
-type ProjectFilter = 'all' | 'green-meadows' | 'fortune-city' | 'sunrise-valley' | 'royal-palms';
+type ProjectFilter = 'all' | 'iskon-city-2' | 'dream-city' | 'iskon-brundhavanam' | 'iskon-elite';
 
 interface FunnelStage {
   stage: string;
@@ -73,10 +73,10 @@ export const AnalyticsWorkspace: React.FC = () => {
 
   const projectWeight = useMemo(() => {
     switch (selectedProject) {
-      case 'green-meadows': return 0.42;
-      case 'fortune-city': return 0.28;
-      case 'sunrise-valley': return 0.18;
-      case 'royal-palms': return 0.12;
+      case 'iskon-city-2': return 0.45;
+      case 'dream-city': return 0.30;
+      case 'iskon-brundhavanam': return 0.15;
+      case 'iskon-elite': return 0.10;
       default: return 1.0;
     }
   }, [selectedProject]);
@@ -172,10 +172,10 @@ export const AnalyticsWorkspace: React.FC = () => {
 
   // Project Absorption
   const projectAbsorptionData = [
-    { name: 'Green Meadows (Hyd)', totalPlots: 350, booked: 285, reserved: 25, available: 40 },
-    { name: 'Fortune City (VJA)', totalPlots: 240, booked: 178, reserved: 22, available: 40 },
-    { name: 'Sunrise Valley (Vizag)', totalPlots: 180, booked: 115, reserved: 15, available: 50 },
-    { name: 'Royal Palms (Guntur)', totalPlots: 150, booked: 92, reserved: 18, available: 40 },
+    { name: 'ISKON City - 2 (Nellore)', totalPlots: 450, booked: 365, reserved: 35, available: 50 },
+    { name: 'Dream City (Kovur)', totalPlots: 280, booked: 210, reserved: 30, available: 40 },
+    { name: 'ISKON Brundhavanam (Nellore)', totalPlots: 180, booked: 125, reserved: 15, available: 40 },
+    { name: 'ISKON Elite Township (Nellore)', totalPlots: 150, booked: 98, reserved: 18, available: 34 },
   ];
 
   // Agent Leaderboard Matrix
@@ -253,10 +253,10 @@ export const AnalyticsWorkspace: React.FC = () => {
               onChange={(e) => setSelectedProject(e.target.value as ProjectFilter)}
             >
               <MenuItem value="all">All Projects</MenuItem>
-              <MenuItem value="green-meadows">Green Meadows (Hyd)</MenuItem>
-              <MenuItem value="fortune-city">Fortune City (VJA)</MenuItem>
-              <MenuItem value="sunrise-valley">Sunrise Valley (Vizag)</MenuItem>
-              <MenuItem value="royal-palms">Royal Palms (Guntur)</MenuItem>
+              <MenuItem value="iskon-city-2">ISKON City - 2 (Nellore)</MenuItem>
+              <MenuItem value="dream-city">Dream City (Kovur / Highway)</MenuItem>
+              <MenuItem value="iskon-brundhavanam">ISKON Brundhavanam (Chinthareddypalem)</MenuItem>
+              <MenuItem value="iskon-elite">ISKON Elite Township (Annamayya Circle)</MenuItem>
             </Select>
           </FormControl>
 
