@@ -190,13 +190,13 @@ export const LeadListScreen: React.FC<LeadListScreenProps> = ({ onSelectLead }) 
         ]}
       >
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <View>
+          <View style={{ flex: 1, marginRight: 8 }}>
             <Text style={[styles.title, { color: colors.textPrimary }]}>Leads Workspace</Text>
             <Text style={[styles.subTitle, { color: colors.textSecondary }]}>
               {isTelecallerUser
                 ? '🔒 Telecaller Private Pool (Strictly Isolated)'
                 : filter === 'MY_LEADS'
-                ? `Assigned to ${user?.displayName || 'You'}`
+                ? `Direct Portfolio • ${user?.displayName || 'Active Associate'}`
                 : 'Direct Team & Appointed Telecaller Leads'}
             </Text>
           </View>
@@ -207,7 +207,7 @@ export const LeadListScreen: React.FC<LeadListScreenProps> = ({ onSelectLead }) 
             activeOpacity={0.8}
           >
             <UserPlus size={16} color="#FFFFFF" />
-            <Text style={styles.headerAddBtnText}>+ Add Lead</Text>
+            <Text style={styles.headerAddBtnText}>+ Add Direct Lead</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -283,20 +283,21 @@ export const LeadListScreen: React.FC<LeadListScreenProps> = ({ onSelectLead }) 
       ) : filteredLeads.length === 0 ? (
         <View style={styles.centerState}>
           <UserCheck size={48} color={colors.textMuted} />
-          <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>No Leads Found</Text>
+          <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>No Leads Found (ఇంకా లీడ్స్ లేవు)</Text>
           <Text style={[styles.emptySub, { color: colors.textSecondary }]}>
             {searchQuery
               ? 'No matching leads found for your search query.'
               : filter === 'MY_LEADS'
-              ? 'మీరు ఇంకా స్వంత కస్టమర్ లీడ్స్‌ను జోడించలేదు. ఇప్పుడే కొత్త లీడ్‌ను జోడించండి!'
+              ? 'మీరు మీ స్వంత కస్టమర్లు, పరిచయస్తులు మరియు ఫోన్ కాంటాక్ట్స్‌ను ఇక్కడ నేరుగా లీడ్స్‌గా నమోదు చేసుకోవచ్చు. మీ సేల్స్ కమిషన్ సురక్షితం.'
               : 'No leads found in this category.'}
           </Text>
 
           <TouchableOpacity
-            style={[styles.switchBtn, { backgroundColor: '#1E40AF', marginTop: 14 }]}
+            style={[styles.switchBtn, { backgroundColor: '#1E40AF', marginTop: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 }]}
             onPress={() => setIsAddModalOpen(true)}
           >
-            <Text style={styles.switchBtnText}>+ Add New Customer Lead</Text>
+            <UserPlus size={16} color="#FFFFFF" />
+            <Text style={styles.switchBtnText}>+ Add Direct Customer / Contact Lead</Text>
           </TouchableOpacity>
 
           {filter === 'MY_LEADS' && !isTelecallerUser && (

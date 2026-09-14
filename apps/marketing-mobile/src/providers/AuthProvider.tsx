@@ -323,7 +323,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         demoUser = {
           uid: 'demo-manager-1',
           email: 'manager@iskondevelopers.com',
-          displayName: 'Rajesh Kumar',
+          displayName: 'Nellore Branch Lead',
           role: 'sales_manager',
           phoneNumber: '+91 9123456789',
           branch: 'Nellore Headquarters',

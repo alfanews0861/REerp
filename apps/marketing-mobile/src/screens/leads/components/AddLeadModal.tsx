@@ -12,7 +12,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { X, UserPlus, Phone, Mail, Building, Compass, DollarSign, FileText, CheckCircle2 } from 'lucide-react-native';
+import { X, UserPlus, Phone, Mail, Building, Compass, DollarSign, FileText, CheckCircle2, BookOpen, Sparkles, ShieldCheck } from 'lucide-react-native';
 import { useAuth } from '../../../providers/AuthProvider';
 import { useMobileTheme } from '../../../theme';
 import { getFirebaseInstance, collection, addDoc } from '../../../services/firebase';
@@ -41,6 +41,7 @@ const BUDGET_OPTIONS = [
 ];
 
 const SOURCE_OPTIONS = [
+  'Phone Contacts / Phonebook (ఫోన్ కాంటాక్ట్స్)',
   'Direct Field Prospecting (స్వంత పరిచయం)',
   'Personal Network / Friends (స్నేహితులు / బంధువులు)',
   'Customer Referral (పాత కస్టమర్ రిఫరల్)',
@@ -52,6 +53,7 @@ export const AddLeadModal: React.FC<AddLeadModalProps> = ({ visible, onClose, on
   const { user } = useAuth();
   const { colors, isDark } = useMobileTheme();
 
+  const [rawContactInput, setRawContactInput] = useState('');
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -64,6 +66,7 @@ export const AddLeadModal: React.FC<AddLeadModalProps> = ({ visible, onClose, on
   const [error, setError] = useState<string | null>(null);
 
   const resetForm = () => {
+    setRawContactInput('');
     setFullName('');
     setPhone('');
     setEmail('');
@@ -73,6 +76,42 @@ export const AddLeadModal: React.FC<AddLeadModalProps> = ({ visible, onClose, on
     setSelectedSource(SOURCE_OPTIONS[0]);
     setNotes('');
     setError(null);
+  };
+
+  const handleParseContact = () => {
+    if (!rawContactInput.trim()) return;
+
+    const cleaned = rawContactInput.trim();
+    // Look for 10-12 digits optionally prefixed with +91
+    const phoneMatch = cleaned.match(/(?:\+91[\s-]?)?[6-9]\d{4}[\s-]?\d{5}/);
+
+    if (phoneMatch) {
+      const extractedDigits = phoneMatch[0].replace(/\D/g, '').slice(-10);
+      setPhone(extractedDigits);
+
+      // Remaining text becomes customer name
+      const remainingName = cleaned.replace(phoneMatch[0], '').replace(/[-:,;|]/g, ' ').trim();
+      if (remainingName) {
+        setFullName(remainingName.replace(/\s+/g, ' '));
+      }
+      setSelectedSource('Phone Contacts / Phonebook (ఫోన్ కాంటాక్ట్స్)');
+      setRawContactInput('');
+      setError(null);
+    } else {
+      const onlyDigits = cleaned.replace(/\D/g, '');
+      if (onlyDigits.length >= 10) {
+        setPhone(onlyDigits.slice(-10));
+        const remainingName = cleaned.replace(/\d+/g, '').replace(/[-:,;|]/g, ' ').trim();
+        if (remainingName) {
+          setFullName(remainingName.replace(/\s+/g, ' '));
+        }
+        setSelectedSource('Phone Contacts / Phonebook (ఫోన్ కాంటాక్ట్స్)');
+        setRawContactInput('');
+        setError(null);
+      } else {
+        setError('కాంటాక్ట్‌లో 10 అంకెల మొబైల్ నంబర్ కనిపించలేదు. దయచేసి తనిఖీ చేయండి.');
+      }
+    }
   };
 
   const handleSaveLead = async () => {
@@ -198,6 +237,49 @@ export const AddLeadModal: React.FC<AddLeadModalProps> = ({ visible, onClose, on
                 <Text style={styles.errorText}>{error}</Text>
               </View>
             )}
+
+            {/* Direct Agent Commission Guarantee Notice */}
+            <View style={styles.guaranteeBox}>
+              <ShieldCheck size={16} color="#10B981" />
+              <Text style={styles.guaranteeText}>
+                ఈ లీడ్ మీ పేరు మీద రిజిస్టర్ అవుతుంది. మీ సేల్స్ కమిషన్ సురక్షితంగా మీ ఖాతాలో జమ చేయబడుతుంది.
+              </Text>
+            </View>
+
+            {/* Quick Contact Fill from Phone Contacts / WhatsApp */}
+            <View style={[styles.quickFillCard, { backgroundColor: isDark ? '#1E293B' : '#EFF6FF', borderColor: '#3B82F6' }]}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <BookOpen size={16} color="#2563EB" />
+                  <Text style={[styles.quickFillTitle, { color: colors.textPrimary }]}>
+                    ఫోన్ కాంటాక్ట్స్ / పేస్ట్ ఫిల్ (Quick Contact Fill)
+                  </Text>
+                </View>
+                <View style={styles.smartBadge}>
+                  <Sparkles size={11} color="#FFFFFF" />
+                  <Text style={styles.smartBadgeText}>SMART</Text>
+                </View>
+              </View>
+              <Text style={[styles.quickFillSub, { color: colors.textSecondary }]}>
+                కాపీ చేసిన కాంటాక్ట్ టెక్స్ట్ ఇక్కడ పేస్ట్ చేసి నింపండి (ఉదా: "రమేష్ 9848012345" లేదా "+91 94401 23456 - సురేష్"):
+              </Text>
+              <View style={styles.quickFillRow}>
+                <TextInput
+                  style={[styles.quickFillInput, { color: colors.textPrimary, borderColor: colors.border }]}
+                  placeholder="Paste phone contact / text here..."
+                  placeholderTextColor={colors.textMuted}
+                  value={rawContactInput}
+                  onChangeText={setRawContactInput}
+                />
+                <TouchableOpacity
+                  style={styles.quickFillBtn}
+                  onPress={handleParseContact}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.quickFillBtnText}>Auto-Fill</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
 
             {/* Customer Full Name */}
             <View style={styles.inputGroup}>
@@ -636,6 +718,82 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '800',
     fontSize: 13.5,
+  },
+  guaranteeBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: '#ECFDF5',
+    borderWidth: 1,
+    borderColor: '#6EE7B7',
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 12,
+  },
+  guaranteeText: {
+    color: '#065F46',
+    fontSize: 11.5,
+    fontWeight: '600',
+    flex: 1,
+    lineHeight: 16,
+  },
+  quickFillCard: {
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    marginBottom: 16,
+  },
+  quickFillTitle: {
+    fontSize: 12.5,
+    fontWeight: '800',
+  },
+  smartBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    backgroundColor: '#2563EB',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  smartBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 9.5,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  quickFillSub: {
+    fontSize: 11,
+    marginTop: 2,
+    marginBottom: 8,
+    lineHeight: 15,
+  },
+  quickFillRow: {
+    flexDirection: 'row',
+    gap: 8,
+    alignItems: 'center',
+  },
+  quickFillInput: {
+    flex: 1,
+    height: 40,
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    fontSize: 12.5,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+  },
+  quickFillBtn: {
+    backgroundColor: '#2563EB',
+    paddingHorizontal: 12,
+    height: 40,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  quickFillBtnText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '800',
   },
 });
 
