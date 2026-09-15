@@ -277,6 +277,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     marginTop: 2,
+    fontFamily: 'Mallanna',
   },
   closeBtn: {
     backgroundColor: '#334155',
@@ -300,6 +301,7 @@ const styles = StyleSheet.create({
     marginTop: 14,
     marginBottom: 8,
     letterSpacing: 0.5,
+    fontFamily: 'Mallanna',
   },
   chipContainer: {
     gap: 8,

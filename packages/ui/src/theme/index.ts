@@ -24,6 +24,19 @@ export function createAppTheme(mode: 'light' | 'dark' | 'corporate'): Theme {
     components: {
       MuiCssBaseline: {
         styleOverrides: `
+          @font-face {
+            font-family: 'Mallanna';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url('/fonts/Mallanna.ttf') format('truetype');
+            unicode-range: U+0C00-0C7F;
+          }
+
+          :lang(te), [lang="te"], .telugu-text, .font-telugu {
+            font-family: 'Mallanna', 'Inter', sans-serif !important;
+          }
+
           body {
             scrollbar-color: ${isDark ? '#334155 #0B0F17' : '#CBD5E1 #F8FAFC'};
           }

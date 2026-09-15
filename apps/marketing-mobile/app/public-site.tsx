@@ -59,6 +59,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 13,
     fontWeight: '800',
+    fontFamily: 'Mallanna',
   },
   portalWrapper: {
     flex: 1,

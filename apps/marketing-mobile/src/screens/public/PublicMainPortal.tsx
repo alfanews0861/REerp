@@ -52,7 +52,7 @@ export const PublicMainPortal: React.FC<PublicMainPortalProps> = ({ onOpenLogin 
 
   return (
     <View style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#0F172A" />
+      <StatusBar barStyle="light-content" backgroundColor="#02280B" />
 
       {/* Top Main Navigation Header with Logo, Fixed Title & Hamburger Menu */}
       <MobileAppHeader

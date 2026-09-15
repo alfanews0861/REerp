@@ -365,6 +365,7 @@ const styles = StyleSheet.create({
   },
   assistantText: {
     color: '#0F172A',
+    fontFamily: 'Mallanna',
   },
   timestamp: {
     fontSize: 9.5,
@@ -488,6 +489,7 @@ const styles = StyleSheet.create({
     fontSize: 11.5,
     color: '#92400E',
     fontWeight: '600',
+    fontFamily: 'Mallanna',
   },
   inputBar: {
     flexDirection: 'row',
@@ -507,6 +509,7 @@ const styles = StyleSheet.create({
     paddingVertical: 9,
     fontSize: 13,
     color: '#0F172A',
+    fontFamily: 'Mallanna',
   },
   sendBtn: {
     width: 40,

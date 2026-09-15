@@ -388,6 +388,7 @@ const styles = StyleSheet.create({
     color: '#CBD5E1',
     lineHeight: 18,
     marginBottom: 14,
+    fontFamily: 'Mallanna',
   },
   searchBar: {
     flexDirection: 'row',

@@ -231,6 +231,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#64748B',
     marginTop: 2,
+    fontFamily: 'Mallanna',
   },
   channelsGrid: {
     gap: 12,

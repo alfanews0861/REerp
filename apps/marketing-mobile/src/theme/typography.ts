@@ -58,3 +58,22 @@ export const typography = {
     letterSpacing: 0.2,
   } as TextStyle,
 };
+
+export const TELUGU_FONT = 'Mallanna';
+
+export const isTelugu = (text?: string | null): boolean => {
+  if (!text) return false;
+  return /[\u0C00-\u0C7F]/.test(text);
+};
+
+export const teluguFont: TextStyle = {
+  fontFamily: TELUGU_FONT,
+};
+
+export const getTeluguFontStyle = (text?: string | null): TextStyle => {
+  if (isTelugu(text)) {
+    return { fontFamily: TELUGU_FONT };
+  }
+  return {};
+};
+

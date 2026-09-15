@@ -508,6 +508,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#94A3B8',
     marginBottom: 12,
+    fontFamily: 'Mallanna',
   },
   legendRow: {
     flexDirection: 'row',

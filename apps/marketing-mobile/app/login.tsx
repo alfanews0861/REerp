@@ -9,6 +9,7 @@ import {
   Alert,
   TouchableOpacity,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -168,7 +169,11 @@ export default function LoginScreen() {
         {/* Header Branding */}
         <View style={styles.headerContainer}>
           <View style={styles.logoBadge}>
-            <ShieldCheck size={36} color="#ffffff" />
+            <Image
+              source={require('../assets/logo.png')}
+              style={{ width: 68, height: 68 }}
+              resizeMode="contain"
+            />
           </View>
           <Text style={styles.appTitle}>ISKON Developers</Text>
           <Text style={styles.appSubtitle}>Executive, Sales & Operations Management Suite</Text>
@@ -398,6 +403,7 @@ const styles = StyleSheet.create({
     color: '#E2E8F0',
     fontSize: 12,
     fontWeight: '700',
+    fontFamily: 'Mallanna',
   },
   headerContainer: {
     alignItems: 'center',
@@ -406,17 +412,12 @@ const styles = StyleSheet.create({
   logoBadge: {
     width: 68,
     height: 68,
-    borderRadius: 20,
-    backgroundColor: '#1E40AF',
-    borderWidth: 2,
-    borderColor: '#F59E0B',
+    borderRadius: 16,
+    backgroundColor: '#02280B',
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
-    shadowColor: '#F59E0B',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.35,
-    shadowRadius: 12,
     elevation: 8,
   },
   appTitle: {

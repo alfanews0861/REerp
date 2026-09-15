@@ -9,6 +9,7 @@ import {
   TouchableWithoutFeedback,
   Linking,
   Alert,
+  Image,
 } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -336,7 +337,11 @@ export const MobileDrawerMenu: React.FC<MobileDrawerMenuProps> = ({ visible, onC
           <View style={styles.drawerHeader}>
             <View style={styles.brandRow}>
               <View style={styles.logoBadge}>
-                <Building2 size={22} color="#FFFFFF" />
+                <Image
+                  source={require('../../assets/logo.png')}
+                  style={{ width: 38, height: 38 }}
+                  resizeMode="contain"
+                />
               </View>
               <View style={styles.brandInfo}>
                 <Text style={[styles.companyName, { color: colors.textPrimary }]}>
@@ -742,14 +747,11 @@ const styles = StyleSheet.create({
   logoBadge: {
     width: 38,
     height: 38,
-    borderRadius: 10,
-    backgroundColor: '#1E40AF',
+    borderRadius: 8,
+    backgroundColor: '#02280B',
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#1E40AF',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
     elevation: 3,
   },
   brandInfo: {
@@ -804,6 +806,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#FFFFFF',
     letterSpacing: -0.2,
+    fontFamily: 'Mallanna',
   },
   profileBadgeRow: {
     flexDirection: 'row',
@@ -842,6 +845,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.8,
     marginBottom: 6,
     paddingHorizontal: 4,
+    fontFamily: 'Mallanna',
   },
   navItem: {
     flexDirection: 'row',

@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useMobileTheme } from '../theme';
 import { useMobileDrawer } from '../providers/MobileDrawerContext';
-import { Menu, Building2, ArrowLeft } from 'lucide-react-native';
+import { Menu, ArrowLeft } from 'lucide-react-native';
 
 export interface MobileAppHeaderProps {
   title?: string;
@@ -42,9 +42,9 @@ export const MobileAppHeader: React.FC<MobileAppHeaderProps> = ({
       style={[
         styles.headerContainer,
         {
-          backgroundColor: '#0F172A', // Crisp Premium Deep Navy Header
+          backgroundColor: '#02280B', // ISKON Logo Rich Emerald Forest Green
           paddingTop: Math.max(insets.top, 16) + 4,
-          borderBottomColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.12)',
+          borderBottomColor: 'rgba(255,255,255,0.12)',
         },
       ]}
     >
@@ -74,7 +74,7 @@ export const MobileAppHeader: React.FC<MobileAppHeaderProps> = ({
           <View style={styles.placeholder} />
         )}
 
-        {/* CENTER: Fixed Company Logo + Permanent 'ISKON DEVELOPERS' Title */}
+        {/* CENTER: Fixed Company Logo + 'ISKON' Title */}
         <TouchableOpacity
           style={styles.brandingContainer}
           onPress={() => router.push('/')}
@@ -82,13 +82,17 @@ export const MobileAppHeader: React.FC<MobileAppHeaderProps> = ({
         >
           {showLogo && (
             <View style={styles.logoBadge}>
-              <Building2 size={20} color="#FFFFFF" />
+              <Image
+                source={require('../../assets/logo.png')}
+                style={styles.logoImage}
+                resizeMode="contain"
+              />
             </View>
           )}
 
           <View style={styles.titleColumn}>
             <Text style={styles.companyTitle} numberOfLines={1}>
-              ISKON DEVELOPERS
+              ISKON
             </Text>
             <Text style={styles.companyTagline} numberOfLines={1}>
               {subtitle}
@@ -112,7 +116,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.18,
+    shadowOpacity: 0.25,
     shadowRadius: 6,
     elevation: 8,
     zIndex: 100,
@@ -127,7 +131,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -143,36 +147,35 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
   },
   logoBadge: {
-    width: 36,
-    height: 36,
-    borderRadius: 9,
-    backgroundColor: '#1E40AF',
-    borderWidth: 1.2,
-    borderColor: '#D97706',
+    width: 38,
+    height: 38,
+    borderRadius: 8,
+    backgroundColor: '#02280B',
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#1E40AF',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    elevation: 3,
+  },
+  logoImage: {
+    width: 38,
+    height: 38,
   },
   titleColumn: {
     alignItems: 'flex-start',
     justifyContent: 'center',
   },
   companyTitle: {
-    fontSize: 14,
+    fontSize: 17,
     fontWeight: '900',
     color: '#FFFFFF',
-    letterSpacing: -0.2,
-    lineHeight: 18,
+    letterSpacing: 0.8,
+    lineHeight: 20,
   },
   companyTagline: {
-    fontSize: 9,
+    fontSize: 8.5,
     fontWeight: '700',
-    color: '#F59E0B',
-    letterSpacing: 0.6,
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
+    opacity: 0.9,
   },
   rightContainer: {
     flexDirection: 'row',

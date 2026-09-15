@@ -339,6 +339,7 @@ const styles = StyleSheet.create({
     fontSize: 12.5,
     color: '#CBD5E1',
     lineHeight: 18,
+    fontFamily: 'Mallanna',
   },
   formCard: {
     backgroundColor: '#FFFFFF',
