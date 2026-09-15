@@ -37,6 +37,30 @@ export const handlePaymentUpdated = async (event: any) => {
       await publisher.publish(evt);
       console.log(`Published BOOKING_FULLY_PAID for booking ${after.id}`);
     }
+
+    // Check if new payment was recorded
+    const beforePaid = before.paymentSchedule?.reduce((sum: number, p: any) => sum + (p.amountPaid || 0), 0) || 0;
+    const afterPaid = after.paymentSchedule?.reduce((sum: number, p: any) => sum + (p.amountPaid || 0), 0) || 0;
+
+    if (afterPaid > beforePaid) {
+      const delta = afterPaid - beforePaid;
+      const customerPhone = (after as any).customerPhone || (after as any).phone;
+      const customerName = (after as any).customerName || 'Valued Customer';
+      const receiptNumber = `REC-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+      if (customerPhone) {
+        const { NotificationService } = await import('../services/notificationService');
+        await NotificationService.sendPaymentReceiptNotification({
+          customerName,
+          customerPhone,
+          amount: delta,
+          bookingNumber: after.bookingNumber || after.id,
+          plotNumber: after.plotId || 'N/A',
+          projectName: (after as any).projectName || 'ISKON City - 2',
+          receiptNumber,
+        });
+      }
+    }
 };
 
 export const onPaymentUpdated = onDocumentUpdated(

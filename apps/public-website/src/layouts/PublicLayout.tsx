@@ -33,6 +33,7 @@ import LockIcon from '@mui/icons-material/Lock';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import PersonIcon from '@mui/icons-material/Person';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import { Outlet, Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 import { SiteVisitModal } from '../components/SiteVisitModal';
 import { TokenBookingModal } from '../components/TokenBookingModal';
@@ -63,6 +64,7 @@ export const PublicLayout: FC = () => {
     { label: t('nav_home'), path: '/' },
     { label: t('nav_ventures'), path: '/ventures' },
     { label: t('nav_plots'), path: '/plots' },
+    { label: 'Customer Portal & Receipts', path: '/portal' },
     { label: t('nav_about'), path: '/about' },
     { label: t('nav_contact'), path: '/contact' },
   ];
@@ -117,6 +119,32 @@ export const PublicLayout: FC = () => {
                 }}
               >
                 Track Site Visit Cab
+              </Button>
+
+              <Button
+                component={RouterLink}
+                to="/portal"
+                size="small"
+                startIcon={<ReceiptLongIcon sx={{ fontSize: '0.9rem !important', color: '#67e8f9' }} />}
+                sx={{
+                  bgcolor: 'rgba(6, 182, 212, 0.2)',
+                  color: '#e0f2fe',
+                  textTransform: 'none',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  py: 0.2,
+                  px: 1.2,
+                  borderRadius: 1.5,
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
+                  border: '1px solid rgba(6, 182, 212, 0.35)',
+                  '&:hover': {
+                    bgcolor: 'rgba(6, 182, 212, 0.3)',
+                    color: '#ffffff',
+                  },
+                }}
+              >
+                Customer Portal & Receipts
               </Button>
 
 

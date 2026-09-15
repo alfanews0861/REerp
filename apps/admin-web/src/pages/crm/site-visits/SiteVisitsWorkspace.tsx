@@ -21,8 +21,14 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import GroupsIcon from '@mui/icons-material/Groups';
 import PlaceIcon from '@mui/icons-material/Place';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import AddIcon from '@mui/icons-material/Add';
+import Button from '@mui/material/Button';
+import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 
 import { useSiteVisits } from '@real-estate-erp/hooks';
+import { SiteVisit } from '@real-estate-erp/types';
+import { ScheduleSiteVisitDialog } from './components/ScheduleSiteVisitDialog';
+import { RecordVisitOutcomeDialog } from './components/RecordVisitOutcomeDialog';
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -55,10 +61,25 @@ const getOutcomeColor = (outcome?: string) => {
 export const SiteVisitsWorkspace: React.FC = () => {
   const [viewMode, setViewMode] = useState<'TABLE' | 'CALENDAR' | 'TIMELINE' | 'MAP'>('TABLE');
   const [filtersOpen, setFiltersOpen] = useState(true);
+  const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [outcomeVisit, setOutcomeVisit] = useState<SiteVisit | null>(null);
+  const [selectedVentureFilter, setSelectedVentureFilter] = useState<string>('ALL');
+  const [selectedStatusFilter, setSelectedStatusFilter] = useState<string>('ALL');
 
   const { data, isFetchingNextPage, isLoading } = useSiteVisits();
 
   const visits = data?.pages.flatMap((page) => page.data) || [];
+
+  const filteredVisits = visits.filter((v) => {
+    if (selectedVentureFilter !== 'ALL') {
+      const match = v.siteLocation?.toLowerCase().includes(selectedVentureFilter.toLowerCase());
+      if (!match) return false;
+    }
+    if (selectedStatusFilter !== 'ALL') {
+      if (v.visitStatus !== selectedStatusFilter) return false;
+    }
+    return true;
+  });
 
   return (
     <Box sx={{ display: 'flex', minHeight: 'calc(100vh - 120px)', borderRadius: 2, overflow: 'hidden', border: '1px solid #e2e8f0' }}>
@@ -67,8 +88,8 @@ export const SiteVisitsWorkspace: React.FC = () => {
         <Paper
           elevation={0}
           sx={{
-            width: 260,
-            minWidth: 260,
+            width: 270,
+            minWidth: 270,
             borderRight: 1,
             borderColor: 'divider',
             borderRadius: 0,
@@ -83,11 +104,41 @@ export const SiteVisitsWorkspace: React.FC = () => {
             Venture Locations & Corridors
           </Typography>
           <Stack spacing={1}>
-            <Chip label="All Ventures" color="primary" variant="filled" size="small" />
-            <Chip label="ISKON City - 2 (Podalakur Road)" variant="outlined" size="small" />
-            <Chip label="Dream City (Kovuru Highway)" variant="outlined" size="small" />
-            <Chip label="ISKON Brundhavanam (Chinthareddypalem)" variant="outlined" size="small" />
-            <Chip label="ISKON Elite Township (Annamayya Circle Extn)" variant="outlined" size="small" />
+            <Chip
+              label="All ISKON Ventures"
+              color={selectedVentureFilter === 'ALL' ? 'primary' : 'default'}
+              variant={selectedVentureFilter === 'ALL' ? 'filled' : 'outlined'}
+              size="small"
+              onClick={() => setSelectedVentureFilter('ALL')}
+            />
+            <Chip
+              label="ISKON City - 2 (Podalakur Rd)"
+              color={selectedVentureFilter === 'ISKON City - 2' ? 'primary' : 'default'}
+              variant={selectedVentureFilter === 'ISKON City - 2' ? 'filled' : 'outlined'}
+              size="small"
+              onClick={() => setSelectedVentureFilter('ISKON City - 2')}
+            />
+            <Chip
+              label="Dream City (Kovuru Highway)"
+              color={selectedVentureFilter === 'Dream City' ? 'primary' : 'default'}
+              variant={selectedVentureFilter === 'Dream City' ? 'filled' : 'outlined'}
+              size="small"
+              onClick={() => setSelectedVentureFilter('Dream City')}
+            />
+            <Chip
+              label="ISKON Brundhavanam"
+              color={selectedVentureFilter === 'ISKON Brundhavanam' ? 'primary' : 'default'}
+              variant={selectedVentureFilter === 'ISKON Brundhavanam' ? 'filled' : 'outlined'}
+              size="small"
+              onClick={() => setSelectedVentureFilter('ISKON Brundhavanam')}
+            />
+            <Chip
+              label="ISKON Elite Township"
+              color={selectedVentureFilter === 'ISKON Elite Township' ? 'primary' : 'default'}
+              variant={selectedVentureFilter === 'ISKON Elite Township' ? 'filled' : 'outlined'}
+              size="small"
+              onClick={() => setSelectedVentureFilter('ISKON Elite Township')}
+            />
           </Stack>
 
           <Divider sx={{ my: 2.5 }} />
@@ -96,9 +147,30 @@ export const SiteVisitsWorkspace: React.FC = () => {
             Status
           </Typography>
           <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-            <Chip label="IN_PROGRESS" color="primary" size="small" />
-            <Chip label="CONFIRMED" color="info" size="small" />
-            <Chip label="COMPLETED" color="success" size="small" />
+            <Chip
+              label="ALL"
+              color={selectedStatusFilter === 'ALL' ? 'primary' : 'default'}
+              size="small"
+              onClick={() => setSelectedStatusFilter('ALL')}
+            />
+            <Chip
+              label="IN_PROGRESS"
+              color={selectedStatusFilter === 'IN_PROGRESS' ? 'primary' : 'default'}
+              size="small"
+              onClick={() => setSelectedStatusFilter('IN_PROGRESS')}
+            />
+            <Chip
+              label="CONFIRMED"
+              color={selectedStatusFilter === 'CONFIRMED' ? 'info' : 'default'}
+              size="small"
+              onClick={() => setSelectedStatusFilter('CONFIRMED')}
+            />
+            <Chip
+              label="COMPLETED"
+              color={selectedStatusFilter === 'COMPLETED' ? 'success' : 'default'}
+              size="small"
+              onClick={() => setSelectedStatusFilter('COMPLETED')}
+            />
           </Stack>
         </Paper>
       )}
@@ -155,23 +227,36 @@ export const SiteVisitsWorkspace: React.FC = () => {
               </Typography>
             )}
           </Box>
+
+          <Button
+            variant="contained"
+            color="primary"
+            size="small"
+            startIcon={<AddIcon />}
+            onClick={() => setScheduleOpen(true)}
+            sx={{ fontWeight: 700, borderRadius: 2, px: 2, textTransform: 'none' }}
+          >
+            Schedule Site Visit
+          </Button>
         </Box>
 
         {/* View Content */}
         <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
           {isLoading && <Typography>Loading site visits...</Typography>}
-          {!isLoading && visits.length === 0 && <Typography>No site visits found.</Typography>}
+          {!isLoading && filteredVisits.length === 0 && (
+            <Typography color="text.secondary">No site visits found matching the selected filters.</Typography>
+          )}
 
-          {!isLoading && visits.length > 0 && (
+          {!isLoading && filteredVisits.length > 0 && (
             <Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Typography variant="h6" fontWeight={700}>
-                  Site Visits Directory ({visits.length} records)
+                  Site Visits Directory ({filteredVisits.length} records)
                 </Typography>
               </Box>
 
               <Grid container spacing={2}>
-                {visits.map((v, i) => (
+                {filteredVisits.map((v, i) => (
                   <Grid item xs={12} md={viewMode === 'TABLE' ? 12 : 6} key={v.id || i}>
                     <Paper
                       elevation={1}
@@ -246,12 +331,28 @@ export const SiteVisitsWorkspace: React.FC = () => {
                             display: 'flex',
                             alignItems: 'center',
                             gap: 1,
+                            mb: 1,
                           }}
                         >
                           <CheckCircleOutlineIcon fontSize="small" color="primary" />
                           <Typography variant="body2" color="text.primary">
                             <strong>Update:</strong> {v.nextAction}
                           </Typography>
+                        </Box>
+                      )}
+
+                      {v.visitStatus !== 'COMPLETED' && (
+                        <Box sx={{ pt: 1, borderTop: '1px dashed #e2e8f0', display: 'flex', justifyContent: 'flex-end' }}>
+                          <Button
+                            size="small"
+                            variant="outlined"
+                            color="success"
+                            startIcon={<AssignmentTurnedInIcon fontSize="small" />}
+                            onClick={() => setOutcomeVisit(v)}
+                            sx={{ fontWeight: 600, textTransform: 'none', borderRadius: 1.5 }}
+                          >
+                            Record Outcome (ఫలితం నమోదు)
+                          </Button>
                         </Box>
                       )}
                     </Paper>
@@ -262,6 +363,19 @@ export const SiteVisitsWorkspace: React.FC = () => {
           )}
         </Box>
       </Box>
+
+      {/* SCHEDULE SITE VISIT DIALOG */}
+      <ScheduleSiteVisitDialog
+        open={scheduleOpen}
+        onClose={() => setScheduleOpen(false)}
+      />
+
+      {/* RECORD VISIT OUTCOME DIALOG */}
+      <RecordVisitOutcomeDialog
+        open={Boolean(outcomeVisit)}
+        visit={outcomeVisit}
+        onClose={() => setOutcomeVisit(null)}
+      />
     </Box>
   );
 };

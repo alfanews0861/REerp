@@ -9,6 +9,7 @@ const VentureDetailPage = lazy(() => import('../pages/Ventures/VentureDetailPage
 const PlotExplorerPage = lazy(() => import('../pages/Plots/PlotExplorerPage').then((m) => ({ default: m.PlotExplorerPage })));
 const AboutPage = lazy(() => import('../pages/About/AboutPage').then((m) => ({ default: m.AboutPage })));
 const ContactPage = lazy(() => import('../pages/Contact/ContactPage').then((m) => ({ default: m.ContactPage })));
+const CustomerPortalPage = lazy(() => import('../pages/Portal/CustomerPortalPage').then((m) => ({ default: m.CustomerPortalPage })));
 
 const LoadingFallback: FC = () => (
   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
@@ -25,6 +26,7 @@ export const PublicRoutes: FC = () => {
           <Route path="/ventures" element={<VenturesPage />} />
           <Route path="/ventures/:id" element={<VentureDetailPage />} />
           <Route path="/plots" element={<PlotExplorerPage />} />
+          <Route path="/portal" element={<CustomerPortalPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
         </Route>

@@ -53,11 +53,11 @@ export const PublicPlotsExplorerScreen: React.FC<PublicPlotsExplorerScreenProps>
   const [isProcessingToken, setIsProcessingToken] = useState(false);
   const [tokenSuccessReceipt, setTokenSuccessReceipt] = useState<string | null>(null);
 
-  const loadData = async () => {
+  const loadData = async (force: boolean = false) => {
     try {
       const [livePlots, liveVentures] = await Promise.all([
-        fetchLivePlots(selectedProjectId),
-        fetchLiveVentures(),
+        fetchLivePlots(selectedProjectId, force),
+        fetchLiveVentures(force),
       ]);
       setPlots(livePlots);
       setVentures(liveVentures);
@@ -75,7 +75,7 @@ export const PublicPlotsExplorerScreen: React.FC<PublicPlotsExplorerScreenProps>
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await loadData();
+    await loadData(true);
     setRefreshing(false);
   };
 

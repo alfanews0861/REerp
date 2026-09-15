@@ -13,4 +13,5 @@ export * from './triggers/leadTriggers';
 export * from './events/publishEvent';
 export * from './events/subscribeEvents';
 export * from './triggers/paymentTriggers';
+export * from './triggers/siteVisitTriggers';
 export * from './http/leadWebhooks';

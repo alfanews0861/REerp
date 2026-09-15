@@ -33,11 +33,11 @@ export const AdminInventoryScreen: React.FC = () => {
   const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
   const [refreshing, setRefreshing] = useState(false);
 
-  const loadData = async () => {
+  const loadData = async (force: boolean = false) => {
     try {
       const [livePlots, liveVentures] = await Promise.all([
-        fetchLivePlots(selectedVenture),
-        fetchLiveVentures(),
+        fetchLivePlots(selectedVenture, force),
+        fetchLiveVentures(force),
       ]);
       setPlots(livePlots);
       setVentures(liveVentures);
@@ -52,7 +52,7 @@ export const AdminInventoryScreen: React.FC = () => {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await loadData();
+    await loadData(true);
     setRefreshing(false);
   };
 

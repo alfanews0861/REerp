@@ -25,6 +25,7 @@ import { useDashboardData } from './hooks/useDashboardData';
 import { DashboardCharts } from './components/DashboardCharts';
 import { DashboardWidgets } from './components/DashboardWidgets';
 import { QuickActions } from './components/QuickActions';
+import { GeminiExecutiveBriefing } from './components/GeminiExecutiveBriefing';
 import { useNavigate } from 'react-router-dom';
 
 // Icons
@@ -148,6 +149,9 @@ const ExecutiveDashboard: React.FC = () => {
           )}
         </Grid>
       </Paper>
+
+      {/* Gemini AI Executive Intelligence Briefing & Ask AI Assistant (Volume 10) */}
+      <GeminiExecutiveBriefing />
 
       {/* 1. MANAGEMENT / DIRECTORS VIEW */}
       {selectedRoleView === 'management' && (

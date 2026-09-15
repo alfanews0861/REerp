@@ -5,6 +5,14 @@ var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __esm = (fn, res, err) => function __init() {
+  if (err) throw err[0];
+  try {
+    return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+  } catch (e) {
+    throw err = [e], e;
+  }
+};
 var __commonJS = (cb, mod) => function __require() {
   try {
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
@@ -40428,6 +40436,126 @@ var require_jsx_runtime = __commonJS({
   }
 });
 
+// src/services/notificationService.ts
+var notificationService_exports = {};
+__export(notificationService_exports, {
+  NotificationService: () => NotificationService
+});
+var admin11, NotificationService;
+var init_notificationService = __esm({
+  "src/services/notificationService.ts"() {
+    "use strict";
+    admin11 = __toESM(require("firebase-admin"));
+    NotificationService = class {
+      static get db() {
+        return admin11.firestore();
+      }
+      /**
+       * Log communication event to Firestore audit trail
+       */
+      static async logCommunication(log) {
+        try {
+          await this.db.collection("communication_logs").add({
+            ...log,
+            createdAt: admin11.firestore.FieldValue.serverTimestamp()
+          });
+          console.log(`[NotificationService] ${log.channel} logged for ${log.recipientPhone} (${log.templateName})`);
+        } catch (err) {
+          console.error("[NotificationService] Failed to record communication log:", err);
+        }
+      }
+      /**
+       * Send WhatsApp / SMS welcome & assignment notification for a new or assigned lead
+       */
+      static async sendLeadWelcomeAndAssignment(lead) {
+        const venture = lead.ventureName || "ISKON City - 2 (Podalakur Road)";
+        const execName = lead.executiveName || "Our Senior Relationship Advisor";
+        const execPhone = lead.executivePhone || "+91 98480 22334";
+        const message = `\u0C28\u0C2E\u0C38\u0C4D\u0C15\u0C3E\u0C30\u0C02 ${lead.customerName}! Welcome to ISKON Developers (Nellore).
+
+Thank you for your interest in ${venture} (NUDA & DTCP Approved Gated Township).
+${execName} (${execPhone}) has been assigned to personally assist you with layout maps, pricing, and scheduling a complimentary AC Cab site visit.
+
+Office: RKRI Towers, Mini Byepass Road, Nellore.
+Explore ventures: https://iskondevelopers.com/ventures`;
+        console.log(`[WhatsApp Gateway Dispatch] To: ${lead.customerPhone}
+${message}`);
+        await this.logCommunication({
+          recipientPhone: lead.customerPhone,
+          recipientName: lead.customerName,
+          channel: "WHATSAPP",
+          templateName: "LEAD_WELCOME_ASSIGNMENT",
+          messageText: message,
+          status: "SENT",
+          metadata: { venture, execName, execPhone },
+          sentAt: (/* @__PURE__ */ new Date()).toISOString()
+        });
+      }
+      /**
+       * Send WhatsApp Site Visit Confirmation with live Cab & Driver details
+       */
+      static async sendSiteVisitConfirmation(visit) {
+        const cabDetails = visit.vehicleNumber ? `\u{1F697} Assigned Cab: ${visit.vehicleNumber}
+\u{1F468}\u200D\u2708\uFE0F Driver: ${visit.driverName || "Designated Driver"} (${visit.driverPhone || "98480 22334"})
+` : "";
+        const message = `\u0C28\u0C2E\u0C38\u0C4D\u0C15\u0C3E\u0C30\u0C02 ${visit.customerName},
+
+Your Site Visit to ${visit.ventureName} has been confirmed!
+\u{1F4C5} Date: ${visit.date}
+\u23F0 Time: ${visit.time}
+\u{1F698} Mode: ${visit.travelMode}
+` + cabDetails + `
+Our chauffeur will arrive at your doorstep ahead of time for a comfortable visit.
+Track your cab live: https://iskondevelopers.com/track
+Helpline: +91 98480 22334 (ISKON Developers)`;
+        console.log(`[WhatsApp Gateway Dispatch] To: ${visit.customerPhone}
+${message}`);
+        await this.logCommunication({
+          recipientPhone: visit.customerPhone,
+          recipientName: visit.customerName,
+          channel: "WHATSAPP",
+          templateName: "SITE_VISIT_CONFIRMATION",
+          messageText: message,
+          status: "SENT",
+          metadata: { ...visit },
+          sentAt: (/* @__PURE__ */ new Date()).toISOString()
+        });
+      }
+      /**
+       * Send WhatsApp Official Payment Receipt with link to Customer Portal
+       */
+      static async sendPaymentReceiptNotification(payment) {
+        const formattedAmount = `\u20B9${payment.amount.toLocaleString("en-IN")}`;
+        const message = `\u0C28\u0C2E\u0C38\u0C4D\u0C15\u0C3E\u0C30\u0C02 ${payment.customerName},
+
+We have successfully received your payment of ${formattedAmount} towards Plot No: ${payment.plotNumber} at ${payment.projectName}.
+
+\u{1F4C4} Receipt No: ${payment.receiptNumber}
+\u{1F4D1} Booking Ref: ${payment.bookingNumber}
+Status: Payment Confirmed & Credited to Company Escrow.
+
+You can view and download your official stamped receipt anytime on our customer portal:
+\u{1F449} https://iskondevelopers.com/portal
+
+Warm regards,
+ISKON Developers, Nellore.`;
+        console.log(`[WhatsApp Gateway Dispatch] To: ${payment.customerPhone}
+${message}`);
+        await this.logCommunication({
+          recipientPhone: payment.customerPhone,
+          recipientName: payment.customerName,
+          channel: "WHATSAPP",
+          templateName: "PAYMENT_RECEIPT_ISSUED",
+          messageText: message,
+          status: "SENT",
+          metadata: { ...payment },
+          sentAt: (/* @__PURE__ */ new Date()).toISOString()
+        });
+      }
+    };
+  }
+});
+
 // src/index.ts
 var index_exports = {};
 __export(index_exports, {
@@ -40445,6 +40573,7 @@ __export(index_exports, {
   handlePlotCreated: () => handlePlotCreated,
   handlePlotPriceChanged: () => handlePlotPriceChanged,
   handleProjectCreated: () => handleProjectCreated,
+  handleSiteVisitCreated: () => handleSiteVisitCreated,
   handleTeamUpdated: () => handleTeamUpdated,
   handleUserProfileUpdated: () => handleUserProfileUpdated,
   hourlyBookingExpiry: () => hourlyBookingExpiry,
@@ -40460,6 +40589,7 @@ __export(index_exports, {
   onPlotCreated: () => onPlotCreated,
   onPlotPriceChanged: () => onPlotPriceChanged,
   onProjectCreated: () => onProjectCreated,
+  onSiteVisitCreated: () => onSiteVisitCreated,
   onTeamUpdated: () => onTeamUpdated,
   onUserCreated: () => onUserCreated,
   onUserDeleted: () => onUserDeleted,
@@ -59515,11 +59645,11 @@ function cloneLongPollingOptions(options) {
 }
 var LOG_TAG$1 = "ComponentProvider";
 var datastoreInstances = /* @__PURE__ */ new Map();
-function removeComponents(firestore15) {
-  const datastore = datastoreInstances.get(firestore15);
+function removeComponents(firestore16) {
+  const datastore = datastoreInstances.get(firestore16);
   if (datastore) {
     logDebug(LOG_TAG$1, "Removing Datastore");
-    datastoreInstances.delete(firestore15);
+    datastoreInstances.delete(firestore16);
     datastore.terminate();
   }
 }
@@ -59667,11 +59797,11 @@ var Firestore$1 = class {
 var Query = class _Query {
   // This is the lite version of the Query class in the main SDK.
   /** @hideconstructor protected */
-  constructor(firestore15, converter, _query) {
+  constructor(firestore16, converter, _query) {
     this.converter = converter;
     this._query = _query;
     this.type = "query";
-    this.firestore = firestore15;
+    this.firestore = firestore16;
   }
   withConverter(converter) {
     return new _Query(this.firestore, converter, this._query);
@@ -59679,11 +59809,11 @@ var Query = class _Query {
 };
 var DocumentReference = class _DocumentReference {
   /** @hideconstructor */
-  constructor(firestore15, converter, _key) {
+  constructor(firestore16, converter, _key) {
     this.converter = converter;
     this._key = _key;
     this.type = "document";
-    this.firestore = firestore15;
+    this.firestore = firestore16;
   }
   get _path() {
     return this._key.path;
@@ -59713,8 +59843,8 @@ var DocumentReference = class _DocumentReference {
 };
 var CollectionReference = class _CollectionReference extends Query {
   /** @hideconstructor */
-  constructor(firestore15, converter, _path) {
-    super(firestore15, converter, newQueryForPath(_path));
+  constructor(firestore16, converter, _path) {
+    super(firestore16, converter, newQueryForPath(_path));
     this._path = _path;
     this.type = "collection";
   }
@@ -59999,28 +60129,28 @@ var Firestore = class extends Firestore$1 {
     }
   }
 };
-function ensureFirestoreConfigured(firestore15) {
-  if (firestore15._terminated) {
+function ensureFirestoreConfigured(firestore16) {
+  if (firestore16._terminated) {
     throw new FirestoreError(Code.FAILED_PRECONDITION, "The client has already been terminated.");
   }
-  if (!firestore15._firestoreClient) {
-    configureFirestore(firestore15);
+  if (!firestore16._firestoreClient) {
+    configureFirestore(firestore16);
   }
-  return firestore15._firestoreClient;
+  return firestore16._firestoreClient;
 }
-function configureFirestore(firestore15) {
+function configureFirestore(firestore16) {
   var _a, _b, _c;
-  const settings = firestore15._freezeSettings();
-  const databaseInfo = makeDatabaseInfo(firestore15._databaseId, ((_a = firestore15._app) === null || _a === void 0 ? void 0 : _a.options.appId) || "", firestore15._persistenceKey, settings);
-  if (!firestore15._componentsProvider) {
+  const settings = firestore16._freezeSettings();
+  const databaseInfo = makeDatabaseInfo(firestore16._databaseId, ((_a = firestore16._app) === null || _a === void 0 ? void 0 : _a.options.appId) || "", firestore16._persistenceKey, settings);
+  if (!firestore16._componentsProvider) {
     if (((_b = settings.localCache) === null || _b === void 0 ? void 0 : _b._offlineComponentProvider) && ((_c = settings.localCache) === null || _c === void 0 ? void 0 : _c._onlineComponentProvider)) {
-      firestore15._componentsProvider = {
+      firestore16._componentsProvider = {
         _offline: settings.localCache._offlineComponentProvider,
         _online: settings.localCache._onlineComponentProvider
       };
     }
   }
-  firestore15._firestoreClient = new FirestoreClient(firestore15._authCredentials, firestore15._appCheckCredentials, firestore15._queue, databaseInfo, firestore15._componentsProvider && buildComponentProvider(firestore15._componentsProvider));
+  firestore16._firestoreClient = new FirestoreClient(firestore16._authCredentials, firestore16._appCheckCredentials, firestore16._queue, databaseInfo, firestore16._componentsProvider && buildComponentProvider(firestore16._componentsProvider));
 }
 function buildComponentProvider(componentsProvider) {
   const online = componentsProvider === null || componentsProvider === void 0 ? void 0 : componentsProvider._online.build();
@@ -60345,10 +60475,10 @@ var UserDataReader = class {
     }, this.databaseId, this.serializer, this.ignoreUndefinedProperties);
   }
 };
-function newUserDataReader(firestore15) {
-  const settings = firestore15._freezeSettings();
-  const serializer = newSerializer(firestore15._databaseId);
-  return new UserDataReader(firestore15._databaseId, !!settings.ignoreUndefinedProperties, serializer);
+function newUserDataReader(firestore16) {
+  const settings = firestore16._freezeSettings();
+  const serializer = newSerializer(firestore16._databaseId);
+  return new UserDataReader(firestore16._databaseId, !!settings.ignoreUndefinedProperties, serializer);
 }
 function parseSetData(userDataReader, methodName, targetDoc, input, hasConverter, options = {}) {
   const context = userDataReader.createContext(options.merge || options.mergeFields ? 2 : 0, methodName, targetDoc, hasConverter);
@@ -61214,9 +61344,9 @@ function applyFirestoreDataConverter(converter, value, options) {
   return convertedValue;
 }
 var LiteUserDataWriter = class extends AbstractUserDataWriter {
-  constructor(firestore15) {
+  constructor(firestore16) {
     super();
-    this.firestore = firestore15;
+    this.firestore = firestore16;
   }
   convertBytes(bytes) {
     return new Bytes(bytes);
@@ -61449,14 +61579,14 @@ function resultChangeType(type) {
 }
 function getDoc(reference) {
   reference = cast(reference, DocumentReference);
-  const firestore15 = cast(reference.firestore, Firestore);
-  const client = ensureFirestoreConfigured(firestore15);
-  return firestoreClientGetDocumentViaSnapshotListener(client, reference._key).then((snapshot) => convertToDocSnapshot(firestore15, reference, snapshot));
+  const firestore16 = cast(reference.firestore, Firestore);
+  const client = ensureFirestoreConfigured(firestore16);
+  return firestoreClientGetDocumentViaSnapshotListener(client, reference._key).then((snapshot) => convertToDocSnapshot(firestore16, reference, snapshot));
 }
 var ExpUserDataWriter = class extends AbstractUserDataWriter {
-  constructor(firestore15) {
+  constructor(firestore16) {
     super();
-    this.firestore = firestore15;
+    this.firestore = firestore16;
   }
   convertBytes(bytes) {
     return new Bytes(bytes);
@@ -61473,25 +61603,25 @@ var ExpUserDataWriter = class extends AbstractUserDataWriter {
 };
 function getDocs(query2) {
   query2 = cast(query2, Query);
-  const firestore15 = cast(query2.firestore, Firestore);
-  const client = ensureFirestoreConfigured(firestore15);
-  const userDataWriter = new ExpUserDataWriter(firestore15);
+  const firestore16 = cast(query2.firestore, Firestore);
+  const client = ensureFirestoreConfigured(firestore16);
+  const userDataWriter = new ExpUserDataWriter(firestore16);
   validateHasExplicitOrderByForLimitToLast(query2._query);
-  return firestoreClientGetDocumentsViaSnapshotListener(client, query2._query).then((snapshot) => new QuerySnapshot(firestore15, userDataWriter, query2, snapshot));
+  return firestoreClientGetDocumentsViaSnapshotListener(client, query2._query).then((snapshot) => new QuerySnapshot(firestore16, userDataWriter, query2, snapshot));
 }
 function setDoc(reference, data, options) {
   reference = cast(reference, DocumentReference);
-  const firestore15 = cast(reference.firestore, Firestore);
+  const firestore16 = cast(reference.firestore, Firestore);
   const convertedValue = applyFirestoreDataConverter(reference.converter, data, options);
-  const dataReader = newUserDataReader(firestore15);
+  const dataReader = newUserDataReader(firestore16);
   const parsed = parseSetData(dataReader, "setDoc", reference._key, convertedValue, reference.converter !== null, options);
   const mutation = parsed.toMutation(reference._key, Precondition.none());
-  return executeWrite(firestore15, [mutation]);
+  return executeWrite(firestore16, [mutation]);
 }
 function updateDoc(reference, fieldOrUpdateData, value, ...moreFieldsAndValues) {
   reference = cast(reference, DocumentReference);
-  const firestore15 = cast(reference.firestore, Firestore);
-  const dataReader = newUserDataReader(firestore15);
+  const firestore16 = cast(reference.firestore, Firestore);
+  const dataReader = newUserDataReader(firestore16);
   fieldOrUpdateData = getModularInstance(fieldOrUpdateData);
   let parsed;
   if (typeof fieldOrUpdateData === "string" || fieldOrUpdateData instanceof FieldPath) {
@@ -61500,30 +61630,30 @@ function updateDoc(reference, fieldOrUpdateData, value, ...moreFieldsAndValues) 
     parsed = parseUpdateData(dataReader, "updateDoc", reference._key, fieldOrUpdateData);
   }
   const mutation = parsed.toMutation(reference._key, Precondition.exists(true));
-  return executeWrite(firestore15, [mutation]);
+  return executeWrite(firestore16, [mutation]);
 }
 function deleteDoc(reference) {
-  const firestore15 = cast(reference.firestore, Firestore);
+  const firestore16 = cast(reference.firestore, Firestore);
   const mutations = [new DeleteMutation(reference._key, Precondition.none())];
-  return executeWrite(firestore15, mutations);
+  return executeWrite(firestore16, mutations);
 }
 function addDoc(reference, data) {
-  const firestore15 = cast(reference.firestore, Firestore);
+  const firestore16 = cast(reference.firestore, Firestore);
   const docRef = doc(reference);
   const convertedValue = applyFirestoreDataConverter(reference.converter, data);
   const dataReader = newUserDataReader(reference.firestore);
   const parsed = parseSetData(dataReader, "addDoc", docRef._key, convertedValue, reference.converter !== null, {});
   const mutation = parsed.toMutation(docRef._key, Precondition.exists(false));
-  return executeWrite(firestore15, [mutation]).then(() => docRef);
+  return executeWrite(firestore16, [mutation]).then(() => docRef);
 }
-function executeWrite(firestore15, mutations) {
-  const client = ensureFirestoreConfigured(firestore15);
+function executeWrite(firestore16, mutations) {
+  const client = ensureFirestoreConfigured(firestore16);
   return firestoreClientWrite(client, mutations);
 }
-function convertToDocSnapshot(firestore15, ref2, snapshot) {
+function convertToDocSnapshot(firestore16, ref2, snapshot) {
   const doc2 = snapshot.docs.get(ref2._key);
-  const userDataWriter = new ExpUserDataWriter(firestore15);
-  return new DocumentSnapshot(firestore15, userDataWriter, ref2._key, doc2, new SnapshotMetadata(snapshot.hasPendingWrites, snapshot.fromCache), ref2.converter);
+  const userDataWriter = new ExpUserDataWriter(firestore16);
+  return new DocumentSnapshot(firestore16, userDataWriter, ref2._key, doc2, new SnapshotMetadata(snapshot.hasPendingWrites, snapshot.fromCache), ref2.converter);
 }
 var DEFAULT_TRANSACTION_OPTIONS = {
   maxAttempts: 5
@@ -61533,9 +61663,9 @@ function validateTransactionOptions(options) {
     throw new FirestoreError(Code.INVALID_ARGUMENT, "Max attempts must be at least 1");
   }
 }
-function validateReference(documentRef, firestore15) {
+function validateReference(documentRef, firestore16) {
   documentRef = getModularInstance(documentRef);
-  if (documentRef.firestore !== firestore15) {
+  if (documentRef.firestore !== firestore16) {
     throw new FirestoreError(Code.INVALID_ARGUMENT, "Provided document reference is from a different Firestore instance.");
   } else {
     return documentRef;
@@ -61627,12 +61757,12 @@ var Transaction = class extends Transaction$1 {
     ), ref2.converter));
   }
 };
-function runTransaction(firestore15, updateFunction, options) {
-  firestore15 = cast(firestore15, Firestore);
+function runTransaction(firestore16, updateFunction, options) {
+  firestore16 = cast(firestore16, Firestore);
   const optionsWithDefaults = Object.assign(Object.assign({}, DEFAULT_TRANSACTION_OPTIONS), options);
   validateTransactionOptions(optionsWithDefaults);
-  const client = ensureFirestoreConfigured(firestore15);
-  return firestoreClientTransaction(client, (internalTransaction) => updateFunction(new Transaction(firestore15, internalTransaction)), optionsWithDefaults);
+  const client = ensureFirestoreConfigured(firestore16);
+  return firestoreClientTransaction(client, (internalTransaction) => updateFunction(new Transaction(firestore16, internalTransaction)), optionsWithDefaults);
 }
 registerFirestore("node");
 
@@ -64006,185 +64136,6 @@ function getFirebaseInstance() {
   }
   return firebaseInstance;
 }
-
-// ../packages/firebase/src/authorization/permissionCache.ts
-var PermissionCache = class {
-  static cache = /* @__PURE__ */ new Map();
-  static DEFAULT_TTL_MS = 60 * 1e3;
-  // 1 minute cache TTL
-  static generateKey(userPermissions, requiredPermission) {
-    return `${userPermissions.sort().join(",")}:${requiredPermission}`;
-  }
-  static get(userPermissions, requiredPermission) {
-    const key = this.generateKey(userPermissions, requiredPermission);
-    const entry = this.cache.get(key);
-    if (!entry) return null;
-    if (Date.now() - entry.timestamp > this.DEFAULT_TTL_MS) {
-      this.cache.delete(key);
-      return null;
-    }
-    return entry.result;
-  }
-  static set(userPermissions, requiredPermission, result) {
-    const key = this.generateKey(userPermissions, requiredPermission);
-    this.cache.set(key, {
-      result,
-      timestamp: Date.now()
-    });
-  }
-  static clear() {
-    this.cache.clear();
-  }
-};
-
-// ../packages/firebase/src/context/AuthContext.tsx
-var import_react = __toESM(require_react());
-var import_jsx_runtime = __toESM(require_jsx_runtime());
-var AuthContext = (0, import_react.createContext)(void 0);
-
-// ../packages/firebase/src/context/SessionContext.tsx
-var import_react2 = __toESM(require_react());
-var import_jsx_runtime2 = __toESM(require_jsx_runtime());
-var SessionContext = (0, import_react2.createContext)(void 0);
-
-// ../packages/firebase/src/context/PermissionContext.tsx
-var import_react3 = __toESM(require_react());
-var import_jsx_runtime3 = __toESM(require_jsx_runtime());
-var PermissionContext = (0, import_react3.createContext)(void 0);
-
-// ../packages/firebase/src/functions.ts
-async function callCloudFunction(name9, data) {
-  const { functions } = getFirebaseInstance();
-  const callable = httpsCallable(functions, name9);
-  const result = await callable(data);
-  return result.data;
-}
-
-// ../packages/firebase/src/constants/collections.ts
-var FIRESTORE_COLLECTIONS = {
-  COMPANIES: "companies",
-  BRANCHES: "branches",
-  ROLES: "roles",
-  PERMISSIONS: "permissions",
-  USERS: "users",
-  EMPLOYEES: "employees",
-  DEPARTMENTS: "departments",
-  DESIGNATIONS: "designations",
-  TEAMS: "teams",
-  BUSINESS_UNITS: "business_units",
-  ORGANIZATION_SETTINGS: "organization_settings",
-  PROJECTS: "projects",
-  LAYOUTS: "layouts",
-  BLOCKS: "blocks",
-  PLOTS: "plots",
-  LEADS: "leads",
-  LEAD_SOURCES: "lead_sources",
-  LEAD_ACTIVITIES: "lead_activities",
-  FOLLOW_UPS: "follow_ups",
-  CAMPAIGNS: "campaigns",
-  CAMPAIGN_EXPENSES: "campaign_expenses",
-  CUSTOMERS: "customers",
-  BOOKINGS: "bookings",
-  PAYMENTS: "payments",
-  REGISTRATIONS: "registrations",
-  RECEIPTS: "receipts",
-  VEHICLES: "vehicles",
-  DRIVERS: "drivers",
-  VEHICLE_TRIPS: "vehicle_trips",
-  FUEL_ENTRIES: "fuel_entries",
-  EXPENSES: "expenses",
-  ATTENDANCE: "attendance",
-  NOTIFICATIONS: "notifications",
-  DOCUMENTS: "documents",
-  MEDIA: "media",
-  SETTINGS: "settings",
-  AUDIT_LOGS: "audit_logs",
-  AI_SUGGESTIONS: "ai_suggestions",
-  PERSONS: "persons",
-  INTERACTIONS: "interactions",
-  WORKFLOW_DEFINITIONS: "workflow_definitions",
-  WORKFLOW_INSTANCES: "workflow_instances",
-  WORKFLOW_HISTORIES: "workflow_histories",
-  WORKFLOW_COMMENTS: "workflow_comments",
-  SITE_VISITS: "site_visits",
-  NETWORK_POSITIONS: "network_positions",
-  NETWORK_MEMBERS: "network_members",
-  NETWORK_TEAMS: "network_teams",
-  COMMISSION_RULES: "commission_rules",
-  COMMISSION_POOLS: "commission_pools",
-  COMMISSION_RECORDS: "commission_records"
-};
-
-// ../packages/firebase/src/models/person.ts
-var personConverter = {
-  toFirestore(person) {
-    return {
-      ...person
-    };
-  },
-  fromFirestore(snapshot, options) {
-    const data = snapshot.data(options);
-    return {
-      ...data,
-      id: snapshot.id
-    };
-  }
-};
-
-// ../packages/firebase/src/converters/baseConverter.ts
-function convertTimestampsToIso(obj) {
-  const result = {};
-  for (const [key, value] of Object.entries(obj)) {
-    if (value instanceof Timestamp) {
-      result[key] = value.toDate().toISOString();
-    } else if (value && typeof value === "object" && !Array.isArray(value) && !(value instanceof Date)) {
-      result[key] = convertTimestampsToIso(value);
-    } else if (value instanceof Date) {
-      result[key] = value.toISOString();
-    } else {
-      result[key] = value;
-    }
-  }
-  return result;
-}
-function createBaseConverter() {
-  return {
-    toFirestore(model) {
-      const modelObj = model;
-      const { id, ...data } = modelObj;
-      const firestoreData = {};
-      for (const [key, value] of Object.entries(data)) {
-        if (value !== void 0) {
-          if (typeof value === "string" && (key.endsWith("At") || key.endsWith("Date")) && !isNaN(Date.parse(value))) {
-            firestoreData[key] = Timestamp.fromDate(new Date(value));
-          } else {
-            firestoreData[key] = value;
-          }
-        }
-      }
-      return firestoreData;
-    },
-    fromFirestore(snapshot, options) {
-      const rawData = snapshot.data(options);
-      const convertedData = convertTimestampsToIso(rawData);
-      const now = (/* @__PURE__ */ new Date()).toISOString();
-      return {
-        id: snapshot.id,
-        createdAt: typeof convertedData.createdAt === "string" ? convertedData.createdAt : now,
-        updatedAt: typeof convertedData.updatedAt === "string" ? convertedData.updatedAt : now,
-        createdBy: typeof convertedData.createdBy === "string" ? convertedData.createdBy : "system",
-        updatedBy: typeof convertedData.updatedBy === "string" ? convertedData.updatedBy : "system",
-        isActive: typeof convertedData.isActive === "boolean" ? convertedData.isActive : true,
-        isDeleted: typeof convertedData.isDeleted === "boolean" ? convertedData.isDeleted : false,
-        version: typeof convertedData.version === "number" ? convertedData.version : 1,
-        ...convertedData
-      };
-    }
-  };
-}
-
-// ../packages/firebase/src/models/interaction.ts
-var interactionConverter = createBaseConverter();
 
 // ../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/external.js
 var external_exports = {};
@@ -68227,6 +68178,429 @@ var coerce = {
 };
 var NEVER = INVALID;
 
+// ../packages/types/src/zod-schemas.ts
+var loginSchema = external_exports.object({
+  email: external_exports.string().email("Please enter a valid email address"),
+  password: external_exports.string().min(6, "Password must be at least 6 characters long")
+});
+var propertyFormSchema = external_exports.object({
+  title: external_exports.string().min(5, "Title must be at least 5 characters"),
+  description: external_exports.string().min(10, "Description must be at least 10 characters"),
+  price: external_exports.coerce.number().positive("Price must be greater than 0"),
+  propertyType: external_exports.enum([
+    "Single Family",
+    "Condo",
+    "Townhouse",
+    "Multi-Family",
+    "Commercial",
+    "Land",
+    "Luxury Villa"
+  ]),
+  status: external_exports.enum(["Active", "Pending", "Sold", "Off-Market", "Draft"]),
+  location: external_exports.object({
+    address: external_exports.string().min(3, "Address is required"),
+    city: external_exports.string().min(2, "City is required"),
+    state: external_exports.string().min(2, "State is required"),
+    zipCode: external_exports.string().min(3, "ZIP Code is required"),
+    country: external_exports.string().default("USA")
+  }),
+  features: external_exports.object({
+    bedrooms: external_exports.coerce.number().min(0),
+    bathrooms: external_exports.coerce.number().min(0),
+    sqft: external_exports.coerce.number().positive("Square footage must be positive"),
+    lotSizeSqft: external_exports.coerce.number().optional(),
+    yearBuilt: external_exports.coerce.number().optional()
+  })
+});
+var leadFormSchema = external_exports.object({
+  fullName: external_exports.string().min(2, "Full Name is required"),
+  phone: external_exports.string().min(10, "Valid 10-digit phone number required"),
+  alternatePhone: external_exports.string().optional(),
+  email: external_exports.string().email().optional().or(external_exports.literal("")),
+  city: external_exports.string().optional(),
+  source: external_exports.enum([
+    "PUBLIC_WEBSITE",
+    "FACEBOOK_ADS",
+    "INSTAGRAM_ADS",
+    "GOOGLE_SEARCH",
+    "99ACRES",
+    "MAGICBRICKS",
+    "HOUSING_COM",
+    "WALK_IN",
+    "REFERRAL",
+    "NEWSPAPER_AD",
+    "COLD_CALLING"
+  ]),
+  budgetMin: external_exports.coerce.number().optional(),
+  budgetMax: external_exports.coerce.number().optional(),
+  preferredPlotSizeSqFt: external_exports.coerce.number().optional(),
+  preferredProjectId: external_exports.string().optional(),
+  notes: external_exports.string().optional()
+});
+var projectSchema = external_exports.object({
+  name: external_exports.string().min(3, "Project name must be at least 3 characters"),
+  code: external_exports.string().min(2, "Short code required (e.g., GPR-01)"),
+  location: external_exports.string().min(3, "Location is required"),
+  city: external_exports.string().min(2, "City is required"),
+  state: external_exports.string().min(2, "State is required"),
+  totalAreaAcres: external_exports.coerce.number().positive("Total area in acres is required"),
+  totalPlotsCount: external_exports.coerce.number().int().positive("Total plots count is required"),
+  dtcpNumber: external_exports.string().optional(),
+  reraId: external_exports.string().optional()
+});
+var bookingSchema = external_exports.object({
+  projectId: external_exports.string().min(1, "Project selection required"),
+  plotId: external_exports.string().min(1, "Plot selection required"),
+  customerId: external_exports.string().min(1, "Customer is required"),
+  salesExecutiveId: external_exports.string().min(1, "Sales Executive is required"),
+  agreedPricePerSqFt: external_exports.coerce.number().positive("Agreed rate required"),
+  totalPlotAmount: external_exports.coerce.number().positive("Total plot amount required"),
+  discountAmount: external_exports.coerce.number().default(0),
+  tokenAmountPaid: external_exports.coerce.number().positive("Token amount paid required"),
+  paymentMode: external_exports.enum(["CASH", "CHEQUE", "BANK_TRANSFER", "UPI", "CARD"]),
+  notes: external_exports.string().optional()
+});
+var fuelLogSchema = external_exports.object({
+  vehicleId: external_exports.string().min(1, "Vehicle is required"),
+  fuelLiters: external_exports.coerce.number().positive("Fuel liters required"),
+  fuelRatePerLiter: external_exports.coerce.number().positive("Fuel rate required"),
+  totalCost: external_exports.coerce.number().positive("Total cost required"),
+  odometerReadingKm: external_exports.coerce.number().positive("Odometer reading required"),
+  paymentMode: external_exports.enum(["CASH", "COMPANY_CARD", "UPI", "REIMBURSEMENT"]),
+  fillingStationName: external_exports.string().optional()
+});
+var attendancePunchSchema = external_exports.object({
+  userId: external_exports.string().min(1, "User ID required"),
+  latitude: external_exports.number(),
+  longitude: external_exports.number(),
+  workSummary: external_exports.string().optional()
+});
+var personAddressSchema = external_exports.object({
+  type: external_exports.enum(["PERMANENT", "CURRENT", "OFFICE", "OTHER"]).optional(),
+  street: external_exports.string().min(2, "Street is required"),
+  city: external_exports.string().min(2, "City is required"),
+  state: external_exports.string().min(2, "State is required"),
+  zipCode: external_exports.string().min(2, "ZIP Code is required"),
+  country: external_exports.string().default("India"),
+  geoCoordinates: external_exports.object({
+    latitude: external_exports.number(),
+    longitude: external_exports.number()
+  }).optional(),
+  googleMapsLink: external_exports.string().url().optional()
+});
+var personIdentitySchema = external_exports.object({
+  type: external_exports.enum(["AADHAAR", "PAN", "PASSPORT", "DRIVING_LICENSE", "VOTER_ID", "RERA_LICENSE", "OTHER"]),
+  idNumber: external_exports.string().min(2, "ID Number is required"),
+  documentUrl: external_exports.string().url().optional(),
+  verified: external_exports.boolean().default(false)
+});
+var personSocialProfileSchema = external_exports.object({
+  platform: external_exports.enum(["LINKEDIN", "FACEBOOK", "TWITTER", "INSTAGRAM", "OTHER"]),
+  url: external_exports.string().url("Must be a valid URL")
+});
+var personCommunicationPreferencesSchema = external_exports.object({
+  phone: external_exports.boolean().default(true),
+  whatsapp: external_exports.boolean().default(true),
+  sms: external_exports.boolean().default(true),
+  email: external_exports.boolean().default(true),
+  bestTimeToCall: external_exports.string().optional(),
+  doNotDisturb: external_exports.boolean().default(false)
+});
+var personRelationshipSchema = external_exports.object({
+  relatedPersonId: external_exports.string().optional(),
+  relation: external_exports.enum(["FAMILY_MEMBER", "NOMINEE", "REFERENCE", "REFERRAL", "BUSINESS_CONTACT", "OTHER"]),
+  name: external_exports.string().optional(),
+  notes: external_exports.string().optional()
+});
+var personSchema = external_exports.object({
+  firstName: external_exports.string().min(2, "First Name is required"),
+  lastName: external_exports.string().optional(),
+  gender: external_exports.enum(["MALE", "FEMALE", "OTHER", "PREFER_NOT_TO_SAY"]).default("PREFER_NOT_TO_SAY"),
+  dateOfBirth: external_exports.string().optional(),
+  occupation: external_exports.string().optional(),
+  company: external_exports.string().optional(),
+  designation: external_exports.string().optional(),
+  photoUrl: external_exports.string().url().optional(),
+  preferredLanguage: external_exports.string().optional(),
+  nationality: external_exports.string().optional(),
+  maritalStatus: external_exports.enum(["SINGLE", "MARRIED", "DIVORCED", "WIDOWED"]).optional(),
+  classifications: external_exports.array(
+    external_exports.enum(["INDIVIDUAL", "CUSTOMER", "LEAD", "BROKER", "CHANNEL_PARTNER", "INVESTOR", "BUILDER", "VENDOR", "LEGAL_ADVISOR", "EMPLOYEE"])
+  ).default(["INDIVIDUAL"]),
+  tags: external_exports.array(
+    external_exports.enum(["VIP", "HOT", "WARM", "COLD", "NRI", "HNI", "REPEAT_BUYER", "REFERRAL", "BLACKLISTED"])
+  ).default([]),
+  mobileNumbers: external_exports.array(external_exports.string().min(10, "Valid mobile number required")).min(1, "At least one mobile number is required"),
+  emailAddresses: external_exports.array(external_exports.string().email("Invalid email")).default([]),
+  primaryMobile: external_exports.string().optional(),
+  primaryEmail: external_exports.string().email().optional(),
+  whatsappNumber: external_exports.string().optional(),
+  telegram: external_exports.string().optional(),
+  socialProfiles: external_exports.array(personSocialProfileSchema).default([]),
+  emergencyContact: external_exports.object({
+    name: external_exports.string(),
+    relation: external_exports.string(),
+    phone: external_exports.string()
+  }).optional(),
+  addresses: external_exports.array(personAddressSchema).default([]),
+  identities: external_exports.array(personIdentitySchema).default([]),
+  communicationPreferences: personCommunicationPreferencesSchema.default({
+    phone: true,
+    whatsapp: true,
+    sms: true,
+    email: true,
+    doNotDisturb: false
+  }),
+  relationships: external_exports.array(personRelationshipSchema).default([])
+});
+var interactionAttachmentSchema = external_exports.object({
+  type: external_exports.enum(["PHOTO", "VIDEO", "PDF", "VOICE_NOTE", "DOCUMENT"]),
+  url: external_exports.string().url(),
+  name: external_exports.string(),
+  sizeBytes: external_exports.number().optional()
+});
+var interactionMeetingDetailsSchema = external_exports.object({
+  location: external_exports.string().optional(),
+  gpsCoordinates: external_exports.object({
+    latitude: external_exports.number(),
+    longitude: external_exports.number()
+  }).optional(),
+  checkInTime: external_exports.string().optional(),
+  checkOutTime: external_exports.string().optional(),
+  participants: external_exports.array(external_exports.string()).default([]),
+  minutes: external_exports.string().optional()
+});
+var interactionTaskDetailsSchema = external_exports.object({
+  assignedTo: external_exports.string().min(1),
+  dueDate: external_exports.string(),
+  reminderTime: external_exports.string().optional(),
+  completionPercentage: external_exports.number().min(0).max(100).optional()
+});
+var interactionReminderDetailsSchema = external_exports.object({
+  pushNotification: external_exports.boolean().default(false),
+  sms: external_exports.boolean().default(false),
+  whatsappReady: external_exports.boolean().default(false),
+  emailReady: external_exports.boolean().default(false)
+});
+var interactionSchema = external_exports.object({
+  personId: external_exports.string().min(1, "Person ID is required"),
+  type: external_exports.enum([
+    "PHONE_CALL",
+    "INCOMING_CALL",
+    "OUTGOING_CALL",
+    "WHATSAPP",
+    "SMS",
+    "EMAIL",
+    "MEETING",
+    "VIDEO_MEETING",
+    "OFFICE_VISIT",
+    "SITE_VISIT",
+    "NOTE",
+    "TASK",
+    "REMINDER",
+    "FOLLOW_UP",
+    "DOCUMENT_SHARED",
+    "QUOTATION_SHARED",
+    "BROCHURE_SHARED"
+  ]),
+  projectId: external_exports.string().optional(),
+  employeeId: external_exports.string().optional(),
+  branchId: external_exports.string().optional(),
+  date: external_exports.string().min(1, "Date is required"),
+  time: external_exports.string().optional(),
+  durationSeconds: external_exports.number().optional(),
+  status: external_exports.enum(["SCHEDULED", "IN_PROGRESS", "COMPLETED", "CANCELLED", "NO_SHOW", "PENDING"]),
+  priority: external_exports.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]),
+  outcome: external_exports.enum(["SUCCESS", "NEUTRAL", "FAILURE", "ESCALATED", "REQUIRES_FOLLOW_UP"]).optional(),
+  callResult: external_exports.enum(["CONNECTED", "BUSY", "NO_ANSWER", "SWITCHED_OFF", "WRONG_NUMBER", "INTERESTED", "NOT_INTERESTED", "CALL_BACK"]).optional(),
+  notes: external_exports.string().optional(),
+  nextAction: external_exports.string().optional(),
+  nextFollowUpDate: external_exports.string().optional(),
+  attachments: external_exports.array(interactionAttachmentSchema).optional(),
+  meetingDetails: interactionMeetingDetailsSchema.optional(),
+  taskDetails: interactionTaskDetailsSchema.optional(),
+  reminderDetails: interactionReminderDetailsSchema.optional()
+});
+
+// ../packages/firebase/src/authorization/permissionCache.ts
+var PermissionCache = class {
+  static cache = /* @__PURE__ */ new Map();
+  static DEFAULT_TTL_MS = 60 * 1e3;
+  // 1 minute cache TTL
+  static generateKey(userPermissions, requiredPermission) {
+    return `${userPermissions.sort().join(",")}:${requiredPermission}`;
+  }
+  static get(userPermissions, requiredPermission) {
+    const key = this.generateKey(userPermissions, requiredPermission);
+    const entry = this.cache.get(key);
+    if (!entry) return null;
+    if (Date.now() - entry.timestamp > this.DEFAULT_TTL_MS) {
+      this.cache.delete(key);
+      return null;
+    }
+    return entry.result;
+  }
+  static set(userPermissions, requiredPermission, result) {
+    const key = this.generateKey(userPermissions, requiredPermission);
+    this.cache.set(key, {
+      result,
+      timestamp: Date.now()
+    });
+  }
+  static clear() {
+    this.cache.clear();
+  }
+};
+
+// ../packages/firebase/src/context/AuthContext.tsx
+var import_react = __toESM(require_react());
+var import_jsx_runtime = __toESM(require_jsx_runtime());
+var AuthContext = (0, import_react.createContext)(void 0);
+
+// ../packages/firebase/src/context/SessionContext.tsx
+var import_react2 = __toESM(require_react());
+var import_jsx_runtime2 = __toESM(require_jsx_runtime());
+var SessionContext = (0, import_react2.createContext)(void 0);
+
+// ../packages/firebase/src/context/PermissionContext.tsx
+var import_react3 = __toESM(require_react());
+var import_jsx_runtime3 = __toESM(require_jsx_runtime());
+var PermissionContext = (0, import_react3.createContext)(void 0);
+
+// ../packages/firebase/src/functions.ts
+async function callCloudFunction(name9, data) {
+  const { functions } = getFirebaseInstance();
+  const callable = httpsCallable(functions, name9);
+  const result = await callable(data);
+  return result.data;
+}
+
+// ../packages/firebase/src/constants/collections.ts
+var FIRESTORE_COLLECTIONS = {
+  COMPANIES: "companies",
+  BRANCHES: "branches",
+  ROLES: "roles",
+  PERMISSIONS: "permissions",
+  USERS: "users",
+  EMPLOYEES: "employees",
+  DEPARTMENTS: "departments",
+  DESIGNATIONS: "designations",
+  TEAMS: "teams",
+  BUSINESS_UNITS: "business_units",
+  ORGANIZATION_SETTINGS: "organization_settings",
+  PROJECTS: "projects",
+  LAYOUTS: "layouts",
+  BLOCKS: "blocks",
+  PLOTS: "plots",
+  LEADS: "leads",
+  LEAD_SOURCES: "lead_sources",
+  LEAD_ACTIVITIES: "lead_activities",
+  FOLLOW_UPS: "follow_ups",
+  CAMPAIGNS: "campaigns",
+  CAMPAIGN_EXPENSES: "campaign_expenses",
+  CUSTOMERS: "customers",
+  BOOKINGS: "bookings",
+  PAYMENTS: "payments",
+  REGISTRATIONS: "registrations",
+  RECEIPTS: "receipts",
+  VEHICLES: "vehicles",
+  DRIVERS: "drivers",
+  VEHICLE_TRIPS: "vehicle_trips",
+  FUEL_ENTRIES: "fuel_entries",
+  EXPENSES: "expenses",
+  ATTENDANCE: "attendance",
+  NOTIFICATIONS: "notifications",
+  DOCUMENTS: "documents",
+  MEDIA: "media",
+  SETTINGS: "settings",
+  AUDIT_LOGS: "audit_logs",
+  AI_SUGGESTIONS: "ai_suggestions",
+  PERSONS: "persons",
+  INTERACTIONS: "interactions",
+  WORKFLOW_DEFINITIONS: "workflow_definitions",
+  WORKFLOW_INSTANCES: "workflow_instances",
+  WORKFLOW_HISTORIES: "workflow_histories",
+  WORKFLOW_COMMENTS: "workflow_comments",
+  SITE_VISITS: "site_visits",
+  NETWORK_POSITIONS: "network_positions",
+  NETWORK_MEMBERS: "network_members",
+  NETWORK_TEAMS: "network_teams",
+  COMMISSION_RULES: "commission_rules",
+  COMMISSION_POOLS: "commission_pools",
+  COMMISSION_RECORDS: "commission_records"
+};
+
+// ../packages/firebase/src/models/person.ts
+var personConverter = {
+  toFirestore(person) {
+    return {
+      ...person
+    };
+  },
+  fromFirestore(snapshot, options) {
+    const data = snapshot.data(options);
+    return {
+      ...data,
+      id: snapshot.id
+    };
+  }
+};
+
+// ../packages/firebase/src/converters/baseConverter.ts
+function convertTimestampsToIso(obj) {
+  const result = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (value instanceof Timestamp) {
+      result[key] = value.toDate().toISOString();
+    } else if (value && typeof value === "object" && !Array.isArray(value) && !(value instanceof Date)) {
+      result[key] = convertTimestampsToIso(value);
+    } else if (value instanceof Date) {
+      result[key] = value.toISOString();
+    } else {
+      result[key] = value;
+    }
+  }
+  return result;
+}
+function createBaseConverter() {
+  return {
+    toFirestore(model) {
+      const modelObj = model;
+      const { id, ...data } = modelObj;
+      const firestoreData = {};
+      for (const [key, value] of Object.entries(data)) {
+        if (value !== void 0) {
+          if (typeof value === "string" && (key.endsWith("At") || key.endsWith("Date")) && !isNaN(Date.parse(value))) {
+            firestoreData[key] = Timestamp.fromDate(new Date(value));
+          } else {
+            firestoreData[key] = value;
+          }
+        }
+      }
+      return firestoreData;
+    },
+    fromFirestore(snapshot, options) {
+      const rawData = snapshot.data(options);
+      const convertedData = convertTimestampsToIso(rawData);
+      const now = (/* @__PURE__ */ new Date()).toISOString();
+      return {
+        id: snapshot.id,
+        createdAt: typeof convertedData.createdAt === "string" ? convertedData.createdAt : now,
+        updatedAt: typeof convertedData.updatedAt === "string" ? convertedData.updatedAt : now,
+        createdBy: typeof convertedData.createdBy === "string" ? convertedData.createdBy : "system",
+        updatedBy: typeof convertedData.updatedBy === "string" ? convertedData.updatedBy : "system",
+        isActive: typeof convertedData.isActive === "boolean" ? convertedData.isActive : true,
+        isDeleted: typeof convertedData.isDeleted === "boolean" ? convertedData.isDeleted : false,
+        version: typeof convertedData.version === "number" ? convertedData.version : 1,
+        ...convertedData
+      };
+    }
+  };
+}
+
+// ../packages/firebase/src/models/interaction.ts
+var interactionConverter = createBaseConverter();
+
 // ../packages/firebase/src/validators/base.ts
 var baseFirestoreModelSchema = external_exports.object({
   id: external_exports.string().min(1),
@@ -68447,7 +68821,7 @@ var createCustomerSchema = baseCreateInputSchema.merge(customerSchema.omit({
   updatedAt: true,
   version: true
 }));
-var bookingSchema = baseFirestoreModelSchema.extend({
+var bookingSchema2 = baseFirestoreModelSchema.extend({
   companyId: external_exports.string().min(1),
   branchId: external_exports.string().min(1),
   projectId: external_exports.string().min(1),
@@ -68466,7 +68840,7 @@ var bookingSchema = baseFirestoreModelSchema.extend({
   status: external_exports.enum(["draft", "confirmed", "cancelled", "completed"]),
   agreementDate: external_exports.string().optional()
 });
-var createBookingSchema = baseCreateInputSchema.merge(bookingSchema.omit({
+var createBookingSchema = baseCreateInputSchema.merge(bookingSchema2.omit({
   id: true,
   createdAt: true,
   updatedAt: true,
@@ -68766,7 +69140,7 @@ var projectMediaSchema = external_exports.object({
   brochurePdf: external_exports.string().url().optional(),
   masterPlanPdf: external_exports.string().url().optional()
 });
-var projectSchema = baseFirestoreModelSchema.extend({
+var projectSchema2 = baseFirestoreModelSchema.extend({
   name: external_exports.string().min(1),
   code: external_exports.string().min(1),
   projectType: external_exports.enum(["RESIDENTIAL", "COMMERCIAL", "VILLA", "FARM_LAND", "APARTMENT", "MIXED_USE"]),
@@ -69219,6 +69593,13 @@ var BaseRepository = class {
   }
 };
 
+// ../packages/firebase/src/realestate/repositories/ProjectRepository.ts
+var ProjectRepository = class extends BaseRepository {
+  constructor() {
+    super(FIRESTORE_COLLECTIONS.PROJECTS, "Project", projectConverter);
+  }
+};
+
 // ../packages/firebase/src/repositories/LeadRepository.ts
 var LeadRepository = class extends BaseRepository {
   constructor() {
@@ -69368,27 +69749,27 @@ var InteractionService = class {
 var interactionService = new InteractionService();
 
 // ../packages/events/src/types/event.ts
-var AggregateType = /* @__PURE__ */ ((AggregateType3) => {
-  AggregateType3["Lead"] = "Lead";
-  AggregateType3["Person"] = "Person";
-  AggregateType3["Interaction"] = "Interaction";
-  AggregateType3["Workflow"] = "Workflow";
-  AggregateType3["Booking"] = "Booking";
-  AggregateType3["Payment"] = "Payment";
-  AggregateType3["Customer"] = "Customer";
-  AggregateType3["Vehicle"] = "Vehicle";
-  AggregateType3["Campaign"] = "Campaign";
-  AggregateType3["Attendance"] = "Attendance";
-  AggregateType3["Expense"] = "Expense";
-  AggregateType3["SiteVisit"] = "SiteVisit";
-  AggregateType3["Notification"] = "Notification";
-  AggregateType3["Plot"] = "Plot";
-  AggregateType3["Network"] = "Network";
-  AggregateType3["Commission"] = "Commission";
-  AggregateType3["Document"] = "Document";
-  AggregateType3["AfterSales"] = "AfterSales";
-  AggregateType3["CustomerNotification"] = "CustomerNotification";
-  return AggregateType3;
+var AggregateType = /* @__PURE__ */ ((AggregateType2) => {
+  AggregateType2["Lead"] = "Lead";
+  AggregateType2["Person"] = "Person";
+  AggregateType2["Interaction"] = "Interaction";
+  AggregateType2["Workflow"] = "Workflow";
+  AggregateType2["Booking"] = "Booking";
+  AggregateType2["Payment"] = "Payment";
+  AggregateType2["Customer"] = "Customer";
+  AggregateType2["Vehicle"] = "Vehicle";
+  AggregateType2["Campaign"] = "Campaign";
+  AggregateType2["Attendance"] = "Attendance";
+  AggregateType2["Expense"] = "Expense";
+  AggregateType2["SiteVisit"] = "SiteVisit";
+  AggregateType2["Notification"] = "Notification";
+  AggregateType2["Plot"] = "Plot";
+  AggregateType2["Network"] = "Network";
+  AggregateType2["Commission"] = "Commission";
+  AggregateType2["Document"] = "Document";
+  AggregateType2["AfterSales"] = "AfterSales";
+  AggregateType2["CustomerNotification"] = "CustomerNotification";
+  return AggregateType2;
 })(AggregateType || {});
 
 // ../packages/events/src/validators/eventValidators.ts
@@ -69408,6 +69789,52 @@ var EventSchema = external_exports.object({
   payload: external_exports.any(),
   metadata: EventMetadataSchema
 });
+
+// ../packages/events/src/core/EventPublisher.ts
+var DefaultEventPublisher = class {
+  constructor(eventStore) {
+    this.eventStore = eventStore;
+  }
+  eventStore;
+  async publish(event) {
+    await this.eventStore.saveEvent(event);
+  }
+};
+
+// ../packages/events/src/core/EventDispatcher.ts
+var EventDispatcher = class {
+  handlers = /* @__PURE__ */ new Map();
+  subscribe(eventType, handler) {
+    if (!this.handlers.has(eventType)) {
+      this.handlers.set(eventType, []);
+    }
+    this.handlers.get(eventType).push(handler);
+  }
+  unsubscribe(eventType, handler) {
+    if (!this.handlers.has(eventType)) return;
+    const currentHandlers = this.handlers.get(eventType);
+    this.handlers.set(
+      eventType,
+      currentHandlers.filter((h) => h !== handler)
+    );
+  }
+  /**
+   * Dispatch an event to all registered handlers for its type.
+   * In an enterprise setup, this might be called by the Cloud Function subscriber
+   * when an event is pulled from Pub/Sub or Firestore triggers.
+   */
+  async dispatch(event) {
+    const eventHandlers = this.handlers.get(event.eventType) || [];
+    await Promise.all(
+      eventHandlers.map((handler) => handler.handle(event))
+    );
+  }
+};
+
+// ../packages/events/src/marketing.ts
+var BookingPaymentEvents = {
+  BOOKING_FULLY_PAID: "BOOKING_FULLY_PAID"
+};
 
 // ../packages/firebase/src/services/SiteVisitService.ts
 var SiteVisitService = class {
@@ -69562,6 +69989,32 @@ var SiteVisitService = class {
   }
 };
 var siteVisitService = new SiteVisitService();
+
+// ../packages/firebase/src/realestate/services/ProjectService.ts
+var ProjectService = class {
+  repository;
+  constructor() {
+    this.repository = new ProjectRepository();
+  }
+  async getAllProjects() {
+    return this.repository.findAll();
+  }
+  async getProject(id) {
+    return this.repository.findById(id);
+  }
+  async createProject(data, userId) {
+    projectSchema2.parse(data);
+    return this.repository.create(data, userId);
+  }
+  async updateProject(id, data, userId) {
+    const existing = await this.repository.findById(id);
+    if (existing) {
+      projectSchema2.parse({ ...existing, ...data });
+    }
+    return this.repository.update(id, data, userId);
+  }
+};
+var projectService = new ProjectService();
 
 // ../packages/firebase/src/realestate/services/InventoryBookingService.ts
 var InventoryBookingService = class {
@@ -70697,7 +71150,7 @@ var syncCustomClaims = (0, import_https2.onCall)(async (request) => {
 });
 
 // src/triggers/onCompanyCreated.ts
-var import_firestore30 = require("firebase-functions/v2/firestore");
+var import_firestore34 = require("firebase-functions/v2/firestore");
 var admin6 = __toESM(require("firebase-admin"));
 var handleCompanyCreated = async (event) => {
   const companyId = event.params.companyId;
@@ -70805,7 +71258,7 @@ var handleCompanyCreated = async (event) => {
   await batch.commit();
   console.log(`Default organization configuration setup complete for company ${companyId}`);
 };
-var onCompanyCreated = (0, import_firestore30.onDocumentCreated)(
+var onCompanyCreated = (0, import_firestore34.onDocumentCreated)(
   {
     document: "companies/{companyId}",
     region: "asia-south1"
@@ -70814,7 +71267,7 @@ var onCompanyCreated = (0, import_firestore30.onDocumentCreated)(
 );
 
 // src/triggers/onBranchCreated.ts
-var import_firestore31 = require("firebase-functions/v2/firestore");
+var import_firestore35 = require("firebase-functions/v2/firestore");
 var admin7 = __toESM(require("firebase-admin"));
 var handleBranchCreated = async (event) => {
   const branchData = event.data?.data();
@@ -70840,7 +71293,7 @@ var handleBranchCreated = async (event) => {
     version: 1
   });
 };
-var onBranchCreated = (0, import_firestore31.onDocumentCreated)(
+var onBranchCreated = (0, import_firestore35.onDocumentCreated)(
   {
     document: "branches/{branchId}",
     region: "asia-south1"
@@ -70849,7 +71302,7 @@ var onBranchCreated = (0, import_firestore31.onDocumentCreated)(
 );
 
 // src/triggers/onDepartmentCreated.ts
-var import_firestore32 = require("firebase-functions/v2/firestore");
+var import_firestore36 = require("firebase-functions/v2/firestore");
 var admin8 = __toESM(require("firebase-admin"));
 var handleDepartmentCreated = async (event) => {
   const departmentId = event.params.departmentId;
@@ -70875,7 +71328,7 @@ var handleDepartmentCreated = async (event) => {
     version: 1
   });
 };
-var onDepartmentCreated = (0, import_firestore32.onDocumentCreated)(
+var onDepartmentCreated = (0, import_firestore36.onDocumentCreated)(
   {
     document: "departments/{departmentId}",
     region: "asia-south1"
@@ -70884,7 +71337,7 @@ var onDepartmentCreated = (0, import_firestore32.onDocumentCreated)(
 );
 
 // src/triggers/onTeamUpdated.ts
-var import_firestore33 = require("firebase-functions/v2/firestore");
+var import_firestore37 = require("firebase-functions/v2/firestore");
 var admin9 = __toESM(require("firebase-admin"));
 var handleTeamUpdated = async (event) => {
   const beforeData = event.data?.before.data();
@@ -70921,7 +71374,7 @@ var handleTeamUpdated = async (event) => {
   });
   await batch.commit();
 };
-var onTeamUpdated = (0, import_firestore33.onDocumentUpdated)(
+var onTeamUpdated = (0, import_firestore37.onDocumentUpdated)(
   {
     document: "teams/{teamId}",
     region: "asia-south1"
@@ -70930,7 +71383,7 @@ var onTeamUpdated = (0, import_firestore33.onDocumentUpdated)(
 );
 
 // src/triggers/projectTriggers.ts
-var import_firestore34 = require("firebase-functions/v2/firestore");
+var import_firestore38 = require("firebase-functions/v2/firestore");
 var admin10 = __toESM(require("firebase-admin"));
 var handleProjectCreated = async (event) => {
   const data = event.data?.data();
@@ -70943,7 +71396,7 @@ var handleProjectCreated = async (event) => {
     details: { projectName: data.name }
   });
 };
-var onProjectCreated = (0, import_firestore34.onDocumentCreated)(
+var onProjectCreated = (0, import_firestore38.onDocumentCreated)(
   {
     document: "projects/{projectId}",
     region: "asia-south1"
@@ -70961,7 +71414,7 @@ var handleLayoutCreated = async (event) => {
     details: { layoutName: data.name, projectId: data.projectId }
   });
 };
-var onLayoutCreated = (0, import_firestore34.onDocumentCreated)(
+var onLayoutCreated = (0, import_firestore38.onDocumentCreated)(
   {
     document: "layouts/{layoutId}",
     region: "asia-south1"
@@ -70979,7 +71432,7 @@ var handleBlockCreated = async (event) => {
     details: { blockName: data.name, layoutId: data.layoutId }
   });
 };
-var onBlockCreated = (0, import_firestore34.onDocumentCreated)(
+var onBlockCreated = (0, import_firestore38.onDocumentCreated)(
   {
     document: "blocks/{blockId}",
     region: "asia-south1"
@@ -70997,7 +71450,7 @@ var handlePlotCreated = async (event) => {
     details: { plotNumber: data.plotNumber, blockId: data.blockId }
   });
 };
-var onPlotCreated = (0, import_firestore34.onDocumentCreated)(
+var onPlotCreated = (0, import_firestore38.onDocumentCreated)(
   {
     document: "plots/{plotId}",
     region: "asia-south1"
@@ -71018,7 +71471,7 @@ var handlePlotPriceChanged = async (event) => {
     });
   }
 };
-var onPlotPriceChanged = (0, import_firestore34.onDocumentUpdated)(
+var onPlotPriceChanged = (0, import_firestore38.onDocumentUpdated)(
   {
     document: "plots/{plotId}",
     region: "asia-south1"
@@ -71027,14 +71480,27 @@ var onPlotPriceChanged = (0, import_firestore34.onDocumentUpdated)(
 );
 
 // src/triggers/leadTriggers.ts
-var import_firestore35 = require("firebase-functions/v2/firestore");
+var import_firestore39 = require("firebase-functions/v2/firestore");
+init_notificationService();
 var handleLeadCreated = async (event) => {
   const leadData = event.data?.data();
   if (!leadData) return;
   const leadId = event.params["leadId"];
   console.log(`Lead Created: ${leadId}`, leadData);
+  const customerPhone = leadData.phone || leadData.mobileNumber || leadData.phoneNumber;
+  const customerName = leadData.name || leadData.fullName || "Valued Buyer";
+  const ventureName = leadData.projectName || leadData.ventureName;
+  if (customerPhone) {
+    await NotificationService.sendLeadWelcomeAndAssignment({
+      customerName,
+      customerPhone,
+      ventureName,
+      executiveName: leadData.assignedToName || "ISKON Senior Advisor",
+      executivePhone: leadData.assignedToPhone || "+91 98480 22334"
+    });
+  }
 };
-var onLeadCreated = (0, import_firestore35.onDocumentCreated)(
+var onLeadCreated = (0, import_firestore39.onDocumentCreated)(
   {
     document: "leads/{leadId}",
     region: "asia-south1"
@@ -71053,7 +71519,7 @@ var handleLeadUpdated = async (event) => {
     console.log(`Lead Qualified: ${leadId}`);
   }
 };
-var onLeadUpdated = (0, import_firestore35.onDocumentUpdated)(
+var onLeadUpdated = (0, import_firestore39.onDocumentUpdated)(
   {
     document: "leads/{leadId}",
     region: "asia-south1"
@@ -71063,143 +71529,8 @@ var onLeadUpdated = (0, import_firestore35.onDocumentUpdated)(
 
 // src/events/publishEvent.ts
 var import_https3 = require("firebase-functions/v2/https");
-var admin11 = __toESM(require("firebase-admin"));
+var admin12 = __toESM(require("firebase-admin"));
 var crypto = __toESM(require("crypto"));
-
-// ../packages/events/dist/types/event.js
-var AggregateType2;
-(function(AggregateType3) {
-  AggregateType3["Lead"] = "Lead";
-  AggregateType3["Person"] = "Person";
-  AggregateType3["Interaction"] = "Interaction";
-  AggregateType3["Workflow"] = "Workflow";
-  AggregateType3["Booking"] = "Booking";
-  AggregateType3["Payment"] = "Payment";
-  AggregateType3["Customer"] = "Customer";
-  AggregateType3["Vehicle"] = "Vehicle";
-  AggregateType3["Campaign"] = "Campaign";
-  AggregateType3["Attendance"] = "Attendance";
-  AggregateType3["Expense"] = "Expense";
-  AggregateType3["SiteVisit"] = "SiteVisit";
-  AggregateType3["Notification"] = "Notification";
-  AggregateType3["Plot"] = "Plot";
-  AggregateType3["Network"] = "Network";
-  AggregateType3["Commission"] = "Commission";
-  AggregateType3["Document"] = "Document";
-  AggregateType3["AfterSales"] = "AfterSales";
-  AggregateType3["CustomerNotification"] = "CustomerNotification";
-})(AggregateType2 || (AggregateType2 = {}));
-
-// ../packages/events/dist/validators/eventValidators.js
-var EventMetadataSchema2 = external_exports.object({
-  correlationId: external_exports.string().optional(),
-  sourceIp: external_exports.string().optional(),
-  userAgent: external_exports.string().optional()
-}).catchall(external_exports.any());
-var EventSchema2 = external_exports.object({
-  eventId: external_exports.string().uuid(),
-  aggregateId: external_exports.string(),
-  aggregateType: external_exports.nativeEnum(AggregateType2),
-  eventType: external_exports.string(),
-  timestamp: external_exports.string().datetime(),
-  version: external_exports.number().int().positive(),
-  actor: external_exports.string(),
-  payload: external_exports.any(),
-  metadata: EventMetadataSchema2
-});
-
-// ../packages/events/dist/core/EventPublisher.js
-var DefaultEventPublisher = class {
-  eventStore;
-  constructor(eventStore) {
-    this.eventStore = eventStore;
-  }
-  async publish(event) {
-    await this.eventStore.saveEvent(event);
-  }
-};
-
-// ../packages/events/dist/core/EventDispatcher.js
-var EventDispatcher = class {
-  handlers = /* @__PURE__ */ new Map();
-  subscribe(eventType, handler) {
-    if (!this.handlers.has(eventType)) {
-      this.handlers.set(eventType, []);
-    }
-    this.handlers.get(eventType).push(handler);
-  }
-  unsubscribe(eventType, handler) {
-    if (!this.handlers.has(eventType))
-      return;
-    const currentHandlers = this.handlers.get(eventType);
-    this.handlers.set(eventType, currentHandlers.filter((h) => h !== handler));
-  }
-  /**
-   * Dispatch an event to all registered handlers for its type.
-   * In an enterprise setup, this might be called by the Cloud Function subscriber
-   * when an event is pulled from Pub/Sub or Firestore triggers.
-   */
-  async dispatch(event) {
-    const eventHandlers = this.handlers.get(event.eventType) || [];
-    await Promise.all(eventHandlers.map((handler) => handler.handle(event)));
-  }
-};
-
-// ../packages/events/dist/marketing.js
-var BookingPaymentEvents = {
-  BOOKING_FULLY_PAID: "BOOKING_FULLY_PAID"
-};
-
-// ../packages/events/dist/networkEvents.js
-var NetworkEventType;
-(function(NetworkEventType2) {
-  NetworkEventType2["NETWORK_MEMBER_CREATED"] = "NETWORK_MEMBER_CREATED";
-  NetworkEventType2["NETWORK_MEMBER_UPDATED"] = "NETWORK_MEMBER_UPDATED";
-  NetworkEventType2["NETWORK_MEMBER_PARENT_CHANGED"] = "NETWORK_MEMBER_PARENT_CHANGED";
-  NetworkEventType2["NETWORK_POSITION_CHANGED"] = "NETWORK_POSITION_CHANGED";
-})(NetworkEventType || (NetworkEventType = {}));
-
-// ../packages/events/dist/commissionEvents.js
-var CommissionEventType;
-(function(CommissionEventType2) {
-  CommissionEventType2["COMMISSION_RULE_CREATED"] = "COMMISSION_RULE_CREATED";
-  CommissionEventType2["COMMISSION_RULE_UPDATED"] = "COMMISSION_RULE_UPDATED";
-  CommissionEventType2["COMMISSION_CALCULATED"] = "COMMISSION_CALCULATED";
-  CommissionEventType2["COMMISSION_APPROVED"] = "COMMISSION_APPROVED";
-  CommissionEventType2["COMMISSION_PAYABLE"] = "COMMISSION_PAYABLE";
-  CommissionEventType2["COMMISSION_PAID"] = "COMMISSION_PAID";
-  CommissionEventType2["COMMISSION_REVERSED"] = "COMMISSION_REVERSED";
-})(CommissionEventType || (CommissionEventType = {}));
-
-// ../packages/events/dist/paymentEvents.js
-var PaymentEventType;
-(function(PaymentEventType2) {
-  PaymentEventType2["PAYMENT_RECEIVED"] = "PAYMENT_RECEIVED";
-  PaymentEventType2["BOOKING_FULLY_PAID"] = "BOOKING_FULLY_PAID";
-})(PaymentEventType || (PaymentEventType = {}));
-
-// ../packages/events/dist/documentEvents.js
-var DocumentEventType;
-(function(DocumentEventType2) {
-  DocumentEventType2["DOCUMENT_UPLOADED"] = "DOCUMENT_UPLOADED";
-  DocumentEventType2["DOCUMENT_UPDATED"] = "DOCUMENT_UPDATED";
-  DocumentEventType2["DOCUMENT_PUBLISHED"] = "DOCUMENT_PUBLISHED";
-  DocumentEventType2["DOCUMENT_REJECTED"] = "DOCUMENT_REJECTED";
-  DocumentEventType2["DOCUMENT_EXPIRED"] = "DOCUMENT_EXPIRED";
-})(DocumentEventType || (DocumentEventType = {}));
-
-// ../packages/events/dist/afterSalesEvents.js
-var AfterSalesEventType;
-(function(AfterSalesEventType2) {
-  AfterSalesEventType2["AFTER_SALES_CREATED"] = "AFTER_SALES_CREATED";
-  AfterSalesEventType2["AFTER_SALES_UPDATED"] = "AFTER_SALES_UPDATED";
-  AfterSalesEventType2["AFTER_SALES_RESOLVED"] = "AFTER_SALES_RESOLVED";
-})(AfterSalesEventType || (AfterSalesEventType = {}));
-var CustomerNotificationEventType;
-(function(CustomerNotificationEventType2) {
-  CustomerNotificationEventType2["CUSTOMER_NOTIFICATION_CREATED"] = "CUSTOMER_NOTIFICATION_CREATED";
-  CustomerNotificationEventType2["CUSTOMER_NOTIFICATION_PUBLISHED"] = "CUSTOMER_NOTIFICATION_PUBLISHED";
-})(CustomerNotificationEventType || (CustomerNotificationEventType = {}));
 
 // ../packages/events/src/store/FirestoreEventStore.ts
 var FirestoreEventStore = class {
@@ -71248,7 +71579,7 @@ var publishEvent = (0, import_https3.onCall)(async (request) => {
     );
   }
   const data = request.data;
-  const db = admin11.firestore();
+  const db = admin12.firestore();
   const eventStore = new FirestoreEventStore(db);
   const eventPublisher = new DefaultEventPublisher(eventStore);
   const event = {
@@ -71267,7 +71598,7 @@ var publishEvent = (0, import_https3.onCall)(async (request) => {
     }
   };
   try {
-    EventSchema2.parse(event);
+    EventSchema.parse(event);
   } catch (error) {
     throw new import_https3.HttpsError(
       "invalid-argument",
@@ -71289,10 +71620,10 @@ var publishEvent = (0, import_https3.onCall)(async (request) => {
 });
 
 // src/events/subscribeEvents.ts
-var import_firestore36 = require("firebase-functions/v2/firestore");
+var import_firestore40 = require("firebase-functions/v2/firestore");
 
 // src/events/handlers/CommissionHandler.ts
-var admin13 = __toESM(require("firebase-admin"));
+var admin14 = __toESM(require("firebase-admin"));
 
 // ../packages/firebase/src/services/CommissionService.ts
 var CommissionService = class {
@@ -71500,11 +71831,26 @@ var NetworkService = class {
       updatedBy: userId,
       updatedAt: (/* @__PURE__ */ new Date()).toISOString()
     }, userId);
+    if (this.memberRepo.findDescendants) {
+      const descendants = await this.memberRepo.findDescendants(memberId);
+      for (const descendant of descendants) {
+        const memberIdx = descendant.ancestors.indexOf(memberId);
+        if (memberIdx !== -1) {
+          const subsequentAncestors = descendant.ancestors.slice(memberIdx + 1);
+          const updatedAncestors = [...newAncestors, memberId, ...subsequentAncestors];
+          await this.memberRepo.update(descendant.id, {
+            ancestors: updatedAncestors,
+            updatedBy: userId,
+            updatedAt: (/* @__PURE__ */ new Date()).toISOString()
+          }, userId);
+        }
+      }
+    }
   }
 };
 
 // src/repositories/AdminCommissionRepositories.ts
-var admin12 = __toESM(require("firebase-admin"));
+var admin13 = __toESM(require("firebase-admin"));
 function applyFilters(query2, filters) {
   if (!filters) return query2;
   let q = query2;
@@ -71514,7 +71860,7 @@ function applyFilters(query2, filters) {
   return q;
 }
 var AdminCommissionPoolRepository = class {
-  db = admin12.firestore();
+  db = admin13.firestore();
   async findAll(filters) {
     let query2 = this.db.collection(FIRESTORE_COLLECTIONS.COMMISSION_POOLS);
     query2 = applyFilters(query2, filters);
@@ -71537,7 +71883,7 @@ var AdminCommissionPoolRepository = class {
   }
 };
 var AdminCommissionRecordRepository = class {
-  db = admin12.firestore();
+  db = admin13.firestore();
   async findById(id) {
     const snap = await this.db.collection(FIRESTORE_COLLECTIONS.COMMISSION_RECORDS).doc(id).get();
     return snap.exists ? snap.data() : null;
@@ -71564,7 +71910,7 @@ var AdminCommissionRecordRepository = class {
   }
 };
 var AdminCommissionRuleRepository = class {
-  db = admin12.firestore();
+  db = admin13.firestore();
   async findAll(filters) {
     let query2 = this.db.collection(FIRESTORE_COLLECTIONS.COMMISSION_RULES);
     query2 = applyFilters(query2, filters);
@@ -71573,7 +71919,7 @@ var AdminCommissionRuleRepository = class {
   }
 };
 var AdminNetworkMemberRepository = class {
-  db = admin12.firestore();
+  db = admin13.firestore();
   async findById(id) {
     const snap = await this.db.collection(FIRESTORE_COLLECTIONS.NETWORK_MEMBERS).doc(id).get();
     return snap.exists ? snap.data() : null;
@@ -71596,7 +71942,7 @@ var CommissionHandler = class {
       const { bookingId } = event.payload;
       if (bookingId) {
         console.log(`CommissionHandler processing BOOKING_FULLY_PAID for booking ${bookingId}`);
-        const db = admin13.firestore();
+        const db = admin14.firestore();
         const bookingDoc = await db.collection("bookings").doc(bookingId).get();
         if (!bookingDoc.exists) return;
         const booking = bookingDoc.data();
@@ -71626,7 +71972,7 @@ var CommissionHandler = class {
 };
 
 // src/events/handlers/KPIAggregatorHandler.ts
-var admin14 = __toESM(require("firebase-admin"));
+var admin15 = __toESM(require("firebase-admin"));
 
 // src/utils/KPIRefs.ts
 var KPIRefs = class {
@@ -71657,7 +72003,7 @@ var KPIRefs = class {
 var KPIAggregatorHandler = class {
   eventType = "ALL_KPI_EVENTS";
   async handle(event) {
-    const db = admin14.firestore();
+    const db = admin15.firestore();
     const { companyId, projectId } = event.metadata;
     const dateIso = event.timestamp;
     if (!companyId) {
@@ -71686,7 +72032,7 @@ var KPIAggregatorHandler = class {
           transaction.set(ref2, increments, { merge: true });
         }
         transaction.set(idempotencyRef, {
-          processedAt: admin14.firestore.FieldValue.serverTimestamp(),
+          processedAt: admin15.firestore.FieldValue.serverTimestamp(),
           eventType: event.eventType
         });
       });
@@ -71696,7 +72042,7 @@ var KPIAggregatorHandler = class {
     }
   }
   getIncrementsForEvent(event) {
-    const FieldValue2 = admin14.firestore.FieldValue;
+    const FieldValue2 = admin15.firestore.FieldValue;
     const inc1 = FieldValue2.increment(1);
     const dec1 = FieldValue2.increment(-1);
     switch (event.eventType) {
@@ -71780,7 +72126,7 @@ var handleEventCreated = async (cloudEvent) => {
     throw error;
   }
 };
-var onEventCreated = (0, import_firestore36.onDocumentCreated)(
+var onEventCreated = (0, import_firestore40.onDocumentCreated)(
   {
     document: "events/{eventId}",
     region: "asia-south1"
@@ -71789,8 +72135,8 @@ var onEventCreated = (0, import_firestore36.onDocumentCreated)(
 );
 
 // src/triggers/paymentTriggers.ts
-var import_firestore37 = require("firebase-functions/v2/firestore");
-var admin15 = __toESM(require("firebase-admin"));
+var import_firestore41 = require("firebase-functions/v2/firestore");
+var admin16 = __toESM(require("firebase-admin"));
 var handlePaymentUpdated = async (event) => {
   const before = event.data?.before.data();
   const after = event.data?.after.data();
@@ -71798,7 +72144,7 @@ var handlePaymentUpdated = async (event) => {
   const wasFullyPaid = before.paymentSchedule.every((p) => p.status === "PAID" && p.amountPaid >= p.amountDue);
   const isFullyPaid = after.paymentSchedule.every((p) => p.status === "PAID" && p.amountPaid >= p.amountDue);
   if (!wasFullyPaid && isFullyPaid) {
-    const store = new FirestoreEventStore(admin15.firestore());
+    const store = new FirestoreEventStore(admin16.firestore());
     const publisher = new DefaultEventPublisher(store);
     const evt = {
       eventId: `evt_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
@@ -71818,8 +72164,28 @@ var handlePaymentUpdated = async (event) => {
     await publisher.publish(evt);
     console.log(`Published BOOKING_FULLY_PAID for booking ${after.id}`);
   }
+  const beforePaid = before.paymentSchedule?.reduce((sum, p) => sum + (p.amountPaid || 0), 0) || 0;
+  const afterPaid = after.paymentSchedule?.reduce((sum, p) => sum + (p.amountPaid || 0), 0) || 0;
+  if (afterPaid > beforePaid) {
+    const delta = afterPaid - beforePaid;
+    const customerPhone = after.customerPhone || after.phone;
+    const customerName = after.customerName || "Valued Customer";
+    const receiptNumber = `REC-${(/* @__PURE__ */ new Date()).getFullYear()}-${Math.floor(1e3 + Math.random() * 9e3)}`;
+    if (customerPhone) {
+      const { NotificationService: NotificationService2 } = await Promise.resolve().then(() => (init_notificationService(), notificationService_exports));
+      await NotificationService2.sendPaymentReceiptNotification({
+        customerName,
+        customerPhone,
+        amount: delta,
+        bookingNumber: after.bookingNumber || after.id,
+        plotNumber: after.plotId || "N/A",
+        projectName: after.projectName || "ISKON City - 2",
+        receiptNumber
+      });
+    }
+  }
 };
-var onPaymentUpdated = (0, import_firestore37.onDocumentUpdated)(
+var onPaymentUpdated = (0, import_firestore41.onDocumentUpdated)(
   {
     document: "bookings/{bookingId}",
     region: "asia-south1"
@@ -71827,12 +72193,48 @@ var onPaymentUpdated = (0, import_firestore37.onDocumentUpdated)(
   handlePaymentUpdated
 );
 
+// src/triggers/siteVisitTriggers.ts
+var import_firestore42 = require("firebase-functions/v2/firestore");
+init_notificationService();
+var handleSiteVisitCreated = async (event) => {
+  const visitData = event.data?.data();
+  if (!visitData) return;
+  const visitId = event.params["visitId"];
+  console.log(`[SiteVisitTrigger] New site visit created: ${visitId}`, visitData);
+  const customerPhone = visitData.customerPhone || visitData.phone;
+  const customerName = visitData.customerName || visitData.leadName || "Valued Client";
+  const ventureName = visitData.projectName || visitData.ventureName || "ISKON City - 2";
+  const date = visitData.scheduledDate || visitData.date || "Upcoming";
+  const time = visitData.scheduledTime || visitData.time || "10:30 AM";
+  const travelMode = visitData.travelMode || "Company AC Cab";
+  if (customerPhone) {
+    await NotificationService.sendSiteVisitConfirmation({
+      customerName,
+      customerPhone,
+      ventureName,
+      date,
+      time,
+      travelMode,
+      vehicleNumber: visitData.vehicleNumber || "AP 26 TE 1234 (Toyota Innova)",
+      driverName: visitData.driverName || "Ramesh",
+      driverPhone: visitData.driverPhone || "+91 98480 22334"
+    });
+  }
+};
+var onSiteVisitCreated = (0, import_firestore42.onDocumentCreated)(
+  {
+    document: "site_visits/{visitId}",
+    region: "asia-south1"
+  },
+  handleSiteVisitCreated
+);
+
 // src/http/leadWebhooks.ts
 var import_https4 = require("firebase-functions/v2/https");
 var crypto2 = __toESM(require("crypto"));
 
 // ../packages/firebase/src/services/leads/LeadAcquisitionService.ts
-var import_firestore39 = require("firebase-admin/firestore");
+var import_firestore44 = require("firebase-admin/firestore");
 
 // ../packages/firebase/src/services/leads/validators.ts
 var LeadValidator = class {
@@ -72007,7 +72409,7 @@ var CampaignAttributionService = class {
 };
 
 // ../packages/firebase/src/services/leads/RoutingService.ts
-var import_firestore38 = require("firebase-admin/firestore");
+var import_firestore43 = require("firebase-admin/firestore");
 var RoutingService = class {
   /**
    * Determine the routing for a newly captured lead based on business rules.
@@ -72040,7 +72442,7 @@ var RoutingService = class {
    * Round-robin implementation with Firebase Transactions.
    */
   async executeRoundRobin(groupId) {
-    const db = (0, import_firestore38.getFirestore)();
+    const db = (0, import_firestore43.getFirestore)();
     const stateRef = db.collection("routing_states").doc(groupId);
     try {
       return await db.runTransaction(async (t) => {
@@ -72135,7 +72537,7 @@ var LeadAcquisitionService = class {
   async acquireLead(dto, userId = "SYSTEM") {
     LeadValidator.validateCaptureRequest(dto);
     if (dto.eventId) {
-      const db = (0, import_firestore39.getFirestore)();
+      const db = (0, import_firestore44.getFirestore)();
       const eventRef = db.collection("processed_webhooks").doc(dto.eventId);
       try {
         await db.runTransaction(async (t) => {
@@ -72241,6 +72643,7 @@ var captureLeadWebhook = (0, import_https4.onRequest)(async (req, res) => {
   handlePlotCreated,
   handlePlotPriceChanged,
   handleProjectCreated,
+  handleSiteVisitCreated,
   handleTeamUpdated,
   handleUserProfileUpdated,
   hourlyBookingExpiry,
@@ -72256,6 +72659,7 @@ var captureLeadWebhook = (0, import_https4.onRequest)(async (req, res) => {
   onPlotCreated,
   onPlotPriceChanged,
   onProjectCreated,
+  onSiteVisitCreated,
   onTeamUpdated,
   onUserCreated,
   onUserDeleted,

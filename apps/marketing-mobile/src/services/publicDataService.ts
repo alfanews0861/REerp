@@ -62,10 +62,19 @@ export interface MobileSiteVisitResult {
 let cachedVentures: PublicVenture[] | null = null;
 let cachedPlots: PublicPlot[] | null = null;
 
+export function invalidatePublicDataCache(): void {
+  cachedVentures = null;
+  cachedPlots = null;
+}
+
 /**
  * Fetches ventures from Firestore 'projects' collection with fallback to seed data.
  */
-export async function fetchLiveVentures(): Promise<PublicVenture[]> {
+export async function fetchLiveVentures(forceRefresh: boolean = false): Promise<PublicVenture[]> {
+  if (forceRefresh) {
+    cachedVentures = null;
+  }
+
   try {
     const { db } = getFirebaseInstance();
     if (db) {
@@ -85,7 +94,7 @@ export async function fetchLiveVentures(): Promise<PublicVenture[]> {
             approvalAuthority: data.approvalAuthority || 'NUDA',
             approvalNumber: data.approvalNumber || 'NUDA/2024/01',
             reraId: data.reraId || 'P02260007891',
-            totalAreaAcres: data.totalAreaAcres || 120,
+            totalAreaAcres: data.totalAreaAcres || data.totalArea || 120,
             totalPlots: data.totalPlotsCount || 450,
             availablePlots: data.availablePlots || 78,
             basePricePerSqYd: data.pricing?.basePrice || 18500,
@@ -127,7 +136,10 @@ export async function fetchLiveVentures(): Promise<PublicVenture[]> {
 /**
  * Fetches plots from Firestore 'plots' collection.
  */
-export async function fetchLivePlots(projectId?: string): Promise<PublicPlot[]> {
+export async function fetchLivePlots(projectId?: string, forceRefresh: boolean = false): Promise<PublicPlot[]> {
+  if (forceRefresh) {
+    cachedPlots = null;
+  }
   try {
     const { db } = getFirebaseInstance();
     if (db) {

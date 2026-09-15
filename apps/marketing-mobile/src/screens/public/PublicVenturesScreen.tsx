@@ -43,9 +43,9 @@ export const PublicVenturesScreen: React.FC<PublicVenturesScreenProps> = ({
   const [selectedVenture, setSelectedVenture] = useState<PublicVenture | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
-  const loadVentures = async () => {
+  const loadVentures = async (force: boolean = false) => {
     try {
-      const data = await fetchLiveVentures();
+      const data = await fetchLiveVentures(force);
       setVentures(data);
     } catch (err) {
       console.warn('Live ventures fetch error:', err);
@@ -58,7 +58,7 @@ export const PublicVenturesScreen: React.FC<PublicVenturesScreenProps> = ({
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await loadVentures();
+    await loadVentures(true);
     setRefreshing(false);
   };
 

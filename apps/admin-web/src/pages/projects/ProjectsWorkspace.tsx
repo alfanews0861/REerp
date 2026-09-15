@@ -30,13 +30,26 @@ import ParkIcon from '@mui/icons-material/Park';
 import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
 import WaterDropIcon from '@mui/icons-material/WaterDrop';
 import SecurityIcon from '@mui/icons-material/Security';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import { Project } from '@real-estate-erp/types';
 import { DataTable, MetricCard, SearchBox } from '@real-estate-erp/ui';
-import { getFirebaseInstance } from '@real-estate-erp/firebase';
-import { collection, query, getDocs, orderBy, limit } from 'firebase/firestore';
+import { getFirebaseInstance, useAuthContext } from '@real-estate-erp/firebase';
+import { collection, query, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { AddProjectDialog } from './components/AddProjectDialog';
 import { ProjectDetailsDialog } from './components/ProjectDetailsDialog';
+import { EditProjectDialog } from './components/EditProjectDialog';
+import { QuickRateChangeDialog } from './components/QuickRateChangeDialog';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+} from '@mui/material';
 
 export const SEED_PROJECTS: Project[] = [
   {
@@ -293,6 +306,7 @@ export const SEED_PROJECTS: Project[] = [
 
 export const ProjectsWorkspace: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuthContext();
   const [projects, setProjects] = useState<Project[]>(SEED_PROJECTS);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -300,34 +314,56 @@ export const ProjectsWorkspace: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
 
+  // Role permissions: Admins and Directors have full CRUD permissions
+  const userRole = (user?.role || user?.cadre || 'director').toLowerCase();
+  const canManage =
+    !user ||
+    userRole.includes('admin') ||
+    userRole.includes('director') ||
+    userRole.includes('super_admin') ||
+    userRole.includes('branch_manager') ||
+    userRole.includes('management');
+
   // Dialog States
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [projectToEdit, setProjectToEdit] = useState<Project | null>(null);
+  const [rateDialogOpen, setRateDialogOpen] = useState(false);
+  const [projectToChangeRate, setProjectToChangeRate] = useState<Project | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const loadProjects = async () => {
+    setLoading(true);
+    try {
+      const { db } = getFirebaseInstance();
+      if (db) {
+        const snapshot = await getDocs(collection(db, 'projects'));
+        if (!snapshot.empty) {
+          const fetched = snapshot.docs.map((d) => ({ id: d.id, ...d.data() })) as Project[];
+          fetched.sort(
+            (a, b) =>
+              new Date(b.updatedAt || b.createdAt || 0).getTime() -
+              new Date(a.updatedAt || a.createdAt || 0).getTime()
+          );
+          setProjects(fetched);
+          return;
+        }
+      }
+      setProjects(SEED_PROJECTS);
+    } catch (err) {
+      console.warn('Firestore fetch projects fallback to seeds:', err);
+      setProjects(SEED_PROJECTS);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const { db } = getFirebaseInstance();
-        if (db) {
-          const q = query(collection(db, 'projects'), orderBy('createdAt', 'desc'), limit(50));
-          const snapshot = await getDocs(q);
-          if (!snapshot.empty) {
-            const fetched = snapshot.docs.map((d) => ({ id: d.id, ...d.data() })) as Project[];
-            // Merge with seeds without duplicate IDs
-            const fetchedIds = new Set(fetched.map((p) => p.id));
-            const merged = [...fetched, ...SEED_PROJECTS.filter((p) => !fetchedIds.has(p.id))];
-            setProjects(merged);
-          }
-        }
-      } catch (err) {
-        console.warn('Firestore fetch projects fallback to seeds:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProjects();
+    loadProjects();
   }, []);
 
   const handleProjectAdded = (newProject: Project) => {
@@ -337,6 +373,52 @@ export const ProjectsWorkspace: React.FC = () => {
   const handleOpenDetails = (project: Project) => {
     setSelectedProject(project);
     setDetailsDialogOpen(true);
+  };
+
+  const handleOpenEdit = (project: Project) => {
+    setProjectToEdit(project);
+    setEditDialogOpen(true);
+  };
+
+  const handleProjectUpdated = (updatedProject: Project) => {
+    setProjects((prev) =>
+      prev.map((p) => (p.id === updatedProject.id ? updatedProject : p))
+    );
+  };
+
+  const handleOpenRateChange = (project: Project) => {
+    setProjectToChangeRate(project);
+    setRateDialogOpen(true);
+  };
+
+  const handleRateUpdated = (updatedProject: Project) => {
+    setProjects((prev) =>
+      prev.map((p) => (p.id === updatedProject.id ? updatedProject : p))
+    );
+  };
+
+  const handlePromptDelete = (project: Project) => {
+    setProjectToDelete(project);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!projectToDelete) return;
+    setDeleting(true);
+    try {
+      const { db } = getFirebaseInstance();
+      if (db) {
+        await deleteDoc(doc(db, 'projects', projectToDelete.id));
+      }
+      setProjects((prev) => prev.filter((p) => p.id !== projectToDelete.id));
+    } catch (err) {
+      console.warn('Delete project warning:', err);
+      setProjects((prev) => prev.filter((p) => p.id !== projectToDelete.id));
+    } finally {
+      setDeleting(false);
+      setDeleteDialogOpen(false);
+      setProjectToDelete(null);
+    }
   };
 
   const handleViewPlots = (project: Project) => {
@@ -472,7 +554,7 @@ export const ProjectsWorkspace: React.FC = () => {
       id: 'actions',
       label: 'Actions',
       render: (row: Project) => (
-        <Stack direction="row" spacing={1}>
+        <Stack direction="row" spacing={0.5} alignItems="center">
           <Button
             size="small"
             variant="outlined"
@@ -486,6 +568,7 @@ export const ProjectsWorkspace: React.FC = () => {
           <Button
             size="small"
             variant="contained"
+            color="primary"
             onClick={(e) => {
               e.stopPropagation();
               handleViewPlots(row);
@@ -493,6 +576,45 @@ export const ProjectsWorkspace: React.FC = () => {
           >
             Plots
           </Button>
+          {canManage && (
+            <>
+              <Button
+                size="small"
+                variant="outlined"
+                color="secondary"
+                startIcon={<EditIcon fontSize="small" />}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleOpenEdit(row);
+                }}
+              >
+                Edit
+              </Button>
+              <Button
+                size="small"
+                variant="outlined"
+                color="success"
+                startIcon={<CurrencyRupeeIcon fontSize="small" />}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleOpenRateChange(row);
+                }}
+              >
+                Rate
+              </Button>
+              <IconButton
+                size="small"
+                color="error"
+                title="Delete Venture"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handlePromptDelete(row);
+                }}
+              >
+                <DeleteOutlineIcon fontSize="small" />
+              </IconButton>
+            </>
+          )}
         </Stack>
       ),
     },
@@ -507,19 +629,33 @@ export const ProjectsWorkspace: React.FC = () => {
             Projects & Ventures Workspace
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25 }}>
-            Manage residential layouts, DTCP & HMDA approved ventures, land records, and plot inventories
+            Manage residential layouts, NUDA & DTCP approved gated ventures, land records, and plot inventories in Nellore & AP
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          color="primary"
-          size="medium"
-          startIcon={<AddIcon />}
-          onClick={() => setAddDialogOpen(true)}
-          sx={{ px: 2, py: 0.75, fontWeight: 600, borderRadius: 2, fontSize: '0.85rem' }}
-        >
-          Add New Venture
-        </Button>
+        <Stack direction="row" spacing={1}>
+          <Button
+            variant="outlined"
+            color="inherit"
+            size="medium"
+            startIcon={<RefreshIcon />}
+            onClick={loadProjects}
+            sx={{ px: 2, py: 0.75, fontWeight: 600, borderRadius: 2, fontSize: '0.85rem' }}
+          >
+            Refresh
+          </Button>
+          {canManage && (
+            <Button
+              variant="contained"
+              color="primary"
+              size="medium"
+              startIcon={<AddIcon />}
+              onClick={() => setAddDialogOpen(true)}
+              sx={{ px: 2, py: 0.75, fontWeight: 600, borderRadius: 2, fontSize: '0.85rem' }}
+            >
+              Add New Venture
+            </Button>
+          )}
+        </Stack>
       </Box>
 
       {/* KPI Cards */}
@@ -589,13 +725,12 @@ export const ProjectsWorkspace: React.FC = () => {
               label="Authority"
               value={authorityFilter}
               onChange={(e) => setAuthorityFilter(e.target.value)}
-              sx={{ minWidth: 140 }}
+              sx={{ minWidth: 160 }}
             >
               <MenuItem value="ALL">All Authorities</MenuItem>
-              <MenuItem value="HMDA">HMDA Approved</MenuItem>
+              <MenuItem value="NUDA">NUDA (Nellore Urban)</MenuItem>
               <MenuItem value="DTCP">DTCP Approved</MenuItem>
-              <MenuItem value="YTDA">YTDA Approved</MenuItem>
-              <MenuItem value="RERA">RERA Registered</MenuItem>
+              <MenuItem value="RERA">AP RERA Registered</MenuItem>
             </TextField>
 
             <TextField
@@ -813,24 +948,62 @@ export const ProjectsWorkspace: React.FC = () => {
                   <Divider />
 
                   {/* Card Actions */}
-                  <CardActions sx={{ p: 2, justifyContent: 'space-between' }}>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      startIcon={<VisibilityIcon />}
-                      onClick={() => handleOpenDetails(project)}
-                    >
-                      Layout Map
-                    </Button>
-                    <Button
-                      size="small"
-                      variant="contained"
-                      color="primary"
-                      startIcon={<MapIcon />}
-                      onClick={() => handleViewPlots(project)}
-                    >
-                      View Plots
-                    </Button>
+                  <CardActions sx={{ p: 2, pt: 1, flexDirection: 'column', gap: 1 }}>
+                    <Stack direction="row" spacing={1} sx={{ width: '100%' }}>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        fullWidth
+                        startIcon={<VisibilityIcon />}
+                        onClick={() => handleOpenDetails(project)}
+                      >
+                        Layout Map
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="contained"
+                        color="primary"
+                        fullWidth
+                        startIcon={<MapIcon />}
+                        onClick={() => handleViewPlots(project)}
+                      >
+                        Plots ({project.totalPlotsCount || 0})
+                      </Button>
+                    </Stack>
+
+                    {canManage && (
+                      <Stack direction="row" spacing={1} sx={{ width: '100%' }}>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color="secondary"
+                          fullWidth
+                          startIcon={<EditIcon fontSize="small" />}
+                          onClick={() => handleOpenEdit(project)}
+                        >
+                          Edit Details
+                        </Button>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color="success"
+                          fullWidth
+                          startIcon={<CurrencyRupeeIcon fontSize="small" />}
+                          onClick={() => handleOpenRateChange(project)}
+                        >
+                          Update Rate
+                        </Button>
+                        <IconButton
+                          size="small"
+                          color="error"
+                          title="Delete Venture"
+                          onClick={() => handlePromptDelete(project)}
+                          sx={{ border: 1, borderColor: 'error.light', borderRadius: 1 }}
+                        >
+                          <DeleteOutlineIcon fontSize="small" />
+                        </IconButton>
+                      </Stack>
+                    )}
                   </CardActions>
                 </Card>
               </Grid>
@@ -863,6 +1036,49 @@ export const ProjectsWorkspace: React.FC = () => {
         open={detailsDialogOpen}
         onClose={() => setDetailsDialogOpen(false)}
       />
+
+      <EditProjectDialog
+        open={editDialogOpen}
+        project={projectToEdit}
+        onClose={() => setEditDialogOpen(false)}
+        onProjectUpdated={handleProjectUpdated}
+      />
+
+      <QuickRateChangeDialog
+        open={rateDialogOpen}
+        project={projectToChangeRate}
+        onClose={() => setRateDialogOpen(false)}
+        onRateUpdated={handleRateUpdated}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => !deleting && setDeleteDialogOpen(false)}
+      >
+        <DialogTitle sx={{ fontWeight: 700, color: 'error.main' }}>
+          Delete Venture / Property?
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete <strong>{projectToDelete?.name}</strong> ({projectToDelete?.code})?
+            This will permanently remove the venture from the cloud database and both the Web and Mobile apps.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ px: 2.5, py: 1.5 }}>
+          <Button onClick={() => setDeleteDialogOpen(false)} disabled={deleting} color="inherit">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmDelete}
+            color="error"
+            variant="contained"
+            disabled={deleting}
+          >
+            {deleting ? 'Deleting...' : 'Yes, Delete Venture'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

@@ -33,6 +33,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
+import CalculateIcon from '@mui/icons-material/Calculate';
+import { CalculateCommissionModal } from './components/CalculateCommissionModal';
 
 interface LedgerEntry {
   id: string;
@@ -289,6 +291,7 @@ export const CommissionLedgerPage: React.FC = () => {
   const [paymentRef, setPaymentRef] = useState('');
   const [paymentMode, setPaymentMode] = useState('NEFT / RTGS');
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+  const [calcModalOpen, setCalcModalOpen] = useState(false);
 
   const filteredLedger = ledger.filter((item) => {
     const matchSearch =
@@ -358,6 +361,16 @@ export const CommissionLedgerPage: React.FC = () => {
             Audit trail of broker commissions, TDS compliance deductions, and bank disbursement triggers.
           </Typography>
         </Box>
+
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<CalculateIcon />}
+          onClick={() => setCalcModalOpen(true)}
+          sx={{ fontWeight: 700, borderRadius: 2, px: 2.5, py: 0.75, textTransform: 'none' }}
+        >
+          Run Cadre Commission Split (కమీషన్ లెక్కింపు)
+        </Button>
       </Stack>
 
       {actionSuccess && (
@@ -667,6 +680,16 @@ export const CommissionLedgerPage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* RUN CADRE COMMISSION MODAL */}
+      <CalculateCommissionModal
+        open={calcModalOpen}
+        onClose={() => setCalcModalOpen(false)}
+        onCommissionsGenerated={(newEntries) => {
+          setLedger([...newEntries, ...ledger]);
+          setActionSuccess(`Generated ${newEntries.length} cadre commission entries successfully!`);
+        }}
+      />
     </Box>
   );
 };

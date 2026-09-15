@@ -21,6 +21,7 @@ import MapIcon from '@mui/icons-material/Map';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
+import AddIcon from '@mui/icons-material/Add';
 
 import { useLeads } from '@real-estate-erp/hooks';
 import { getFirebaseInstance } from '@real-estate-erp/firebase';
@@ -37,12 +38,14 @@ import { LeadTimelineView } from './components/LeadTimelineView';
 import { LeadMapView } from './components/LeadMapView';
 import { LeadsPreviewPanel } from './components/LeadsPreviewPanel';
 import { BulkActionsMenu } from './components/BulkActionsMenu';
+import { CreateLeadDialog } from './components/CreateLeadDialog';
 
 export const LeadsWorkspace: React.FC = () => {
   const dispatch = useDispatch();
   const { viewMode, activeFilters, selectedLeadId } = useSelector((state: RootState) => state.leads);
   
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [createLeadOpen, setCreateLeadOpen] = useState(false);
   const [selectedLeads, setSelectedLeads] = useState<string[]>([]);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useLeads(activeFilters);
@@ -182,6 +185,23 @@ export const LeadsWorkspace: React.FC = () => {
                 selectedLeads={selectedLeadObjects}
                 onBatchUpdate={handleBatchUpdate}
               />
+
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<AddIcon />}
+                onClick={() => setCreateLeadOpen(true)}
+                sx={{
+                  textTransform: 'none',
+                  fontWeight: 700,
+                  borderRadius: 2,
+                  px: 2,
+                  height: 38,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                New Lead
+              </Button>
             </Stack>
           </Stack>
 
@@ -273,6 +293,12 @@ export const LeadsWorkspace: React.FC = () => {
           <LeadsPreviewPanel leads={leads} />
         </Box>
       )}
+
+      {/* CREATE LEAD DIALOG */}
+      <CreateLeadDialog
+        open={createLeadOpen}
+        onClose={() => setCreateLeadOpen(false)}
+      />
     </Box>
   );
 };

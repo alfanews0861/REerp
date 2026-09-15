@@ -1,4 +1,5 @@
 import { onDocumentCreated, onDocumentUpdated } from 'firebase-functions/v2/firestore';
+import { NotificationService } from '../services/notificationService';
 
 export const handleLeadCreated = async (event: any) => {
     const leadData = event.data?.data();
@@ -6,7 +7,19 @@ export const handleLeadCreated = async (event: any) => {
     const leadId = event.params['leadId'];
     console.log(`Lead Created: ${leadId}`, leadData);
 
-    // Additional logic like push notifications, webhook integrations, etc.
+    const customerPhone = leadData.phone || leadData.mobileNumber || leadData.phoneNumber;
+    const customerName = leadData.name || leadData.fullName || 'Valued Buyer';
+    const ventureName = leadData.projectName || leadData.ventureName;
+
+    if (customerPhone) {
+      await NotificationService.sendLeadWelcomeAndAssignment({
+        customerName,
+        customerPhone,
+        ventureName,
+        executiveName: leadData.assignedToName || 'ISKON Senior Advisor',
+        executivePhone: leadData.assignedToPhone || '+91 98480 22334',
+      });
+    }
 };
 
 export const onLeadCreated = onDocumentCreated(

@@ -5,6 +5,14 @@ var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __esm = (fn, res, err) => function __init() {
+  if (err) throw err[0];
+  try {
+    return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+  } catch (e) {
+    throw err = [e], e;
+  }
+};
 var __commonJS = (cb, mod) => function __require() {
   try {
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
@@ -40428,6 +40436,126 @@ var require_jsx_runtime = __commonJS({
   }
 });
 
+// src/services/notificationService.ts
+var notificationService_exports = {};
+__export(notificationService_exports, {
+  NotificationService: () => NotificationService
+});
+var admin11, NotificationService;
+var init_notificationService = __esm({
+  "src/services/notificationService.ts"() {
+    "use strict";
+    admin11 = __toESM(require("firebase-admin"));
+    NotificationService = class {
+      static get db() {
+        return admin11.firestore();
+      }
+      /**
+       * Log communication event to Firestore audit trail
+       */
+      static async logCommunication(log) {
+        try {
+          await this.db.collection("communication_logs").add({
+            ...log,
+            createdAt: admin11.firestore.FieldValue.serverTimestamp()
+          });
+          console.log(`[NotificationService] ${log.channel} logged for ${log.recipientPhone} (${log.templateName})`);
+        } catch (err) {
+          console.error("[NotificationService] Failed to record communication log:", err);
+        }
+      }
+      /**
+       * Send WhatsApp / SMS welcome & assignment notification for a new or assigned lead
+       */
+      static async sendLeadWelcomeAndAssignment(lead) {
+        const venture = lead.ventureName || "ISKON City - 2 (Podalakur Road)";
+        const execName = lead.executiveName || "Our Senior Relationship Advisor";
+        const execPhone = lead.executivePhone || "+91 98480 22334";
+        const message = `\u0C28\u0C2E\u0C38\u0C4D\u0C15\u0C3E\u0C30\u0C02 ${lead.customerName}! Welcome to ISKON Developers (Nellore).
+
+Thank you for your interest in ${venture} (NUDA & DTCP Approved Gated Township).
+${execName} (${execPhone}) has been assigned to personally assist you with layout maps, pricing, and scheduling a complimentary AC Cab site visit.
+
+Office: RKRI Towers, Mini Byepass Road, Nellore.
+Explore ventures: https://iskondevelopers.com/ventures`;
+        console.log(`[WhatsApp Gateway Dispatch] To: ${lead.customerPhone}
+${message}`);
+        await this.logCommunication({
+          recipientPhone: lead.customerPhone,
+          recipientName: lead.customerName,
+          channel: "WHATSAPP",
+          templateName: "LEAD_WELCOME_ASSIGNMENT",
+          messageText: message,
+          status: "SENT",
+          metadata: { venture, execName, execPhone },
+          sentAt: (/* @__PURE__ */ new Date()).toISOString()
+        });
+      }
+      /**
+       * Send WhatsApp Site Visit Confirmation with live Cab & Driver details
+       */
+      static async sendSiteVisitConfirmation(visit) {
+        const cabDetails = visit.vehicleNumber ? `\u{1F697} Assigned Cab: ${visit.vehicleNumber}
+\u{1F468}\u200D\u2708\uFE0F Driver: ${visit.driverName || "Designated Driver"} (${visit.driverPhone || "98480 22334"})
+` : "";
+        const message = `\u0C28\u0C2E\u0C38\u0C4D\u0C15\u0C3E\u0C30\u0C02 ${visit.customerName},
+
+Your Site Visit to ${visit.ventureName} has been confirmed!
+\u{1F4C5} Date: ${visit.date}
+\u23F0 Time: ${visit.time}
+\u{1F698} Mode: ${visit.travelMode}
+` + cabDetails + `
+Our chauffeur will arrive at your doorstep ahead of time for a comfortable visit.
+Track your cab live: https://iskondevelopers.com/track
+Helpline: +91 98480 22334 (ISKON Developers)`;
+        console.log(`[WhatsApp Gateway Dispatch] To: ${visit.customerPhone}
+${message}`);
+        await this.logCommunication({
+          recipientPhone: visit.customerPhone,
+          recipientName: visit.customerName,
+          channel: "WHATSAPP",
+          templateName: "SITE_VISIT_CONFIRMATION",
+          messageText: message,
+          status: "SENT",
+          metadata: { ...visit },
+          sentAt: (/* @__PURE__ */ new Date()).toISOString()
+        });
+      }
+      /**
+       * Send WhatsApp Official Payment Receipt with link to Customer Portal
+       */
+      static async sendPaymentReceiptNotification(payment) {
+        const formattedAmount = `\u20B9${payment.amount.toLocaleString("en-IN")}`;
+        const message = `\u0C28\u0C2E\u0C38\u0C4D\u0C15\u0C3E\u0C30\u0C02 ${payment.customerName},
+
+We have successfully received your payment of ${formattedAmount} towards Plot No: ${payment.plotNumber} at ${payment.projectName}.
+
+\u{1F4C4} Receipt No: ${payment.receiptNumber}
+\u{1F4D1} Booking Ref: ${payment.bookingNumber}
+Status: Payment Confirmed & Credited to Company Escrow.
+
+You can view and download your official stamped receipt anytime on our customer portal:
+\u{1F449} https://iskondevelopers.com/portal
+
+Warm regards,
+ISKON Developers, Nellore.`;
+        console.log(`[WhatsApp Gateway Dispatch] To: ${payment.customerPhone}
+${message}`);
+        await this.logCommunication({
+          recipientPhone: payment.customerPhone,
+          recipientName: payment.customerName,
+          channel: "WHATSAPP",
+          templateName: "PAYMENT_RECEIPT_ISSUED",
+          messageText: message,
+          status: "SENT",
+          metadata: { ...payment },
+          sentAt: (/* @__PURE__ */ new Date()).toISOString()
+        });
+      }
+    };
+  }
+});
+
 // src/index.ts
 var index_exports = {};
 __export(index_exports, {
@@ -40445,6 +40573,7 @@ __export(index_exports, {
   handlePlotCreated: () => handlePlotCreated,
   handlePlotPriceChanged: () => handlePlotPriceChanged,
   handleProjectCreated: () => handleProjectCreated,
+  handleSiteVisitCreated: () => handleSiteVisitCreated,
   handleTeamUpdated: () => handleTeamUpdated,
   handleUserProfileUpdated: () => handleUserProfileUpdated,
   hourlyBookingExpiry: () => hourlyBookingExpiry,
@@ -40460,6 +40589,7 @@ __export(index_exports, {
   onPlotCreated: () => onPlotCreated,
   onPlotPriceChanged: () => onPlotPriceChanged,
   onProjectCreated: () => onProjectCreated,
+  onSiteVisitCreated: () => onSiteVisitCreated,
   onTeamUpdated: () => onTeamUpdated,
   onUserCreated: () => onUserCreated,
   onUserDeleted: () => onUserDeleted,
@@ -59515,11 +59645,11 @@ function cloneLongPollingOptions(options) {
 }
 var LOG_TAG$1 = "ComponentProvider";
 var datastoreInstances = /* @__PURE__ */ new Map();
-function removeComponents(firestore15) {
-  const datastore = datastoreInstances.get(firestore15);
+function removeComponents(firestore16) {
+  const datastore = datastoreInstances.get(firestore16);
   if (datastore) {
     logDebug(LOG_TAG$1, "Removing Datastore");
-    datastoreInstances.delete(firestore15);
+    datastoreInstances.delete(firestore16);
     datastore.terminate();
   }
 }
@@ -59667,11 +59797,11 @@ var Firestore$1 = class {
 var Query = class _Query {
   // This is the lite version of the Query class in the main SDK.
   /** @hideconstructor protected */
-  constructor(firestore15, converter, _query) {
+  constructor(firestore16, converter, _query) {
     this.converter = converter;
     this._query = _query;
     this.type = "query";
-    this.firestore = firestore15;
+    this.firestore = firestore16;
   }
   withConverter(converter) {
     return new _Query(this.firestore, converter, this._query);
@@ -59679,11 +59809,11 @@ var Query = class _Query {
 };
 var DocumentReference = class _DocumentReference {
   /** @hideconstructor */
-  constructor(firestore15, converter, _key) {
+  constructor(firestore16, converter, _key) {
     this.converter = converter;
     this._key = _key;
     this.type = "document";
-    this.firestore = firestore15;
+    this.firestore = firestore16;
   }
   get _path() {
     return this._key.path;
@@ -59713,8 +59843,8 @@ var DocumentReference = class _DocumentReference {
 };
 var CollectionReference = class _CollectionReference extends Query {
   /** @hideconstructor */
-  constructor(firestore15, converter, _path) {
-    super(firestore15, converter, newQueryForPath(_path));
+  constructor(firestore16, converter, _path) {
+    super(firestore16, converter, newQueryForPath(_path));
     this._path = _path;
     this.type = "collection";
   }
@@ -59999,28 +60129,28 @@ var Firestore = class extends Firestore$1 {
     }
   }
 };
-function ensureFirestoreConfigured(firestore15) {
-  if (firestore15._terminated) {
+function ensureFirestoreConfigured(firestore16) {
+  if (firestore16._terminated) {
     throw new FirestoreError(Code.FAILED_PRECONDITION, "The client has already been terminated.");
   }
-  if (!firestore15._firestoreClient) {
-    configureFirestore(firestore15);
+  if (!firestore16._firestoreClient) {
+    configureFirestore(firestore16);
   }
-  return firestore15._firestoreClient;
+  return firestore16._firestoreClient;
 }
-function configureFirestore(firestore15) {
+function configureFirestore(firestore16) {
   var _a, _b, _c;
-  const settings = firestore15._freezeSettings();
-  const databaseInfo = makeDatabaseInfo(firestore15._databaseId, ((_a = firestore15._app) === null || _a === void 0 ? void 0 : _a.options.appId) || "", firestore15._persistenceKey, settings);
-  if (!firestore15._componentsProvider) {
+  const settings = firestore16._freezeSettings();
+  const databaseInfo = makeDatabaseInfo(firestore16._databaseId, ((_a = firestore16._app) === null || _a === void 0 ? void 0 : _a.options.appId) || "", firestore16._persistenceKey, settings);
+  if (!firestore16._componentsProvider) {
     if (((_b = settings.localCache) === null || _b === void 0 ? void 0 : _b._offlineComponentProvider) && ((_c = settings.localCache) === null || _c === void 0 ? void 0 : _c._onlineComponentProvider)) {
-      firestore15._componentsProvider = {
+      firestore16._componentsProvider = {
         _offline: settings.localCache._offlineComponentProvider,
         _online: settings.localCache._onlineComponentProvider
       };
     }
   }
-  firestore15._firestoreClient = new FirestoreClient(firestore15._authCredentials, firestore15._appCheckCredentials, firestore15._queue, databaseInfo, firestore15._componentsProvider && buildComponentProvider(firestore15._componentsProvider));
+  firestore16._firestoreClient = new FirestoreClient(firestore16._authCredentials, firestore16._appCheckCredentials, firestore16._queue, databaseInfo, firestore16._componentsProvider && buildComponentProvider(firestore16._componentsProvider));
 }
 function buildComponentProvider(componentsProvider) {
   const online = componentsProvider === null || componentsProvider === void 0 ? void 0 : componentsProvider._online.build();
@@ -60345,10 +60475,10 @@ var UserDataReader = class {
     }, this.databaseId, this.serializer, this.ignoreUndefinedProperties);
   }
 };
-function newUserDataReader(firestore15) {
-  const settings = firestore15._freezeSettings();
-  const serializer = newSerializer(firestore15._databaseId);
-  return new UserDataReader(firestore15._databaseId, !!settings.ignoreUndefinedProperties, serializer);
+function newUserDataReader(firestore16) {
+  const settings = firestore16._freezeSettings();
+  const serializer = newSerializer(firestore16._databaseId);
+  return new UserDataReader(firestore16._databaseId, !!settings.ignoreUndefinedProperties, serializer);
 }
 function parseSetData(userDataReader, methodName, targetDoc, input, hasConverter, options = {}) {
   const context = userDataReader.createContext(options.merge || options.mergeFields ? 2 : 0, methodName, targetDoc, hasConverter);
@@ -61214,9 +61344,9 @@ function applyFirestoreDataConverter(converter, value, options) {
   return convertedValue;
 }
 var LiteUserDataWriter = class extends AbstractUserDataWriter {
-  constructor(firestore15) {
+  constructor(firestore16) {
     super();
-    this.firestore = firestore15;
+    this.firestore = firestore16;
   }
   convertBytes(bytes) {
     return new Bytes(bytes);
@@ -61449,14 +61579,14 @@ function resultChangeType(type) {
 }
 function getDoc(reference) {
   reference = cast(reference, DocumentReference);
-  const firestore15 = cast(reference.firestore, Firestore);
-  const client = ensureFirestoreConfigured(firestore15);
-  return firestoreClientGetDocumentViaSnapshotListener(client, reference._key).then((snapshot) => convertToDocSnapshot(firestore15, reference, snapshot));
+  const firestore16 = cast(reference.firestore, Firestore);
+  const client = ensureFirestoreConfigured(firestore16);
+  return firestoreClientGetDocumentViaSnapshotListener(client, reference._key).then((snapshot) => convertToDocSnapshot(firestore16, reference, snapshot));
 }
 var ExpUserDataWriter = class extends AbstractUserDataWriter {
-  constructor(firestore15) {
+  constructor(firestore16) {
     super();
-    this.firestore = firestore15;
+    this.firestore = firestore16;
   }
   convertBytes(bytes) {
     return new Bytes(bytes);
@@ -61473,25 +61603,25 @@ var ExpUserDataWriter = class extends AbstractUserDataWriter {
 };
 function getDocs(query2) {
   query2 = cast(query2, Query);
-  const firestore15 = cast(query2.firestore, Firestore);
-  const client = ensureFirestoreConfigured(firestore15);
-  const userDataWriter = new ExpUserDataWriter(firestore15);
+  const firestore16 = cast(query2.firestore, Firestore);
+  const client = ensureFirestoreConfigured(firestore16);
+  const userDataWriter = new ExpUserDataWriter(firestore16);
   validateHasExplicitOrderByForLimitToLast(query2._query);
-  return firestoreClientGetDocumentsViaSnapshotListener(client, query2._query).then((snapshot) => new QuerySnapshot(firestore15, userDataWriter, query2, snapshot));
+  return firestoreClientGetDocumentsViaSnapshotListener(client, query2._query).then((snapshot) => new QuerySnapshot(firestore16, userDataWriter, query2, snapshot));
 }
 function setDoc(reference, data, options) {
   reference = cast(reference, DocumentReference);
-  const firestore15 = cast(reference.firestore, Firestore);
+  const firestore16 = cast(reference.firestore, Firestore);
   const convertedValue = applyFirestoreDataConverter(reference.converter, data, options);
-  const dataReader = newUserDataReader(firestore15);
+  const dataReader = newUserDataReader(firestore16);
   const parsed = parseSetData(dataReader, "setDoc", reference._key, convertedValue, reference.converter !== null, options);
   const mutation = parsed.toMutation(reference._key, Precondition.none());
-  return executeWrite(firestore15, [mutation]);
+  return executeWrite(firestore16, [mutation]);
 }
 function updateDoc(reference, fieldOrUpdateData, value, ...moreFieldsAndValues) {
   reference = cast(reference, DocumentReference);
-  const firestore15 = cast(reference.firestore, Firestore);
-  const dataReader = newUserDataReader(firestore15);
+  const firestore16 = cast(reference.firestore, Firestore);
+  const dataReader = newUserDataReader(firestore16);
   fieldOrUpdateData = getModularInstance(fieldOrUpdateData);
   let parsed;
   if (typeof fieldOrUpdateData === "string" || fieldOrUpdateData instanceof FieldPath) {
@@ -61500,30 +61630,30 @@ function updateDoc(reference, fieldOrUpdateData, value, ...moreFieldsAndValues) 
     parsed = parseUpdateData(dataReader, "updateDoc", reference._key, fieldOrUpdateData);
   }
   const mutation = parsed.toMutation(reference._key, Precondition.exists(true));
-  return executeWrite(firestore15, [mutation]);
+  return executeWrite(firestore16, [mutation]);
 }
 function deleteDoc(reference) {
-  const firestore15 = cast(reference.firestore, Firestore);
+  const firestore16 = cast(reference.firestore, Firestore);
   const mutations = [new DeleteMutation(reference._key, Precondition.none())];
-  return executeWrite(firestore15, mutations);
+  return executeWrite(firestore16, mutations);
 }
 function addDoc(reference, data) {
-  const firestore15 = cast(reference.firestore, Firestore);
+  const firestore16 = cast(reference.firestore, Firestore);
   const docRef = doc(reference);
   const convertedValue = applyFirestoreDataConverter(reference.converter, data);
   const dataReader = newUserDataReader(reference.firestore);
   const parsed = parseSetData(dataReader, "addDoc", docRef._key, convertedValue, reference.converter !== null, {});
   const mutation = parsed.toMutation(docRef._key, Precondition.exists(false));
-  return executeWrite(firestore15, [mutation]).then(() => docRef);
+  return executeWrite(firestore16, [mutation]).then(() => docRef);
 }
-function executeWrite(firestore15, mutations) {
-  const client = ensureFirestoreConfigured(firestore15);
+function executeWrite(firestore16, mutations) {
+  const client = ensureFirestoreConfigured(firestore16);
   return firestoreClientWrite(client, mutations);
 }
-function convertToDocSnapshot(firestore15, ref2, snapshot) {
+function convertToDocSnapshot(firestore16, ref2, snapshot) {
   const doc2 = snapshot.docs.get(ref2._key);
-  const userDataWriter = new ExpUserDataWriter(firestore15);
-  return new DocumentSnapshot(firestore15, userDataWriter, ref2._key, doc2, new SnapshotMetadata(snapshot.hasPendingWrites, snapshot.fromCache), ref2.converter);
+  const userDataWriter = new ExpUserDataWriter(firestore16);
+  return new DocumentSnapshot(firestore16, userDataWriter, ref2._key, doc2, new SnapshotMetadata(snapshot.hasPendingWrites, snapshot.fromCache), ref2.converter);
 }
 var DEFAULT_TRANSACTION_OPTIONS = {
   maxAttempts: 5
@@ -61533,9 +61663,9 @@ function validateTransactionOptions(options) {
     throw new FirestoreError(Code.INVALID_ARGUMENT, "Max attempts must be at least 1");
   }
 }
-function validateReference(documentRef, firestore15) {
+function validateReference(documentRef, firestore16) {
   documentRef = getModularInstance(documentRef);
-  if (documentRef.firestore !== firestore15) {
+  if (documentRef.firestore !== firestore16) {
     throw new FirestoreError(Code.INVALID_ARGUMENT, "Provided document reference is from a different Firestore instance.");
   } else {
     return documentRef;
@@ -61627,12 +61757,12 @@ var Transaction = class extends Transaction$1 {
     ), ref2.converter));
   }
 };
-function runTransaction(firestore15, updateFunction, options) {
-  firestore15 = cast(firestore15, Firestore);
+function runTransaction(firestore16, updateFunction, options) {
+  firestore16 = cast(firestore16, Firestore);
   const optionsWithDefaults = Object.assign(Object.assign({}, DEFAULT_TRANSACTION_OPTIONS), options);
   validateTransactionOptions(optionsWithDefaults);
-  const client = ensureFirestoreConfigured(firestore15);
-  return firestoreClientTransaction(client, (internalTransaction) => updateFunction(new Transaction(firestore15, internalTransaction)), optionsWithDefaults);
+  const client = ensureFirestoreConfigured(firestore16);
+  return firestoreClientTransaction(client, (internalTransaction) => updateFunction(new Transaction(firestore16, internalTransaction)), optionsWithDefaults);
 }
 registerFirestore("node");
 
@@ -71351,11 +71481,24 @@ var onPlotPriceChanged = (0, import_firestore38.onDocumentUpdated)(
 
 // src/triggers/leadTriggers.ts
 var import_firestore39 = require("firebase-functions/v2/firestore");
+init_notificationService();
 var handleLeadCreated = async (event) => {
   const leadData = event.data?.data();
   if (!leadData) return;
   const leadId = event.params["leadId"];
   console.log(`Lead Created: ${leadId}`, leadData);
+  const customerPhone = leadData.phone || leadData.mobileNumber || leadData.phoneNumber;
+  const customerName = leadData.name || leadData.fullName || "Valued Buyer";
+  const ventureName = leadData.projectName || leadData.ventureName;
+  if (customerPhone) {
+    await NotificationService.sendLeadWelcomeAndAssignment({
+      customerName,
+      customerPhone,
+      ventureName,
+      executiveName: leadData.assignedToName || "ISKON Senior Advisor",
+      executivePhone: leadData.assignedToPhone || "+91 98480 22334"
+    });
+  }
 };
 var onLeadCreated = (0, import_firestore39.onDocumentCreated)(
   {
@@ -71386,7 +71529,7 @@ var onLeadUpdated = (0, import_firestore39.onDocumentUpdated)(
 
 // src/events/publishEvent.ts
 var import_https3 = require("firebase-functions/v2/https");
-var admin11 = __toESM(require("firebase-admin"));
+var admin12 = __toESM(require("firebase-admin"));
 var crypto = __toESM(require("crypto"));
 
 // ../packages/events/src/store/FirestoreEventStore.ts
@@ -71436,7 +71579,7 @@ var publishEvent = (0, import_https3.onCall)(async (request) => {
     );
   }
   const data = request.data;
-  const db = admin11.firestore();
+  const db = admin12.firestore();
   const eventStore = new FirestoreEventStore(db);
   const eventPublisher = new DefaultEventPublisher(eventStore);
   const event = {
@@ -71480,7 +71623,7 @@ var publishEvent = (0, import_https3.onCall)(async (request) => {
 var import_firestore40 = require("firebase-functions/v2/firestore");
 
 // src/events/handlers/CommissionHandler.ts
-var admin13 = __toESM(require("firebase-admin"));
+var admin14 = __toESM(require("firebase-admin"));
 
 // ../packages/firebase/src/services/CommissionService.ts
 var CommissionService = class {
@@ -71707,7 +71850,7 @@ var NetworkService = class {
 };
 
 // src/repositories/AdminCommissionRepositories.ts
-var admin12 = __toESM(require("firebase-admin"));
+var admin13 = __toESM(require("firebase-admin"));
 function applyFilters(query2, filters) {
   if (!filters) return query2;
   let q = query2;
@@ -71717,7 +71860,7 @@ function applyFilters(query2, filters) {
   return q;
 }
 var AdminCommissionPoolRepository = class {
-  db = admin12.firestore();
+  db = admin13.firestore();
   async findAll(filters) {
     let query2 = this.db.collection(FIRESTORE_COLLECTIONS.COMMISSION_POOLS);
     query2 = applyFilters(query2, filters);
@@ -71740,7 +71883,7 @@ var AdminCommissionPoolRepository = class {
   }
 };
 var AdminCommissionRecordRepository = class {
-  db = admin12.firestore();
+  db = admin13.firestore();
   async findById(id) {
     const snap = await this.db.collection(FIRESTORE_COLLECTIONS.COMMISSION_RECORDS).doc(id).get();
     return snap.exists ? snap.data() : null;
@@ -71767,7 +71910,7 @@ var AdminCommissionRecordRepository = class {
   }
 };
 var AdminCommissionRuleRepository = class {
-  db = admin12.firestore();
+  db = admin13.firestore();
   async findAll(filters) {
     let query2 = this.db.collection(FIRESTORE_COLLECTIONS.COMMISSION_RULES);
     query2 = applyFilters(query2, filters);
@@ -71776,7 +71919,7 @@ var AdminCommissionRuleRepository = class {
   }
 };
 var AdminNetworkMemberRepository = class {
-  db = admin12.firestore();
+  db = admin13.firestore();
   async findById(id) {
     const snap = await this.db.collection(FIRESTORE_COLLECTIONS.NETWORK_MEMBERS).doc(id).get();
     return snap.exists ? snap.data() : null;
@@ -71799,7 +71942,7 @@ var CommissionHandler = class {
       const { bookingId } = event.payload;
       if (bookingId) {
         console.log(`CommissionHandler processing BOOKING_FULLY_PAID for booking ${bookingId}`);
-        const db = admin13.firestore();
+        const db = admin14.firestore();
         const bookingDoc = await db.collection("bookings").doc(bookingId).get();
         if (!bookingDoc.exists) return;
         const booking = bookingDoc.data();
@@ -71829,7 +71972,7 @@ var CommissionHandler = class {
 };
 
 // src/events/handlers/KPIAggregatorHandler.ts
-var admin14 = __toESM(require("firebase-admin"));
+var admin15 = __toESM(require("firebase-admin"));
 
 // src/utils/KPIRefs.ts
 var KPIRefs = class {
@@ -71860,7 +72003,7 @@ var KPIRefs = class {
 var KPIAggregatorHandler = class {
   eventType = "ALL_KPI_EVENTS";
   async handle(event) {
-    const db = admin14.firestore();
+    const db = admin15.firestore();
     const { companyId, projectId } = event.metadata;
     const dateIso = event.timestamp;
     if (!companyId) {
@@ -71889,7 +72032,7 @@ var KPIAggregatorHandler = class {
           transaction.set(ref2, increments, { merge: true });
         }
         transaction.set(idempotencyRef, {
-          processedAt: admin14.firestore.FieldValue.serverTimestamp(),
+          processedAt: admin15.firestore.FieldValue.serverTimestamp(),
           eventType: event.eventType
         });
       });
@@ -71899,7 +72042,7 @@ var KPIAggregatorHandler = class {
     }
   }
   getIncrementsForEvent(event) {
-    const FieldValue2 = admin14.firestore.FieldValue;
+    const FieldValue2 = admin15.firestore.FieldValue;
     const inc1 = FieldValue2.increment(1);
     const dec1 = FieldValue2.increment(-1);
     switch (event.eventType) {
@@ -71993,7 +72136,7 @@ var onEventCreated = (0, import_firestore40.onDocumentCreated)(
 
 // src/triggers/paymentTriggers.ts
 var import_firestore41 = require("firebase-functions/v2/firestore");
-var admin15 = __toESM(require("firebase-admin"));
+var admin16 = __toESM(require("firebase-admin"));
 var handlePaymentUpdated = async (event) => {
   const before = event.data?.before.data();
   const after = event.data?.after.data();
@@ -72001,7 +72144,7 @@ var handlePaymentUpdated = async (event) => {
   const wasFullyPaid = before.paymentSchedule.every((p) => p.status === "PAID" && p.amountPaid >= p.amountDue);
   const isFullyPaid = after.paymentSchedule.every((p) => p.status === "PAID" && p.amountPaid >= p.amountDue);
   if (!wasFullyPaid && isFullyPaid) {
-    const store = new FirestoreEventStore(admin15.firestore());
+    const store = new FirestoreEventStore(admin16.firestore());
     const publisher = new DefaultEventPublisher(store);
     const evt = {
       eventId: `evt_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
@@ -72021,6 +72164,26 @@ var handlePaymentUpdated = async (event) => {
     await publisher.publish(evt);
     console.log(`Published BOOKING_FULLY_PAID for booking ${after.id}`);
   }
+  const beforePaid = before.paymentSchedule?.reduce((sum, p) => sum + (p.amountPaid || 0), 0) || 0;
+  const afterPaid = after.paymentSchedule?.reduce((sum, p) => sum + (p.amountPaid || 0), 0) || 0;
+  if (afterPaid > beforePaid) {
+    const delta = afterPaid - beforePaid;
+    const customerPhone = after.customerPhone || after.phone;
+    const customerName = after.customerName || "Valued Customer";
+    const receiptNumber = `REC-${(/* @__PURE__ */ new Date()).getFullYear()}-${Math.floor(1e3 + Math.random() * 9e3)}`;
+    if (customerPhone) {
+      const { NotificationService: NotificationService2 } = await Promise.resolve().then(() => (init_notificationService(), notificationService_exports));
+      await NotificationService2.sendPaymentReceiptNotification({
+        customerName,
+        customerPhone,
+        amount: delta,
+        bookingNumber: after.bookingNumber || after.id,
+        plotNumber: after.plotId || "N/A",
+        projectName: after.projectName || "ISKON City - 2",
+        receiptNumber
+      });
+    }
+  }
 };
 var onPaymentUpdated = (0, import_firestore41.onDocumentUpdated)(
   {
@@ -72030,12 +72193,48 @@ var onPaymentUpdated = (0, import_firestore41.onDocumentUpdated)(
   handlePaymentUpdated
 );
 
+// src/triggers/siteVisitTriggers.ts
+var import_firestore42 = require("firebase-functions/v2/firestore");
+init_notificationService();
+var handleSiteVisitCreated = async (event) => {
+  const visitData = event.data?.data();
+  if (!visitData) return;
+  const visitId = event.params["visitId"];
+  console.log(`[SiteVisitTrigger] New site visit created: ${visitId}`, visitData);
+  const customerPhone = visitData.customerPhone || visitData.phone;
+  const customerName = visitData.customerName || visitData.leadName || "Valued Client";
+  const ventureName = visitData.projectName || visitData.ventureName || "ISKON City - 2";
+  const date = visitData.scheduledDate || visitData.date || "Upcoming";
+  const time = visitData.scheduledTime || visitData.time || "10:30 AM";
+  const travelMode = visitData.travelMode || "Company AC Cab";
+  if (customerPhone) {
+    await NotificationService.sendSiteVisitConfirmation({
+      customerName,
+      customerPhone,
+      ventureName,
+      date,
+      time,
+      travelMode,
+      vehicleNumber: visitData.vehicleNumber || "AP 26 TE 1234 (Toyota Innova)",
+      driverName: visitData.driverName || "Ramesh",
+      driverPhone: visitData.driverPhone || "+91 98480 22334"
+    });
+  }
+};
+var onSiteVisitCreated = (0, import_firestore42.onDocumentCreated)(
+  {
+    document: "site_visits/{visitId}",
+    region: "asia-south1"
+  },
+  handleSiteVisitCreated
+);
+
 // src/http/leadWebhooks.ts
 var import_https4 = require("firebase-functions/v2/https");
 var crypto2 = __toESM(require("crypto"));
 
 // ../packages/firebase/src/services/leads/LeadAcquisitionService.ts
-var import_firestore43 = require("firebase-admin/firestore");
+var import_firestore44 = require("firebase-admin/firestore");
 
 // ../packages/firebase/src/services/leads/validators.ts
 var LeadValidator = class {
@@ -72210,7 +72409,7 @@ var CampaignAttributionService = class {
 };
 
 // ../packages/firebase/src/services/leads/RoutingService.ts
-var import_firestore42 = require("firebase-admin/firestore");
+var import_firestore43 = require("firebase-admin/firestore");
 var RoutingService = class {
   /**
    * Determine the routing for a newly captured lead based on business rules.
@@ -72243,7 +72442,7 @@ var RoutingService = class {
    * Round-robin implementation with Firebase Transactions.
    */
   async executeRoundRobin(groupId) {
-    const db = (0, import_firestore42.getFirestore)();
+    const db = (0, import_firestore43.getFirestore)();
     const stateRef = db.collection("routing_states").doc(groupId);
     try {
       return await db.runTransaction(async (t) => {
@@ -72338,7 +72537,7 @@ var LeadAcquisitionService = class {
   async acquireLead(dto, userId = "SYSTEM") {
     LeadValidator.validateCaptureRequest(dto);
     if (dto.eventId) {
-      const db = (0, import_firestore43.getFirestore)();
+      const db = (0, import_firestore44.getFirestore)();
       const eventRef = db.collection("processed_webhooks").doc(dto.eventId);
       try {
         await db.runTransaction(async (t) => {
@@ -72444,6 +72643,7 @@ var captureLeadWebhook = (0, import_https4.onRequest)(async (req, res) => {
   handlePlotCreated,
   handlePlotPriceChanged,
   handleProjectCreated,
+  handleSiteVisitCreated,
   handleTeamUpdated,
   handleUserProfileUpdated,
   hourlyBookingExpiry,
@@ -72459,6 +72659,7 @@ var captureLeadWebhook = (0, import_https4.onRequest)(async (req, res) => {
   onPlotCreated,
   onPlotPriceChanged,
   onProjectCreated,
+  onSiteVisitCreated,
   onTeamUpdated,
   onUserCreated,
   onUserDeleted,
