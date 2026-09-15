@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Image,
+  StatusBar,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -17,7 +18,7 @@ import Svg, { Path } from 'react-native-svg';
 import { useAuth } from '../src/providers/AuthProvider';
 import { Input } from '../src/components/Input';
 import { Button } from '../src/components/Button';
-import { ShieldCheck, ArrowLeft, Lock, Mail, Phone, KeyRound, CheckCircle2, Key } from 'lucide-react-native';
+import { ShieldCheck, Lock, Mail, Phone, KeyRound, CheckCircle2, Key } from 'lucide-react-native';
 
 const GoogleIcon: React.FC = () => (
   <Svg width={20} height={20} viewBox="0 0 48 48" style={{ marginRight: 8 }}>
@@ -144,9 +145,10 @@ export default function LoginScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor: '#02280B' }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
+      <StatusBar barStyle="light-content" backgroundColor="#02280B" />
       <ScrollView
         contentContainerStyle={[
           styles.container,
@@ -156,23 +158,13 @@ export default function LoginScreen() {
           },
         ]}
       >
-        {/* Back to Public Website Gateway */}
-        <TouchableOpacity
-          style={styles.backToPublicBtn}
-          onPress={() => router.replace('/')}
-          activeOpacity={0.8}
-        >
-          <ArrowLeft size={16} color="#CBD5E1" />
-          <Text style={styles.backToPublicText}>← Back to Public Website (పబ్లిక్ సైట్)</Text>
-        </TouchableOpacity>
-
-        {/* Header Branding */}
+        {/* Header Branding with Full Coverage Logo */}
         <View style={styles.headerContainer}>
           <View style={styles.logoBadge}>
             <Image
               source={require('../assets/logo.png')}
-              style={{ width: 68, height: 68 }}
-              resizeMode="contain"
+              style={styles.logoImage}
+              resizeMode="cover"
             />
           </View>
           <Text style={styles.appTitle}>ISKON Developers</Text>
@@ -380,45 +372,34 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: '#0A192F',
+    backgroundColor: '#02280B', // Rich Emerald Green matching the brand icon
     paddingHorizontal: 20,
     paddingTop: 45,
     paddingBottom: 40,
     justifyContent: 'center',
-  },
-  backToPublicBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    borderRadius: 10,
-    alignSelf: 'flex-start',
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.12)',
-  },
-  backToPublicText: {
-    color: '#E2E8F0',
-    fontSize: 12,
-    fontWeight: '700',
-    fontFamily: 'Mallanna',
   },
   headerContainer: {
     alignItems: 'center',
     marginBottom: 20,
   },
   logoBadge: {
-    width: 68,
-    height: 68,
-    borderRadius: 16,
+    width: 88,
+    height: 88,
+    borderRadius: 20,
     backgroundColor: '#02280B',
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 10,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
     elevation: 8,
+  },
+  logoImage: {
+    width: '100%',
+    height: '100%',
   },
   appTitle: {
     fontSize: 24,
@@ -428,7 +409,7 @@ const styles = StyleSheet.create({
   },
   appSubtitle: {
     fontSize: 12.5,
-    color: '#94A3B8',
+    color: 'rgba(255, 255, 255, 0.85)',
     marginTop: 3,
     fontWeight: '500',
     textAlign: 'center',

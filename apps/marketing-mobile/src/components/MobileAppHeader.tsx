@@ -85,7 +85,7 @@ export const MobileAppHeader: React.FC<MobileAppHeaderProps> = ({
               <Image
                 source={require('../../assets/logo.png')}
                 style={styles.logoImage}
-                resizeMode="contain"
+                resizeMode="cover"
               />
             </View>
           )}
@@ -147,17 +147,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
   },
   logoBadge: {
-    width: 38,
-    height: 38,
-    borderRadius: 8,
+    width: 40,
+    height: 40,
+    borderRadius: 9,
     backgroundColor: '#02280B',
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
   },
   logoImage: {
-    width: 38,
-    height: 38,
+    width: '100%',
+    height: '100%',
   },
   titleColumn: {
     alignItems: 'flex-start',

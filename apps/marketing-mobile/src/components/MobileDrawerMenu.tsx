@@ -339,8 +339,8 @@ export const MobileDrawerMenu: React.FC<MobileDrawerMenuProps> = ({ visible, onC
               <View style={styles.logoBadge}>
                 <Image
                   source={require('../../assets/logo.png')}
-                  style={{ width: 38, height: 38 }}
-                  resizeMode="contain"
+                  style={styles.logoImage}
+                  resizeMode="cover"
                 />
               </View>
               <View style={styles.brandInfo}>
@@ -745,14 +745,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   logoBadge: {
-    width: 38,
-    height: 38,
-    borderRadius: 8,
+    width: 44,
+    height: 44,
+    borderRadius: 10,
     backgroundColor: '#02280B',
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 3,
+  },
+  logoImage: {
+    width: '100%',
+    height: '100%',
   },
   brandInfo: {
     flex: 1,
