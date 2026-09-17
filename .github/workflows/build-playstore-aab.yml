@@ -1,9 +1,6 @@
-name: Android Release Build (APK & Play Store AAB)
+name: Android Play Store AAB Bundle Build
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       version_code:
@@ -16,10 +13,10 @@ on:
         default: '1.0.0'
 
 jobs:
-  build:
-    name: Build Android Release APK & Play Store AAB
+  build-aab:
+    name: Build Play Store AAB (Android App Bundle)
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 40
 
     steps:
       - name: Checkout Repository
@@ -72,13 +69,13 @@ jobs:
         working-directory: apps/marketing-mobile/android
         run: chmod +x gradlew
 
-      - name: Build Android Release APK & Play Store AAB Bundle (API 36 Compliant)
+      - name: Build Play Store AAB Bundle (API 36 Compliant)
         working-directory: apps/marketing-mobile/android
         run: |
           VERSION_CODE="${{ inputs.version_code || '1' }}"
           VERSION_NAME="${{ inputs.version_name || '1.0.0' }}"
-          echo "Building Release APK & Play Store AAB with versionCode: $VERSION_CODE, versionName: $VERSION_NAME"
-          ./gradlew assembleRelease bundleRelease -Pandroid.versionCode="$VERSION_CODE" -Pandroid.versionName="$VERSION_NAME" --stacktrace
+          echo "Building Play Store AAB Bundle with versionCode: $VERSION_CODE, versionName: $VERSION_NAME"
+          ./gradlew bundleRelease -Pandroid.versionCode="$VERSION_CODE" -Pandroid.versionName="$VERSION_NAME" --stacktrace
         env:
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
@@ -93,18 +90,6 @@ jobs:
           EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           EXPO_PUBLIC_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
 
-      - name: Locate and Verify Release APK
-        run: |
-          echo "=== Generated APK files ==="
-          find apps/marketing-mobile/android/app/build/outputs/apk -name "*.apk" -ls
-          RELEASE_APK=$(find apps/marketing-mobile/android/app/build/outputs/apk -name "*release*.apk" | head -n 1)
-          if [ -z "$RELEASE_APK" ]; then
-            echo "::error::Release APK not found in outputs directory!"
-            exit 1
-          fi
-          echo "✅ Release APK found at: $RELEASE_APK"
-          ls -lh "$RELEASE_APK"
-
       - name: Locate and Verify Play Store Release AAB
         run: |
           echo "=== Generated AAB (Android App Bundle) files ==="
@@ -117,14 +102,6 @@ jobs:
           echo "✅ Play Store Release AAB found at: $RELEASE_AAB"
           ls -lh "$RELEASE_AAB"
 
-      - name: Upload Release APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: RealEstateERP-V1-release-apk
-          path: apps/marketing-mobile/android/app/build/outputs/apk/**/*.apk
-          if-no-files-found: error
-          retention-days: 30
-
       - name: Upload Play Store AAB Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -136,14 +113,13 @@ jobs:
       - name: Build Summary
         if: always()
         run: |
-          echo "## RealEstateERP V1 Android Release Build" >> $GITHUB_STEP_SUMMARY
+          echo "## RealEstateERP V1 Play Store AAB Build" >> $GITHUB_STEP_SUMMARY
           if [ "${{ job.status }}" = "success" ]; then
             echo "**Status:** ✅ PASS" >> $GITHUB_STEP_SUMMARY
-            echo "**APK:** Generated Signed Release APK (Direct Sideloading/Testing)" >> $GITHUB_STEP_SUMMARY
             echo "**AAB:** Generated Play Store Compliant Release AAB (Google Play Console Ready)" >> $GITHUB_STEP_SUMMARY
           else
             echo "**Status:** ❌ FAIL" >> $GITHUB_STEP_SUMMARY
-            echo "**Artifacts:** Build Failed" >> $GITHUB_STEP_SUMMARY
+            echo "**Artifact:** Build Failed" >> $GITHUB_STEP_SUMMARY
           fi
           echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY

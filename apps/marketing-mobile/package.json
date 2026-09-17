@@ -14,6 +14,8 @@
     "type-check": "node --jitless node_modules/typescript/bin/tsc --noEmit",
     "lint": "eslint . --ext .ts,.tsx",
     "test": "vitest run --pool=forks --poolOptions.forks.singleFork=true",
+    "build:apk": "cd android && ./gradlew assembleRelease",
+    "build:aab": "cd android && ./gradlew bundleRelease",
     "postinstall": "node scripts/patch-screens.js"
   },
   "dependencies": {
