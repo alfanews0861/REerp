@@ -75,8 +75,10 @@ jobs:
       - name: Build Android Release APK & Play Store AAB Bundle (API 36 Compliant)
         working-directory: apps/marketing-mobile/android
         run: |
-          VERSION_CODE="${{ inputs.version_code || '1' }}"
-          VERSION_NAME="${{ inputs.version_name || '1.0.0' }}"
+          VERSION_CODE="${{ inputs.version_code }}"
+          VERSION_CODE="${VERSION_CODE:-1}"
+          VERSION_NAME="${{ inputs.version_name }}"
+          VERSION_NAME="${VERSION_NAME:-1.0.0}"
           echo "Building Release APK & Play Store AAB with versionCode: $VERSION_CODE, versionName: $VERSION_NAME"
           ./gradlew assembleRelease bundleRelease -Pandroid.versionCode="$VERSION_CODE" -Pandroid.versionName="$VERSION_NAME" --stacktrace
         env:
@@ -104,6 +106,8 @@ jobs:
           fi
           echo "✅ Release APK found at: $RELEASE_APK"
           ls -lh "$RELEASE_APK"
+          echo "=== Verifying APK Signature ==="
+          jarsigner -verify "$RELEASE_APK" || true
 
       - name: Locate and Verify Play Store Release AAB
         run: |
@@ -116,6 +120,8 @@ jobs:
           fi
           echo "✅ Play Store Release AAB found at: $RELEASE_AAB"
           ls -lh "$RELEASE_AAB"
+          echo "=== Verifying Play Store AAB Signature ==="
+          jarsigner -verify "$RELEASE_AAB" || true
 
       - name: Upload Release APK Artifact
         uses: actions/upload-artifact@v4
